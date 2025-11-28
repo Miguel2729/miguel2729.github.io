@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email LAN</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f5f5;
+        }
+        .email-app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        header {
+            background: #0078d4;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .login-box {
+            display: flex;
+            gap: 10px;
+        }
+        .login-box input, .compose-form input, .compose-form textarea {
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 15px;
+            background: #005a9e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #004080;
+        }
+        .main-container {
+            display: flex;
+            flex: 1;
+        }
+        .sidebar {
+            width: 200px;
+            background: #f0f0f0;
+            padding: 15px;
+            border-right: 1px solid #ddd;
+        }
+        .email-list {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        .email-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            border-left: 4px solid transparent;
+        }
+        .email-item.unread {
+            border-left: 4px solid #0078d4;
+            font-weight: bold;
+        }
+        .email-item:hover {
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .email-view {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            margin-left: 15px;
+            display: none;
+        }
+        .compose-form {
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+            padding: 15px;
+            background: white;
+            border-radius: 4px;
+            margin: 15px;
+        }
+        .compose-form textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        .folder {
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+        }
+        .folder:hover, .folder.active {
+            background: #ddd;
+        }
+        .user-status {
+            font-size: 0.9em;
+            color: #e0e0e0;
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #0078d4;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            display: none;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-app">
+        <header>
+            <div>
+                <h1>Email LAN</h1>
+                <div class="user-status" id="user-status">Não conectado</div>
+            </div>
+            <div class="login-box" id="login-box">
+                <input type="text" id="email-input" placeholder="seu@email.local">
+                <button id="login-btn">Entrar</button>
+            </div>
+            <div id="logout-box" style="display: none;">
+                <button id="logout-btn">Sair</button>
+            </div>
+        </header>
+
+        <div class="main-container">
+            <aside class="sidebar">
+                <button id="compose-btn">✏️ Novo Email</button>
+                <div style="margin-top: 20px;">
+                    <div class="folder active" data-folder="inbox">📥 Caixa de Entrada</div>
+                    <div class="folder" data-folder="sent">📤 Enviados</div>
+                    <div class="folder" data-folder="drafts">📝 Rascunhos</div>
+                </div>
+            </aside>
+
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <div class="compose-form" id="compose-form">
+                    <input type="text" id="compose-to" placeholder="Para (ex: amigo@local)">
+                    <input type="text" id="compose-subject" placeholder="Assunto">
+                    <textarea id="compose-body" placeholder="Escreva sua mensagem aqui..."></textarea>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="send-btn">Enviar</button>
+                        <button id="save-draft-btn">Salvar Rascunho</button>
+                        <button id="cancel-compose-btn">Cancelar</button>
+                    </div>
+                </div>
+
+                <main class="email-list" id="email-list">
+                    <div class="no-emails">Faça login para ver seus emails</div>
+                </main>
+            </div>
+
+            <div class="email-view" id="email-view">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2 id="view-subject"></h2>
+                    <button id="delete-email-btn">🗑️ Excluir</button>
+                </div>
+                <div style="margin: 15px 0; border-bottom: 1px solid #eee; padding-bottom: 10px;">
+                    <div><strong>De:</strong> <span id="view-from"></span></div>
+                    <div><strong>Para:</strong> <span id="view-to"></span></div>
+                    <div><strong>Data:</strong> <span id="view-date"></span></div>
+                </div>
+                <div id="view-body" style="white-space: pre-wrap;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // Banco de dados usando localStorage
+        const EmailDB = {
+            getEmails: () => {
+                const emails = localStorage.getItem('lan-emails');
+                return emails ? JSON.parse(emails) : [];
+            },
+            saveEmails: (emails) => {
+                localStorage.setItem('lan-emails', JSON.stringify(emails));
+            },
+            addEmail: (email) => {
+                const emails = EmailDB.getEmails();
+                emails.push(email);
+                EmailDB.saveEmails(emails);
+                return email;
+            },
+            deleteEmail: (id) => {
+                const emails = EmailDB.getEmails();
+                const updated = emails.filter(e => e.id !== id);
+                EmailDB.saveEmails(updated);
+                return updated;
+            },
+            markAsRead: (id) => {
+                const emails = EmailDB.getEmails();
+                const updated = emails.map(e => {
+                    if (e.id === id && e.to === currentUser && e.unread) {
+                        return {...e, unread: false};
+                    }
+                    return e;
+                });
+                EmailDB.saveEmails(updated);
+                return updated;
+            }
+        };
+
+        // Estado do aplicativo
+        let currentUser = null;
+        let currentFolder = 'inbox';
+        let ws = null;
+
+        // Elementos da UI
+        const emailInput = document.getElementById('email-input');
+        const loginBtn = document.getElementById('login-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        const loginBox = document.getElementById('login-box');
+        const logoutBox = document.getElementById('logout-box');
+        const userStatus = document.getElementById('user-status');
+        const composeBtn = document.getElementById('compose-btn');
+        const composeForm = document.getElementById('compose-form');
+        const sendBtn = document.getElementById('send-btn');
+        const saveDraftBtn = document.getElementById('save-draft-btn');
+        const cancelComposeBtn = document.getElementById('cancel-compose-btn');
+        const composeTo = document.getElementById('compose-to');
+        const composeSubject = document.getElementById('compose-subject');
+        const composeBody = document.getElementById('compose-body');
+        const emailList = document.getElementById('email-list');
+        const emailView = document.getElementById('email-view');
+        const viewSubject = document.getElementById('view-subject');
+        const viewFrom = document.getElementById('view-from');
+        const viewTo = document.getElementById('view-to');
+        const viewDate = document.getElementById('view-date');
+        const viewBody = document.getElementById('view-body');
+        const deleteEmailBtn = document.getElementById('delete-email-btn');
+        const folders = document.querySelectorAll('.folder');
+        const notification = document.getElementById('notification');
+
+        // Função de login
+        loginBtn.addEventListener('click', () => {
+            const email = emailInput.value.trim().toLowerCase();
+            if (validateEmail(email)) {
+                currentUser = email;
+                userStatus.textContent = `Conectado como: ${email}`;
+                loginBox.style.display = 'none';
+                logoutBox.style.display = 'block';
+                
+                // Conectar ao WebSocket
+                connectWebSocket();
+                
+                loadEmails();
+            } else {
+                alert('Por favor, insira um email válido (formato: usuario@dominio)');
+            }
+        });
+
+        // Função de logout
+        logoutBtn.addEventListener('click', () => {
+            currentUser = null;
+            userStatus.textContent = 'Não conectado';
+            loginBox.style.display = 'flex';
+            logoutBox.style.display = 'none';
+            
+            // Desconectar do WebSocket
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+            
+            emailList.innerHTML = '<div class="no-emails">Faça login para ver seus emails</div>';
+            emailView.style.display = 'none';
+            composeForm.style.display = 'none';
+        });
+
+        // Validar email
+        function validateEmail(email) {
+            return email.includes('@') && email.split('@')[1].includes('.');
+        }
+
+        // Conectar ao WebSocket
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const host = "192.168.18.8";
+            
+            try {
+                ws = new WebSocket(`ws://${host}:8765`);
+                
+                ws.onopen = () => {
+                    console.log('Conectado ao servidor WebSocket');
+                    // Registrar usuário
+                    ws.send(JSON.stringify({
+                        type: 'register',
+                        email: currentUser
+                    }));
+                };
+                
+                ws.onmessage = (event) => {
+                    const message = JSON.parse(event.data);
+                    
+                    if (message.type === 'new_email') {
+                        if (message.email.to === currentUser) {
+                            showNotification(`Novo email de ${message.email.from}`);
+                            loadEmails();
+                        }
+                    }
+                };
+                
+                ws.onclose = () => {
+                    console.log('Desconectado do servidor WebSocket');
+                    // Tentar reconectar após 5 segundos
+                    setTimeout(connectWebSocket, 5000);
+                };
+                
+                ws.onerror = (error) => {
+                    console.error('Erro no WebSocket:', error);
+                };
+            } catch (error) {
+                console.error('Erro ao conectar ao WebSocket:', error);
+            }
+        }
+
+        // Mostrar notificação
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 5000);
+        }
+
+        // Carregar emails
+        function loadEmails() {
+            if (!currentUser) return;
+            
+            emailList.innerHTML = '';
+            const allEmails = EmailDB.getEmails();
+            
+            let userEmails = [];
+            if (currentFolder === 'inbox') {
+                userEmails = allEmails.filter(email => email.to === currentUser);
+            } else if (currentFolder === 'sent') {
+                userEmails = allEmails.filter(email => email.from === currentUser && !email.isDraft);
+            } else if (currentFolder === 'drafts') {
+                userEmails = allEmails.filter(email => email.from === currentUser && email.isDraft);
+            }
+            
+            userEmails.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (userEmails.length === 0) {
+                emailList.innerHTML = `<div class="no-emails">Nenhum email na pasta ${getFolderName(currentFolder)}</div>`;
+                return;
+            }
+            
+            userEmails.forEach(email => {
+                const emailElement = document.createElement('div');
+                emailElement.className = `email-item ${email.to === currentUser && email.unread ? 'unread' : ''}`;
+                emailElement.dataset.id = email.id;
+                emailElement.innerHTML = `
+                    <h3>${email.subject || '(Sem assunto)'}</h3>
+                    <p>${currentFolder === 'inbox' ? 'De: ' + email.from : 'Para: ' + email.to}</p>
+                    <p>${formatDate(email.date)}</p>
+                    <p>${email.body.substring(0, 100)}${email.body.length > 100 ? '...' : ''}</p>
+                `;
+                emailElement.addEventListener('click', () => viewEmail(email.id));
+                emailList.appendChild(emailElement);
+            });
+        }
+
+        // Visualizar email
+        function viewEmail(id) {
+            const email = EmailDB.getEmails().find(e => e.id === id);
+            if (!email) return;
+            
+            // Marcar como lido se for destinado ao usuário atual
+            if (email.to === currentUser && email.unread) {
+                EmailDB.markAsRead(id);
+            }
+            
+            viewSubject.textContent = email.subject || '(Sem assunto)';
+            viewFrom.textContent = email.from;
+            viewTo.textContent = email.to;
+            viewDate.textContent = formatDate(email.date, true);
+            viewBody.textContent = email.body;
+            
+            emailView.style.display = 'block';
+            emailList.style.display = 'none';
+            
+            // Configurar botão de exclusão
+            deleteEmailBtn.onclick = () => {
+                if (confirm('Tem certeza que deseja excluir este email?')) {
+                    EmailDB.deleteEmail(id);
+                    emailView.style.display = 'none';
+                    emailList.style.display = 'block';
+                    loadEmails();
+                }
+            };
+        }
+
+        // Formatar data
+        function formatDate(dateString, full = false) {
+            const date = new Date(dateString);
+            if (full) {
+                return date.toLocaleString();
+            }
+            return date.toLocaleDateString();
+        }
+
+        // Nome da pasta
+        function getFolderName(folder) {
+            const names = {
+                'inbox': 'Caixa de Entrada',
+                'sent': 'Enviados',
+                'drafts': 'Rascunhos'
+            };
+            return names[folder] || folder;
+        }
+
+        // Navegação entre pastas
+        folders.forEach(folder => {
+            folder.addEventListener('click', () => {
+                folders.forEach(f => f.classList.remove('active'));
+                folder.classList.add('active');
+                currentFolder = folder.dataset.folder;
+                loadEmails();
+                emailView.style.display = 'none';
+                emailList.style.display = 'block';
+            });
+        });
+
+        // Novo email
+        composeBtn.addEventListener('click', () => {
+            composeTo.value = '';
+            composeSubject.value = '';
+            composeBody.value = '';
+            composeForm.style.display = 'flex';
+            emailList.style.display = 'none';
+            emailView.style.display = 'none';
+        });
+
+        // Cancelar composição
+        cancelComposeBtn.addEventListener('click', () => {
+            composeForm.style.display = 'none';
+            emailList.style.display = 'block';
+        });
+
+        // Enviar email
+        sendBtn.addEventListener('click', () => {
+            const to = composeTo.value.trim().toLowerCase();
+            const subject = composeSubject.value.trim();
+            const body = composeBody.value.trim();
+            
+            if (!validateEmail(to)) {
+                alert('Por favor, insira um destinatário válido');
+                return;
+            }
+            
+            if (!body) {
+                alert('Por favor, escreva uma mensagem');
+                return;
+            }
+            
+            const email = {
+                id: Date.now().toString(),
+                from: currentUser,
+                to,
+                subject,
+                body,
+                date: new Date().toISOString(),
+                unread: true,
+                isDraft: false
+            };
+            
+            EmailDB.addEmail(email);
+            
+            // Notificar via WebSocket se possível
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                ws.send(JSON.stringify({
+                    type: 'new_email',
+                    email
+                }));
+            }
+            
+            composeForm.style.display = 'none';
+            emailList.style.display = 'block';
+            currentFolder = 'sent';
+            document.querySelector('.folder[data-folder="sent"]').click();
+            
+            showNotification('Email enviado com sucesso!');
+        });
+
+        // Salvar rascunho
+        saveDraftBtn.addEventListener('click', () => {
+            const to = composeTo.value.trim().toLowerCase();
+            const subject = composeSubject.value.trim();
+            const body = composeBody.value.trim();
+            
+            if (!body) {
+                alert('Por favor, escreva uma mensagem');
+                return;
+            }
+            
+            const email = {
+                id: Date.now().toString(),
+                from: currentUser,
+                to: to || '(Rascunho)',
+                subject: subject || '(Sem assunto)',
+                body,
+                date: new Date().toISOString(),
+                unread: false,
+                isDraft: true
+            };
+            
+            EmailDB.addEmail(email);
+            composeForm.style.display = 'none';
+            emailList.style.display = 'block';
+            currentFolder = 'drafts';
+            document.querySelector('.folder[data-folder="drafts"]').click();
+            
+            showNotification('Rascunho salvo!');
+        });
+
+        // Adicionar alguns emails de exemplo no primeiro uso
+        window.addEventListener('load', () => {
+            if (EmailDB.getEmails().length === 0) {
+                const now = new Date();
+                const exampleEmails = [
+                    {
+                        id: '1',
+                        from: 'admin@local',
+                        to: 'user@local',
+                        subject: 'Bem-vindo ao Email LAN',
+                        body: 'Este é um sistema de email que funciona em sua rede local.\n\nVocê pode enviar e receber emails de outros usuários na mesma rede.\n\nExperimente enviar um email para você mesmo!',
+                        date: now.toISOString(),
+                        unread: false,
+                        isDraft: false
+                    },
+                    {
+                        id: '2',
+                        from: 'suporte@local',
+                        to: 'user@local',
+                        subject: 'Como usar',
+                        body: 'Para enviar um novo email, clique no botão "Novo Email" na barra lateral.\n\nVocê pode salvar rascunhos para terminar depois.\n\nOs emails são armazenados apenas no seu navegador e na rede local.',
+                        date: new Date(now.getTime() - 3600000).toISOString(),
+                        unread: true,
+                        isDraft: false
+                    }
+                ];
+                
+                exampleEmails.forEach(email => EmailDB.addEmail(email));
+            }
+        });
+    </script>
+</body>
+</html>

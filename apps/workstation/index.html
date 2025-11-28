@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Workstation Web</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    header {
+      background: #222;
+      color: white;
+      padding: 10px;
+      text-align: center;
+    }
+
+    nav {
+      background: #333;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      padding: 10px;
+    }
+
+    nav button {
+      background: #555;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-size: 16px;
+      border-radius: 4px;
+    }
+
+    nav button:hover {
+      background: #777;
+    }
+
+    iframe {
+      flex-grow: 1;
+      width: 100%;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🧰 Workstation Web</h1>
+  </header>
+
+  <nav>
+    <button onclick="carregar('porc.html')">🔵 gráfico de pizza</button>
+    <button onclick="carregar('plan.html')">📊 Planilhas</button>
+    <button onclick="carregar('comp.html')">⚖️ Comparar</button>
+    <button onclick="carregar('apre.html')">📽️ Apresentações</button>
+<button onclick="carregar('calc.html')">🟰Calculadora</button>
+    <button onclick="carregar('notas.html')">📝 Notas</button>
+<button onclick="carregar('calc.html')">🟰Calculadora</button>
+    <button onclick="carregar('list.html')">📋lista de tarefas</button>
+  </nav>
+
+  <iframe id="tela" src=""></iframe>
+
+  <script>
+    function carregar(pagina) {
+      document.getElementById('tela').src = pagina;
+    }
+  </script>
+</body>
+</html>

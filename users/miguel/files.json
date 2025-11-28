@@ -1,0 +1,233 @@
+{
+  "pastas": [
+    {
+      "path": "/apps/",
+      "nome": "Apps",
+      "tipo": "pasta",
+      "slot": 1,
+      "metadata": {
+        "criado": "2023-11-01T09:00:00Z",
+        "icone": "imgs/folder.png",
+        "tamanho": "120 KB"
+      },
+      "conteudo": [
+        {
+          "path": "/apps/jogos/",
+          "nome": "Jogos",
+          "tipo": "pasta",
+          "slot": 1,
+          "metadata": {
+            "criado": "2023-11-05T10:30:00Z",
+            "icone": "imgs/folder.png",
+            "tamanho": "80 KB"
+          },
+          "conteudo": [
+            {
+              "path": "/apps/jogos/jogo_do_reflexo.html",
+              "nome": "Jogo do Reflexo",
+              "tipo": "app",
+              "slot": 1,
+              "metadata": {
+                "executavel": "jogo_do_reflexo.html",
+                "icone": "imgs/file.png",
+                "tamanho": "2.5 MB",
+                "versao": "1.0"
+              }
+            },
+            {
+              "path": "/apps/jogos/jogo_da_caixa_movel.html",
+              "nome": "Caixa Móvel",
+              "tipo": "app",
+              "slot": 2,
+              "metadata": {
+                "executavel": "jogo_da_caixa_movel.html",
+                "icone": "imgs/file.png",
+                "tamanho": "3.1 MB"
+              }
+            },
+            {
+              "path": "/apps/jogos/flappy_bird.html",
+              "nome": "Flappy Bird",
+              "tipo": "app",
+              "slot": 3,
+              "metadata": {
+                "executavel": "flappy_bird.html",
+                "icone": "imgs/file.png",
+                "tamanho": "1.8 MB"
+              }
+            },
+            {
+              "path": "/apps/jogos/jogo.html",
+              "nome": "Jogo Genérico",
+              "tipo": "app",
+              "slot": 4,
+              "metadata": {
+                "executavel": "jogo.html",
+                "icone": "imgs/file.png",
+                "tamanho": "2.2 MB"
+              }
+            }
+          ]
+        },
+        {
+          "path": "/apps/utilitarios/",
+          "nome": "Utilitários",
+          "tipo": "pasta",
+          "slot": 2,
+          "metadata": {
+            "criado": "2023-11-05T11:15:00Z",
+            "icone": "imgs/folder.png",
+            "tamanho": "45 KB"
+          },
+          "conteudo": [
+            {
+              "path": "/apps/utilitarios/workstation.html",
+              "nome": "Workstation",
+              "tipo": "app",
+              "slot": 1,
+              "metadata": {
+                "executavel": "workstation.html",
+                "icone": "imgs/file.png",
+                "tamanho": "5.2 MB"
+              }
+            },
+            {
+              "path": "/apps/utilitarios/gravador.html",
+              "nome": "Gravador",
+              "tipo": "app",
+              "slot": 2,
+              "metadata": {
+                "executavel": "gravador.html",
+                "icone": "imgs/file.png",
+                "tamanho": "3.7 MB"
+              }
+            },
+            {
+              "path": "/apps/utilitarios/notas.html",
+              "nome": "Notas",
+              "tipo": "app",
+              "slot": 3,
+              "metadata": {
+                "executavel": "notas.html",
+                "icone": "imgs/file.png",
+                "tamanho": "1.2 MB"
+              }
+            },
+            {
+              "path": "/apps/utilitarios/calculadora.html",
+              "nome": "Calculadora",
+              "tipo": "app",
+              "slot": 4,
+              "metadata": {
+                "executavel": "calculadora.html",
+                "icone": "imgs/file.png",
+                "tamanho": "2.8 MB"
+              }
+            },
+            {
+              "path": "/apps/utilitarios/navegador.html",
+              "nome": "Navegador",
+              "tipo": "app",
+              "slot": 5,
+              "metadata": {
+                "executavel": "navegador.html",
+                "icone": "imgs/file.png",
+                "tamanho": "6.5 MB"
+              }
+            },
+            {
+              "path": "/apps/utilitarios/terminal.html",
+              "nome": "Terminal",
+              "tipo": "app",
+              "slot": 6,
+              "metadata": {
+                "executavel": "terminal.html",
+                "icone": "imgs/file.png",
+                "tamanho": "4.1 MB"
+              }
+            },
+            {
+              "path": "/apps/utilitarios/manual.html",
+              "nome": "Manual",
+              "tipo": "app",
+              "slot": 7,
+              "metadata": {
+                "executavel": "manual.html",
+                "icone": "imgs/file.png",
+                "tamanho": "3.3 MB"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "path": "/documentos/",
+      "nome": "Documentos",
+      "tipo": "pasta",
+      "slot": 2,
+      "metadata": {
+        "criado": "2023-11-01T10:00:00Z",
+        "icone": "imgs/folder.png",
+        "tamanho": "75 KB"
+      },
+      "conteudo": [
+        {
+          "path": "/documentos/notas.txt",
+          "nome": "notas.txt",
+          "tipo": "texto",
+          "slot": 1,
+          "metadata": {
+            "icone": "imgs/file.png",
+            "tamanho": "15 KB",
+            "formato": "txt"
+          }
+        },
+        {
+          "path": "/documentos/projetos/",
+          "nome": "Projetos",
+          "tipo": "pasta",
+          "slot": 2,
+          "metadata": {
+            "criado": "2023-11-10T14:20:00Z",
+            "icone": "imgs/folder.png",
+            "tamanho": "0 KB"
+          },
+          "conteudo": []
+        }
+      ]
+    }
+  ],
+  "config": {
+    "icones_area_trabalho": [
+      {
+        "path": "/documentos/projetos/",
+        "nome": "Projetos",
+        "slot": 3,
+        "tipo": "pasta"
+      },
+      {
+        "path": "/documentos/",
+        "nome": "Documentos",
+        "slot": 4,
+        "tipo": "pasta"
+      },
+      {
+        "path": "/apps/",
+        "nome": "Apps",
+        "slot": 5,
+        "tipo": "pasta"
+      },
+      {
+        "path": "/documentos/notas.txt",
+        "nome": "notas.txt",
+        "slot": 6,
+        "tipo": "texto"
+      }
+    ],
+    "wallpaper": "wallpaper1.png",
+    "tema": "claro",
+    "ordem": "nome",
+    "mostrar_ocultos": false
+  }
+}

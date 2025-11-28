@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Executor Seguro de JavaScript</title>
+  <style>
+    textarea { width: 100%; }
+    #resultado { margin-top: 10px; background: #f0f0f0; padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Digite seu código JavaScript:</h2>
+  <textarea id="codigo" rows="10">// Ex: console.log("Olá, mundo!")</textarea><br><br>
+  <button onclick="executarCodigo()">Executar</button>
+
+  <div>
+    <label for="senha">Desativar segurança:</label>
+    <input type="password" id="senha">
+    <button onclick="verificarSenha()">Desativar</button>
+  </div>
+
+  <div id="resultado"></div>
+
+  <script>
+    let modoSeguro = true;
+
+    function verificarSenha() {
+      const senha = document.getElementById("senha").value;
+      if (senha === "miguel123=") {
+        modoSeguro = false;
+        alert("Modo seguro desativado!");
+      } else {
+        alert("Senha incorreta.");
+      }
+    }
+
+    function executarCodigo() {
+      const codigo = document.getElementById("codigo").value;
+      const resultado = document.getElementById("resultado");
+
+      if (modoSeguro && /document\.|window\.|localStorage|sessionStorage|fetch|location|eval|Function|XMLHttpRequest/.test(codigo)) {
+        resultado.innerText = "Comando bloqueado por segurança!";
+        return;
+      }
+
+      try {
+        const saida = eval(codigo);
+        resultado.innerText = "Resultado: " + (saida !== undefined ? saida : "Executado com sucesso.");
+      } catch (erro) {
+        resultado.innerText = "Erro: " + erro;
+      }
+    }
+  </script>
+</body>
+</html>

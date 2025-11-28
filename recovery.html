@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Recuperação</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #1E1E1E;
+      color: #CCCCCC;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    h1 {
+      color: #00BFFF;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .secao {
+      margin-bottom: 40px;
+    }
+
+    .secao h2 {
+      color: #AAAAAA;
+      border-bottom: 1px solid #444;
+      padding-bottom: 6px;
+      margin-bottom: 20px;
+    }
+
+    .opcoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button {
+      background-color: #2E2E2E;
+      color: #00BFFF;
+      border: 1px solid #00BFFF;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background-color: #00BFFF;
+      color: #1E1E1E;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Modo de Recuperação</h1>
+
+  <div class="secao">
+    <h2>Aplicativos</h2>
+    <div class="opcoes">
+      <button onclick="enviar('abrir_admin system_manager.html')">System Manager</button>
+      <button onclick="enviar('abrir_admin menu_exec.html')">Menu Executar</button>
+    </div>
+  </div>
+
+  <div class="secao">
+    <h2>Outros</h2>
+    <div class="opcoes">
+      <button onclick="enviar('abrir_admin advanced_recorvery.html')">Avançado</button>
+      <button onclick="enviar('abrir_admin verificador_de_sintaxe.html')">verificador de sintaxe</button>
+    </div>
+  </div>
+
+  <div class="secao">
+    <h2>Opções</h2>
+    <div class="opcoes">
+      <button onclick="enviar('reboot')">Reiniciar</button>
+
+ <button onclick="enviar('desligar')">Desligar</button>
+    </div>
+  </div>
+
+  <script>
+  parent.postMessage("fechar_tudo", "*")
+    function enviar(msg) {
+      parent.postMessage(msg, "*");
+    }
+  </script>
+
+</body>
+</html>

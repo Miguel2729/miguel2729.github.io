@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora Avançada</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .calculadora {
+      width: 260px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .tela {
+      width: 100%;
+      height: 50px;
+      font-size: 22px;
+      text-align: right;
+      padding: 10px;
+      box-sizing: border-box;
+      margin-bottom: 15px;
+    }
+    .botoes {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    button {
+      padding: 15px;
+      font-size: 18px;
+      cursor: pointer;
+      background: #0074D9;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+    button:hover {
+      background: #005fa3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="calculadora">
+    <input type="text" id="tela" class="tela" placeholder="0">
+    <div class="botoes">
+      <button onclick="adicionar('1')">1</button>
+      <button onclick="adicionar('2')">2</button>
+      <button onclick="adicionar('3')">3</button>
+      <button onclick="adicionar('+')">+</button>
+
+      <button onclick="adicionar('4')">4</button>
+      <button onclick="adicionar('5')">5</button>
+      <button onclick="adicionar('6')">6</button>
+      <button onclick="adicionar('-')">-</button>
+
+      <button onclick="adicionar('7')">7</button>
+      <button onclick="adicionar('8')">8</button>
+      <button onclick="adicionar('9')">9</button>
+      <button onclick="adicionar('*')">×</button>
+
+      <button onclick="adicionar('0')">0</button>
+      <button onclick="adicionar('/')">÷</button>
+      <button onclick="calcular()">=</button>
+      <button onclick="limpar()">C</button>
+
+      <button onclick="adicionar('%')">%</button>
+      <button onclick="inverterSinal()">+/-</button>
+      <button onclick="adicionar('(')">(</button>
+      <button onclick="adicionar(')')">)</button>
+      <button onclick="raiz()">√</button>
+    </div>
+  </div>
+
+  <script>
+    const tela = document.getElementById('tela');
+
+    function adicionar(valor) {
+      const operadores = '+-*/.%';
+      const ultimo = tela.value.slice(-1);
+
+      if (operadores.includes(valor)) {
+        if (tela.value === '') return;
+        if (operadores.includes(ultimo)) return;
+      }
+
+      tela.value += valor;
+    }
+
+    function limpar() {
+      tela.value = '';
+    }
+
+    function inverterSinal() {
+      try {
+        const valor = parseFloat(tela.value);
+        if (!isNaN(valor)) tela.value = (-valor).toString();
+      } catch {
+        tela.value = 'Erro';
+      }
+    }
+
+    function raiz() {
+      try {
+        const resultado = Math.sqrt(parseFloat(tela.value));
+        tela.value = isNaN(resultado) ? 'Erro' : resultado;
+      } catch {
+        tela.value = 'Erro';
+      }
+    }
+
+    function calcular() {
+      try {
+        let expressao = tela.value.replace(/×/g, '*').replace(/÷/g, '/');
+
+        if (/\/0+(?![\d.])/.test(expressao)) {
+          tela.value = 'Erro: ÷ por 0';
+          return;
+        }
+
+        tela.value = Function('"use strict"; return (' + expressao + ')')();
+      } catch {
+        tela.value = 'Erro';
+      }
+    }
+
+    // Suporte ao teclado opcional
+    document.addEventListener('keydown', (e) => {
+      if ('0123456789+-*/().%'.includes(e.key)) {
+        adicionar(e.key);
+      } else if (e.key === 'Enter') {
+        calcular();
+      } else if (e.key === 'Backspace') {
+        tela.value = tela.value.slice(0, -1);
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Manual de Uso</title>
+  <style>
+    body {
+      background-color: #FFD700;
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    pre {
+      white-space: pre-wrap;
+      background-color: #fff;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+  <h1>manual</h1>
+  <pre id="conteudo"></pre>
+
+  <script>
+    fetch('../manual-de-uso.txt')
+      .then(resposta => {
+        if (!resposta.ok) {
+          throw new Error("Erro ao carregar o arquivo");
+        }
+        return resposta.text();
+      })
+      .then(texto => {
+        document.getElementById('conteudo').textContent = texto;
+      })
+      .catch(erro => {
+        document.getElementById('conteudo').textContent = "Não foi possível carregar o arquivo.";
+        console.error(erro);
+      });
+  </script>
+</body>
+</html>

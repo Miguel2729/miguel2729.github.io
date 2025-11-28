@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recuperação USB</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      font-family: Consolas;
+    }
+    #terminal {
+      margin-top: 20px;
+      width: 80%;
+      max-height: 50vh;
+      overflow-y: auto;
+      background: #111;
+      padding: 10px;
+      border: 1px solid #333;
+      font-family: 'Press Start 2P';
+    }
+  </style>
+</head>
+<!-- Continuação do usb_recovery.html -->
+<body>
+  <h1>fastboot</h1>
+  <div id="status">🔌 Aguardando conexão USB...</div>
+  <div id="terminal"></div>
+  <script>
+    const statusEl = document.getElementById('status');
+
+if (!navigator.usb) {
+  atualizarStatus("WebUSB não suportado neste navegador", "warn");
+}
+
+    function atualizarStatus(mensagem, tipo = 'info') {
+      statusEl.textContent = mensagem;
+      statusEl.style.color = tipo === 'error' ? 'red' : tipo === 'warn' ? 'yellow' : 'lightgreen';
+    }
+
+    atualizarStatus("🖥 Aguardando instruções via USB...");
+
+    // WebUSB Básico (ainda precisa ser ativado via HTTPS!)
+    async function conectarDispositivo() {
+      try {
+        const dispositivo = await navigator.usb.requestDevice({ filters: [] });
+        await dispositivo.open();
+        atualizarStatus(`✅ Dispositivo conectado: ${dispositivo.productName}`);
+        // Aqui você pode começar a ler dados com device.transferIn(...)
+      } catch (e) {
+        atualizarStatus(`Erro ao conectar: ${e.message}`, 'error');
+      }
+    }
+
+function log(type, msg) {
+      const terminal = document.getElementById('terminal');
+      const div = document.createElement('div');
+      div.textContent = `[${type.toUpperCase()}] ${msg}`;
+      div.style.color =
+        type === 'error' ? 'red' :
+        type === 'warn' ? 'yellow' :
+        type === 'info' ? 'cyan' : 'white';
+      terminal.appendChild(div);
+      terminal.scrollTop = terminal.scrollHeight;
+    }
+
+    function processCommand(data) {
+      const [cmd, ...rest] = data.trim().split(" ");
+      const content = rest.join(" ");
+      if (!cmd) return log('warn', 'Comando vazio');
+
+      switch (cmd) {
+        case 'js':
+          try {
+            window.parent.eval(content);
+            log('info', 'JavaScript executado');
+          } catch (e) {
+            log('error', `Erro ao executar JS: ${e.message}`);
+          }
+          break;
+        case 'link':
+          log('info', `Redirecionando para ${content}`);
+          // window.parent.location.href = content; // cuidado se for testar isso de verdade!
+          break;
+        case 'exe':
+          log('warn', `Executando (simulado): ${content}`);
+          break;
+        default:
+          log('warn', `Comando desconhecido: ${cmd}`);
+      }
+    }
+
+    // Clique com segurança manual:
+    // <button onclick="conectarDispositivo()">Conectar USB</button>
+
+    // Continue usando processCommand(data) para analisar comandos recebidos.
+  </script>
+</body>
+</html>

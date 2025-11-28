@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Recuperação Avançada</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 40px;
+      background: #121212;
+      color: #DDDDDD;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    h1 {
+      text-align: center;
+      color: #00FFD0;
+      margin-bottom: 40px;
+    }
+
+    .secao {
+      margin-bottom: 40px;
+    }
+
+    .secao h2 {
+      color: #AAAAAA;
+      border-bottom: 1px solid #333;
+      margin-bottom: 16px;
+      padding-bottom: 6px;
+    }
+
+    .botoes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    button {
+      background-color: #1F1F1F;
+      color: #00FFD0;
+      border: 1px solid #00FFD0;
+      padding: 12px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background-color: #00FFD0;
+      color: #121212;
+    }
+
+    #log {
+      margin-top: 30px;
+      white-space: pre-line;
+      font-size: 13px;
+      background: #1A1A1A;
+      border-left: 4px solid #00FFD0;
+      padding: 10px 16px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Recuperação Avançada</h1>
+
+  <div class="secao">
+    <h2>Arquivo</h2>
+    <div class="botoes">
+      <button onclick="enviar('abrir editor_screen.html')">Editar screen.html</button>
+      <button onclick="escanearSintaxe()">Escanear problemas de sintaxe</button>
+    </div>
+  </div>
+
+  <div class="secao">
+    <h2>Console</h2>
+    <div class="botoes">
+      <button onclick="enviar('abrir console.html')">Abrir Console</button>
+      <button onclick="mostrarLog('erro')">Visualizar erro</button>
+      <button onclick="mostrarLog('aviso')">Visualizar aviso</button>
+      <button onclick="mostrarLog('info')">Visualizar informação</button>
+    </div>
+  </div>
+
+  <div id="log"></div>
+
+  <script>
+    function enviar(msg) {
+      parent.postMessage(msg, "*");
+    }
+
+    function escanearSintaxe() {
+      const simulados = [
+        "Linha 248: tag <script> sem fechamento",
+        "Linha 390: função iniciarResizeDesktop duplicada",
+        "Linha 412: fechamento de <body> ausente"
+      ];
+      document.getElementById("log").textContent =
+        "Erros de sintaxe detectados:\n• " + simulados.join("\n• ");
+    }
+
+    function mostrarLog(tipo) {
+      const logs = {
+        erro: "ReferenceError: zIndexAtual is not defined",
+        aviso: "Atenção: janela já está aberta - ignorando novo comando",
+        info: "Janela 'console.html' criada com sucesso"
+      };
+      document.getElementById("log").textContent = logs[tipo] || "Nenhum log encontrado.";
+    }
+  </script>
+
+</body>
+</html>

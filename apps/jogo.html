@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Adivinhe o Número</title>
+  <style>
+    body {
+      font-family: Arial;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+      text-align: center;
+    }
+    .jogo {
+      border: 2px solid #444;
+      padding: 20px;
+      border-radius: 10px;
+      background: #fff;
+      max-width: 400px;
+    }
+    input, button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="jogo">
+    <h1>🎯 Adivinhe o Número!</h1>
+    <p>Estou pensando em um número entre 1 e 100.</p>
+    <input type="number" id="palpite" placeholder="Digite seu palpite">
+    <button onclick="verificar()">Chutar</button>
+    <p id="mensagem"></p>
+  </div>
+
+  <script>
+    const numeroSecreto = Math.floor(Math.random() * 100) + 1;
+    const mensagem = document.getElementById('mensagem');
+
+    function verificar() {
+      const palpite = parseInt(document.getElementById('palpite').value);
+      if (isNaN(palpite)) {
+        mensagem.textContent = 'Por favor, digite um número válido.';
+      } else if (palpite < numeroSecreto) {
+        mensagem.textContent = 'Tente um número mais alto.';
+      } else if (palpite > numeroSecreto) {
+        mensagem.textContent = 'Tente um número mais baixo.';
+      } else {
+        mensagem.textContent = '🎉 Parabéns! Você acertou!';
+      }
+    }
+  </script>
+</body>
+</html>

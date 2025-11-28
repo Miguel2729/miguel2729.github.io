@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeria de Fotos</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .upload-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .upload-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .upload-btn:hover {
+            background-color: #45a049;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            width: 100%;
+        }
+
+        .photo-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+            margin: 0;
+        }
+
+        .photo-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .photo-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+            display: block;
+        }
+
+        .photo-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .edit-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 90%;
+            max-height: 90%;
+            overflow: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #333;
+        }
+
+        .edit-tools {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 4px;
+        }
+
+        .tool-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .canvas-container {
+            position: relative;
+            margin: 0 auto;
+            max-width: 100%;
+        }
+
+        #editCanvas {
+            max-width: 100%;
+            display: block;
+            margin: 0 auto;
+            border: 1px solid #ddd;
+        }
+
+        .color-picker {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .brush-size {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .save-edit-btn {
+            display: block;
+            margin: 10px auto 0;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .no-photos {
+            text-align: center;
+            padding: 40px;
+            background-color: white;
+            border-radius: 8px;
+            color: #666;
+            grid-column: 1 / -1;
+        }
+
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            color: white;
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Galeria de Fotos</h1>
+        
+        <div class="upload-section">
+            <input type="file" id="fileInput" accept="image/*" multiple>
+            <button class="upload-btn" id="uploadBtn">Adicionar Fotos</button>
+        </div>
+        
+        <div class="gallery" id="gallery">
+            <!-- Fotos serão adicionadas aqui dinamicamente -->
+        </div>
+    </div>
+    
+    <!-- Modal de Edição -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <span class="close-btn" id="closeEditModal">&times;</span>
+            <h2>Editar Foto</h2>
+            
+            <div class="edit-tools">
+                <button class="tool-btn" id="cropBtn">Cortar</button>
+                <button class="tool-btn" id="rotateBtn">Girar 90°</button>
+                <button class="tool-btn" id="flipHBtn">Inverter Horizontal</button>
+                <button class="tool-btn" id="flipVBtn">Inverter Vertical</button>
+                <button class="tool-btn" id="brightnessBtn">Brilho</button>
+                <button class="tool-btn" id="contrastBtn">Contraste</button>
+                <button class="tool-btn" id="grayscaleBtn">Preto e Branco</button>
+                <button class="tool-btn" id="sepiaBtn">Sépia</button>
+                <button class="tool-btn" id="resetBtn">Resetar</button>
+                
+                <div class="color-picker">
+                    <label for="drawColor">Cor:</label>
+                    <input type="color" id="drawColor" value="#000000">
+                </div>
+                
+                <div class="brush-size">
+                    <label for="brushSize">Tamanho:</label>
+                    <input type="range" id="brushSize" min="1" max="20" value="5">
+                </div>
+                
+                <button class="tool-btn" id="drawBtn">Desenhar</button>
+                <button class="tool-btn" id="eraseBtn">Apagar</button>
+            </div>
+            
+            <div class="canvas-container">
+                <canvas id="editCanvas"></canvas>
+            </div>
+            
+            <button class="save-edit-btn" id="saveEditBtn">Salvar Edições</button>
+        </div>
+    </div>
+    
+    <!-- Overlay de carregamento -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        Processando imagens, por favor aguarde...
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ===== CONSTANTES DE ELEMENTOS DO DOM =====
+        const gallery = document.getElementById('gallery');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileInput = document.getElementById('fileInput');
+        const editModal = document.getElementById('editModal');
+        const closeEditModal = document.getElementById('closeEditModal');
+        const editCanvas = document.getElementById('editCanvas');
+        const ctx = editCanvas.getContext('2d');
+        const saveEditBtn = document.getElementById('saveEditBtn');
+        const cropBtn = document.getElementById('cropBtn');
+        const rotateBtn = document.getElementById('rotateBtn');
+        const flipHBtn = document.getElementById('flipHBtn');
+        const flipVBtn = document.getElementById('flipVBtn');
+        const brightnessBtn = document.getElementById('brightnessBtn');
+        const contrastBtn = document.getElementById('contrastBtn');
+        const grayscaleBtn = document.getElementById('grayscaleBtn');
+        const sepiaBtn = document.getElementById('sepiaBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const drawBtn = document.getElementById('drawBtn');
+        const eraseBtn = document.getElementById('eraseBtn');
+        const drawColor = document.getElementById('drawColor');
+        const brushSize = document.getElementById('brushSize');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        // ===== VARIÁVEIS DE ESTADO =====
+        let photos = [];
+        let currentUser = 'default';
+        let currentPhotoIndex = -1;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let currentTool = '';
+        let originalImageData = null;
+
+        // ===== INICIALIZAÇÃO =====
+        initGallery();
+
+        // ===== FUNÇÕES PRINCIPAIS =====
+        function initGallery() {
+            loadPhotos();
+            renderGallery();
+        }
+
+        function loadPhotos() {
+            const savedPhotos = localStorage.getItem(`photoGallery_${currentUser}`);
+            photos = savedPhotos ? JSON.parse(savedPhotos) : [];
+        }
+
+        function savePhotos() {
+            localStorage.setItem(`photoGallery_${currentUser}`, JSON.stringify(photos));
+        }
+
+        function renderGallery() {
+            gallery.innerHTML = '';
+            
+            if (photos.length === 0) {
+                gallery.innerHTML = '<div class="no-photos">Nenhuma foto adicionada ainda. Clique em "Adicionar Fotos" para começar.</div>';
+                return;
+            }
+            
+            photos.forEach((photo, index) => {
+                const photoCard = document.createElement('div');
+                photoCard.className = 'photo-card';
+                
+                const img = document.createElement('img');
+                img.className = 'photo-img';
+                img.src = photo.data;
+                img.alt = `Foto ${index + 1}`;
+                
+                const actions = document.createElement('div');
+                actions.className = 'photo-actions';
+                
+                const editBtn = document.createElement('button');
+                editBtn.className = 'action-btn edit-btn';
+                editBtn.textContent = 'Editar';
+                editBtn.addEventListener('click', () => openEditModal(index));
+                
+                const deleteBtn = document.createElement('button');
+                deleteBtn.className = 'action-btn delete-btn';
+                deleteBtn.textContent = 'Excluir';
+                deleteBtn.addEventListener('click', () => deletePhoto(index));
+                
+                actions.appendChild(editBtn);
+                actions.appendChild(deleteBtn);
+                photoCard.appendChild(img);
+                photoCard.appendChild(actions);
+                gallery.appendChild(photoCard);
+            });
+        }
+
+        // ===== FUNÇÕES DE COMPRESSÃO =====
+        function compressImage(imageData, quality = 0.7, maxWidth = 800) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = function() {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Calcula novas dimensões mantendo aspect ratio
+                    let width = img.width;
+                    let height = img.height;
+                    
+                    if (width > maxWidth) {
+                        height = Math.round((maxWidth / width) * height);
+                        width = maxWidth;
+                    }
+                    
+                    // Configura o canvas
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Desenha a imagem com as novas dimensões
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Converte para JPEG com qualidade ajustável
+                    resolve(canvas.toDataURL('image/jpeg', quality));
+                };
+                
+                img.src = imageData;
+            });
+        }
+
+        function readFileAsDataURL(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        
+function checkStorageSpace() {
+    try {
+        // Calcula o espaço usado pelo usuário atual
+        const currentPhotos = localStorage.getItem(`photoGallery_${currentUser}`);
+        const currentSize = currentPhotos ? currentPhotos.length : 0;
+        
+        // Calcula o espaço disponível aproximado (5MB é o limite comum)
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        const usedSpace = JSON.stringify(localStorage).length;
+        
+        // Verifica se há espaço para mais 500KB para este usuário
+        if (usedSpace + 500 * 1024 > maxSize) {
+            return false;
+        }
+        
+        // Testa se podemos armazenar mais 500KB
+        const testKey = `storage_test_${Date.now()}_${currentUser}`;
+        const testData = new Array(1024 * 500).join('a');
+        localStorage.setItem(testKey, testData);
+        localStorage.removeItem(testKey);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+        // ===== FUNÇÕES DE UPLOAD =====
+        uploadBtn.addEventListener('click', () => fileInput.click());
+        
+        fileInput.addEventListener('change', async function(e) {
+            const files = e.target.files;
+            if (files.length === 0) return;
+            
+            if (!checkStorageSpace()) {
+                alert('Armazenamento cheio. Exclua fotos antes de adicionar novas.');
+                return;
+            }
+            
+            // Mostra o overlay de carregamento
+            loadingOverlay.style.display = 'flex';
+            
+            try {
+                // Processa cada arquivo sequencialmente
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (!file.type.match('image.*')) continue;
+                    
+                    try {
+                        // Lê o arquivo como DataURL
+                        const originalData = await readFileAsDataURL(file);
+                        
+                        // Comprime a imagem (qualidade 70%, largura máxima 800px)
+                        const compressedData = await compressImage(originalData);
+                        
+                        // Adiciona à galeria
+                        photos.push({
+                            data: compressedData,
+                            edits: []
+                        });
+                        
+                        savePhotos();
+                        
+                    } catch (error) {
+                        console.error('Erro ao processar imagem:', error);
+                    }
+                }
+                
+                renderGallery();
+                
+            } finally {
+                // Esconde o overlay de carregamento
+                loadingOverlay.style.display = 'none';
+                fileInput.value = '';
+            }
+        });
+
+        function deletePhoto(index) {
+            if (confirm('Tem certeza que deseja excluir esta foto?')) {
+                photos.splice(index, 1);
+                savePhotos();
+                renderGallery();
+            }
+        }
+
+        // ===== FUNÇÕES DE EDIÇÃO =====
+        function openEditModal(index) {
+            currentPhotoIndex = index;
+            const photo = photos[index];
+            
+            const img = new Image();
+            img.onload = function() {
+                editCanvas.width = img.width > 800 ? 800 : img.width;
+                editCanvas.height = img.height > 600 ? 600 : img.height;
+                
+                const ratio = Math.min(800 / img.width, 600 / img.height);
+                
+                if (ratio < 1) {
+                    editCanvas.width = img.width * ratio;
+                    editCanvas.height = img.height * ratio;
+                }
+                
+                ctx.drawImage(img, 0, 0, editCanvas.width, editCanvas.height);
+                originalImageData = ctx.getImageData(0, 0, editCanvas.width, editCanvas.height);
+                
+                if (photo.edits && photo.edits.length > 0) {
+                    applyEdits(photo.edits);
+                }
+            };
+            img.src = photo.data;
+            
+            editModal.style.display = 'flex';
+        }
+
+        function applyEdits(edits) {
+            edits.forEach(edit => {
+                switch(edit.type) {
+                    case 'filter':
+                        applyFilter(edit.filter, edit.value);
+                        break;
+                    case 'transform':
+                        applyTransform(edit.transform);
+                        break;
+                }
+            });
+        }
+
+        function applyFilter(filter, value) {
+            const imageData = ctx.getImageData(0, 0, editCanvas.width, editCanvas.height);
+            const data = imageData.data;
+            
+            switch(filter) {
+                case 'brightness':
+                    const brightness = 1 + (value / 100);
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = data[i] * brightness;
+                        data[i+1] = data[i+1] * brightness;
+                        data[i+2] = data[i+2] * brightness;
+                    }
+                    break;
+                    
+                case 'contrast':
+                    const contrast = (value / 100) + 1;
+                    const intercept = 128 * (1 - contrast);
+                    for (let i = 0; i < data.length; i += 4) {
+                        data[i] = data[i] * contrast + intercept;
+                        data[i+1] = data[i+1] * contrast + intercept;
+                        data[i+2] = data[i+2] * contrast + intercept;
+                    }
+                    break;
+                    
+                case 'grayscale':
+                    for (let i = 0; i < data.length; i += 4) {
+                        const avg = (data[i] + data[i+1] + data[i+2]) / 3;
+                        data[i] = avg;
+                        data[i+1] = avg;
+                        data[i+2] = avg;
+                    }
+                    break;
+                    
+                case 'sepia':
+                    for (let i = 0; i < data.length; i += 4) {
+                        const r = data[i];
+                        const g = data[i+1];
+                        const b = data[i+2];
+                        
+                        data[i] = Math.min(255, (r * 0.393) + (g * 0.769) + (b * 0.189));
+                        data[i+1] = Math.min(255, (r * 0.349) + (g * 0.686) + (b * 0.168));
+                        data[i+2] = Math.min(255, (r * 0.272) + (g * 0.534) + (b * 0.131));
+                    }
+                    break;
+            }
+            
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        function applyTransform(transform) {
+            switch(transform) {
+                case 'rotate90':
+                    rotateImage(90);
+                    break;
+                case 'flipH':
+                    flipImage('horizontal');
+                    break;
+                case 'flipV':
+                    flipImage('vertical');
+                    break;
+            }
+        }
+
+        function rotateImage(degrees) {
+            const canvas = document.createElement('canvas');
+            const tempCtx = canvas.getContext('2d');
+            
+            if (degrees === 90 || degrees === 270) {
+                canvas.width = editCanvas.height;
+                canvas.height = editCanvas.width;
+            } else {
+                canvas.width = editCanvas.width;
+                canvas.height = editCanvas.height;
+            }
+            
+            tempCtx.translate(canvas.width / 2, canvas.height / 2);
+            tempCtx.rotate(degrees * Math.PI / 180);
+            tempCtx.drawImage(editCanvas, -editCanvas.width / 2, -editCanvas.height / 2);
+            
+            editCanvas.width = canvas.width;
+            editCanvas.height = canvas.height;
+            ctx.drawImage(canvas, 0, 0);
+        }
+
+        function flipImage(direction) {
+            ctx.save();
+            ctx.clearRect(0, 0, editCanvas.width, editCanvas.height);
+            
+            if (direction === 'horizontal') {
+                ctx.translate(editCanvas.width, 0);
+                ctx.scale(-1, 1);
+            } else {
+                ctx.translate(0, editCanvas.height);
+                ctx.scale(1, -1);
+            }
+            
+            ctx.drawImage(editCanvas, 0, 0, editCanvas.width, editCanvas.height);
+            ctx.restore();
+        }
+
+        function addEdit(type, name, value = null) {
+            photos[currentPhotoIndex].edits.push({
+                type,
+                [name]: value || name,
+                timestamp: new Date().getTime()
+            });
+        }
+
+        // ===== EVENT LISTENERS DE EDIÇÃO =====
+        closeEditModal.addEventListener('click', function() {
+            editModal.style.display = 'none';
+            currentTool = '';
+        });
+
+        cropBtn.addEventListener('click', function() {
+            alert('Funcionalidade de corte será implementada em uma versão futura.');
+        });
+
+        rotateBtn.addEventListener('click', function() {
+            rotateImage(90);
+            addEdit('transform', 'rotate90');
+        });
+
+        flipHBtn.addEventListener('click', function() {
+            flipImage('horizontal');
+            addEdit('transform', 'flipH');
+        });
+
+        flipVBtn.addEventListener('click', function() {
+            flipImage('vertical');
+            addEdit('transform', 'flipV');
+        });
+
+        brightnessBtn.addEventListener('click', function() {
+            const value = prompt('Ajuste o brilho (-100 a 100):', '10');
+            if (value !== null) {
+                applyFilter('brightness', parseInt(value));
+                addEdit('filter', 'brightness', parseInt(value));
+            }
+        });
+
+        contrastBtn.addEventListener('click', function() {
+            const value = prompt('Ajuste o contraste (-100 a 100):', '10');
+            if (value !== null) {
+                applyFilter('contrast', parseInt(value));
+                addEdit('filter', 'contrast', parseInt(value));
+            }
+        });
+
+        grayscaleBtn.addEventListener('click', function() {
+            applyFilter('grayscale', 100);
+            addEdit('filter', 'grayscale', 100);
+        });
+
+        sepiaBtn.addEventListener('click', function() {
+            applyFilter('sepia', 100);
+            addEdit('filter', 'sepia', 100);
+        });
+
+        resetBtn.addEventListener('click', function() {
+            if (confirm('Resetar todas as edições desta foto?')) {
+                photos[currentPhotoIndex].edits = [];
+                openEditModal(currentPhotoIndex);
+            }
+        });
+
+        drawBtn.addEventListener('click', function() {
+            currentTool = 'draw';
+        });
+
+        eraseBtn.addEventListener('click', function() {
+            currentTool = 'erase';
+        });
+
+        // ===== FUNCIONALIDADE DE DESENHO =====
+        editCanvas.addEventListener('mousedown', startDrawing);
+        editCanvas.addEventListener('mousemove', draw);
+        editCanvas.addEventListener('mouseup', stopDrawing);
+        editCanvas.addEventListener('mouseout', stopDrawing);
+
+        function startDrawing(e) {
+            if (currentTool !== 'draw' && currentTool !== 'erase') return;
+            
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            
+            if (currentTool === 'draw') {
+                ctx.strokeStyle = drawColor.value;
+                ctx.globalCompositeOperation = 'source-over';
+            } else {
+                ctx.strokeStyle = 'white';
+                ctx.globalCompositeOperation = 'destination-out';
+            }
+            
+            ctx.lineWidth = brushSize.value;
+            ctx.stroke();
+            
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        saveEditBtn.addEventListener('click', function() {
+            if (currentPhotoIndex !== -1) {
+                photos[currentPhotoIndex].data = editCanvas.toDataURL('image/png');
+                savePhotos();
+                renderGallery();
+                editModal.style.display = 'none';
+            }
+        });
+
+        // ===== TROCA DE USUÁRIO =====
+        window.addEventListener('message', function(e) {
+            if (e.data.startsWith("user:")) {
+                currentUser = e.data.split(":")[1].trim();
+                initGallery();
+            }
+        });
+
+        // ===== INICIALIZAÇÃO DO APP =====
+        window.addEventListener("DOMContentLoaded", () => {
+            const appName = "fotos";
+            window.parent.postMessage(`app_ready:${appName}`, "*");
+        });
+    });
+</script>
+</body>
+</html>

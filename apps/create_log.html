@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Captura de Entrada</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <h2>Digite algo e pressione Enter</h2>
+  <input type="text" id="entrada" placeholder="Escreva aqui...">
+
+  <script>
+    const input = document.getElementById("entrada");
+
+    input.addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        console.log("Você digitou:", input.value);
+        input.value = ""; // limpa o campo
+      }
+    });
+  </script>
+</body>
+</html>

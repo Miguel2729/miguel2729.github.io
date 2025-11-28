@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cachorro Faminto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial Rounded MT Bold', 'Arial', sans-serif;
+            overflow: hidden;
+            background-color: #4a9c5f;
+            touch-action: manipulation;
+            user-select: none;
+        }
+        
+        #start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #6bbd7a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            transition: opacity 0.5s;
+        }
+        
+        #start-image {
+            width: 80%;
+            max-width: 500px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            margin-bottom: 30px;
+        }
+        
+        #start-button {
+            padding: 15px 40px;
+            font-size: 24px;
+            background: linear-gradient(to bottom, #ff6b6b, #ff3f3f);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        #start-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        #game-field {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #6bbd7a;
+        }
+        
+        #player {
+            position: absolute;
+            font-size: 40px;
+            z-index: 10;
+            transition: transform 0.2s;
+        }
+        
+        .strawberry {
+            position: absolute;
+            font-size: 30px;
+            z-index: 5;
+            animation: float 3s infinite ease-in-out;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        #ui {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 20;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        #hunger-container {
+            width: 200px;
+            height: 20px;
+            background-color: #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+        
+        #hunger-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(to right, #ff3f3f, #ff9e3f, #6bbd7a);
+            transition: width 0.3s;
+        }
+        
+        #score {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        #controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: none;
+            grid-template-columns: repeat(3, 60px);
+            grid-template-rows: repeat(3, 60px);
+            gap: 5px;
+            z-index: 20;
+        }
+        
+        .control-btn {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        #up-btn {
+            grid-column: 2;
+            grid-row: 1;
+        }
+        
+        #left-btn {
+            grid-column: 1;
+            grid-row: 2;
+        }
+        
+        #right-btn {
+            grid-column: 3;
+            grid-row: 2;
+        }
+        
+        #down-btn {
+            grid-column: 2;
+            grid-row: 3;
+        }
+        
+        #game-over {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            color: white;
+        }
+        
+        #game-over h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #ff3f3f;
+        }
+        
+        #final-score {
+            font-size: 32px;
+            margin-bottom: 30px;
+        }
+        
+        #restart-button {
+            padding: 15px 40px;
+            font-size: 20px;
+            background: linear-gradient(to bottom, #6bbd7a, #4a9c5f);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Responsividade para mobile */
+        @media (max-width: 768px) {
+            #controls {
+                display: grid;
+            }
+            
+            #ui {
+                top: 10px;
+                left: 10px;
+                padding: 10px;
+            }
+            
+            #hunger-container {
+                width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <img id="start-image" src="imgs/dog_and_morango.png" alt="Cachorro e Morango">
+        <button id="start-button">Clique para começar</button>
+    </div>
+
+    <div id="game-container">
+        <div id="game-field">
+            <div id="player">🐶</div>
+            <!-- Morangos serão gerados dinamicamente -->
+        </div>
+        
+        <div id="ui">
+            <div id="hunger-container">
+                <div id="hunger-bar"></div>
+            </div>
+            <div id="score">Pontos: 0</div>
+        </div>
+        
+        <div id="controls">
+            <button class="control-btn" id="up-btn">↑</button>
+            <button class="control-btn" id="left-btn">←</button>
+            <button class="control-btn" id="right-btn">→</button>
+            <button class="control-btn" id="down-btn">↓</button>
+        </div>
+        
+        <div id="game-over">
+            <h2>Game Over!</h2>
+            <div id="final-score">Pontuação: 0</div>
+            <button id="restart-button">Jogar Novamente</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do DOM
+            const startScreen = document.getElementById('start-screen');
+            const gameContainer = document.getElementById('game-container');
+            const gameField = document.getElementById('game-field');
+            const player = document.getElementById('player');
+            const hungerBar = document.getElementById('hunger-bar');
+            const scoreDisplay = document.getElementById('score');
+            const gameOverScreen = document.getElementById('game-over');
+            const finalScoreDisplay = document.getElementById('final-score');
+            const startButton = document.getElementById('start-button');
+            const restartButton = document.getElementById('restart-button');
+            
+            // Controles
+            const upBtn = document.getElementById('up-btn');
+            const leftBtn = document.getElementById('left-btn');
+            const rightBtn = document.getElementById('right-btn');
+            const downBtn = document.getElementById('down-btn');
+            
+            // Variáveis do jogo
+            let gameStarted = false;
+            let score = 0;
+            let hunger = 100;
+            let playerSpeed = 5;
+            let playerX = 0;
+            let playerY = 0;
+            let strawberries = [];
+            let gameLoop;
+            let hungerInterval;
+            let keys = {};
+            
+            // Tamanho do campo de jogo
+            const fieldWidth = window.innerWidth;
+            const fieldHeight = window.innerHeight;
+            
+            // Inicializar o jogador
+            function initPlayer() {
+                playerX = fieldWidth / 2 - 20;
+                playerY = fieldHeight / 2 - 20;
+                player.style.left = playerX + 'px';
+                player.style.top = playerY + 'px';
+            }
+            
+            // Gerar morangos
+            function generateStrawberry() {
+        const strawberry = document.createElement('div');
+        strawberry.className = 'strawberry';
+        strawberry.innerHTML = '🍓';
+        
+        // Gerar posição que não esteja muito perto do jogador
+        let x, y;
+        let tooClose;
+        let attempts = 0;
+        
+        do {
+            x = Math.random() * (fieldWidth - 50);
+            y = Math.random() * (fieldHeight - 50);
+            
+            // Verificar se está muito perto do jogador (menos de 100px)
+            const distance = Math.sqrt((x - playerX) ** 2 + (y - playerY) ** 2);
+            tooClose = distance < 100;
+            attempts++;
+        } while (tooClose && attempts < 10); // Tentar no máximo 10 vezes
+        
+        strawberry.style.left = x + 'px';
+        strawberry.style.top = y + 'px';
+        
+        gameField.appendChild(strawberry);
+        
+        // Adicionar à lista de morangos
+        strawberries.push({
+            element: strawberry,
+            x: x,
+            y: y,
+            width: 30,
+            height: 30
+        });
+    }
+            
+            // Verificar colisões
+                // Verificar colisões - VERSÃO CORRIGIDA
+    function checkCollisions() {
+        for (let i = 0; i < strawberries.length; i++) {
+            const s = strawberries[i];
+            
+            // Verificar se o jogador colidiu com o morango
+            if (
+                playerX < s.x + s.width &&
+                playerX + 40 > s.x &&
+                playerY < s.y + s.height &&
+                playerY + 40 > s.y
+            ) {
+                // Remover o morango
+                s.element.remove();
+                strawberries.splice(i, 1);
+                
+                // Adicionar pontos e fome
+                score += 10;
+                hunger = Math.min(100, hunger + 10);
+                updateUI();
+                
+                // Gerar novo morango IMEDIATAMENTE
+                generateStrawberry();
+                
+                break; // Importante: sair do loop após processar a colisão
+            }
+        }
+    }
+            
+            // Atualizar a UI
+            function updateUI() {
+                hungerBar.style.width = hunger + '%';
+                scoreDisplay.textContent = `Pontos: ${score}`;
+                
+                // Ajustar velocidade baseado na fome
+                if (hunger < 30) {
+                    playerSpeed = 2;
+                    player.style.transform = 'scale(0.8)';
+                    player.style.opacity = '0.8';
+                } else if (hunger < 60) {
+                    playerSpeed = 3.5;
+                    player.style.transform = 'scale(0.9)';
+                    player.style.opacity = '0.9';
+                } else {
+                    playerSpeed = 5;
+                    player.style.transform = 'scale(1)';
+                    player.style.opacity = '1';
+                }
+            }
+            
+            // Movimentar o jogador
+            function movePlayer(dx, dy) {
+                if (!gameStarted) return;
+                
+                playerX += dx * playerSpeed;
+                playerY += dy * playerSpeed;
+                
+                // Manter o jogador dentro dos limites
+                playerX = Math.max(0, Math.min(fieldWidth - 40, playerX));
+                playerY = Math.max(0, Math.min(fieldHeight - 40, playerY));
+                
+                player.style.left = playerX + 'px';
+                player.style.top = playerY + 'px';
+                
+                checkCollisions();
+            }
+            
+            // Iniciar o jogo
+            function startGame() {
+                startScreen.style.opacity = '0';
+                setTimeout(() => {
+                    startScreen.style.display = 'none';
+                }, 500);
+                
+                gameStarted = true;
+                score = 0;
+                hunger = 100;
+                
+                // Limpar morangos existentes
+                strawberries.forEach(s => s.element.remove());
+                strawberries = [];
+                
+                // Posicionar o jogador
+                initPlayer();
+                
+                // Gerar morangos iniciais
+                for (let i = 0; i < 5; i++) {
+                    generateStrawberry();
+                }
+                
+                updateUI();
+                
+                // Iniciar loop do jogo
+                gameLoop = requestAnimationFrame(gameUpdate);
+                
+                // Diminuir a fome ao longo do tempo
+                hungerInterval = setInterval(() => {
+                    if (gameStarted) {
+                        hunger = Math.max(0, hunger - 0.5);
+                        updateUI();
+                        
+                        // Verificar se o jogador perdeu
+                        if (hunger <= 0) {
+                            endGame();
+                        }
+                    }
+                }, 1000);
+            }
+            
+            // Finalizar o jogo
+            function endGame() {
+                gameStarted = false;
+                cancelAnimationFrame(gameLoop);
+                clearInterval(hungerInterval);
+                
+                finalScoreDisplay.textContent = `Pontuação: ${score}`;
+                gameOverScreen.style.display = 'flex';
+            }
+            
+            // Atualização principal do jogo
+            function gameUpdate() {
+                if (!gameStarted) return;
+                
+                // Movimento baseado nas teclas pressionadas
+                if (keys['ArrowUp'] || keys['w'] || keys['W']) movePlayer(0, -1);
+                if (keys['ArrowDown'] || keys['s'] || keys['S']) movePlayer(0, 1);
+                if (keys['ArrowLeft'] || keys['a'] || keys['A']) movePlayer(-1, 0);
+                if (keys['ArrowRight'] || keys['d'] || keys['D']) movePlayer(1, 0);
+                
+                gameLoop = requestAnimationFrame(gameUpdate);
+            }
+            
+            // Event Listeners
+            startButton.addEventListener('click', startGame);
+            restartButton.addEventListener('click', startGame);
+            
+            // Controles de teclado
+            document.addEventListener('keydown', (e) => {
+                keys[e.key] = true;
+            });
+            
+            document.addEventListener('keyup', (e) => {
+                keys[e.key] = false;
+            });
+            
+            // Controles de toque
+            upBtn.addEventListener('touchstart', () => keys['ArrowUp'] = true);
+            upBtn.addEventListener('touchend', () => keys['ArrowUp'] = false);
+            
+            leftBtn.addEventListener('touchstart', () => keys['ArrowLeft'] = true);
+            leftBtn.addEventListener('touchend', () => keys['ArrowLeft'] = false);
+            
+            rightBtn.addEventListener('touchstart', () => keys['ArrowRight'] = true);
+            rightBtn.addEventListener('touchend', () => keys['ArrowRight'] = false);
+            
+            downBtn.addEventListener('touchstart', () => keys['ArrowDown'] = true);
+            downBtn.addEventListener('touchend', () => keys['ArrowDown'] = false);
+            
+            // Prevenir comportamento padrão de toque
+            document.addEventListener('touchmove', function(e) {
+                if (e.target.classList.contains('control-btn')) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Inicializar posição do jogador
+            initPlayer();
+        });
+    </script>
+</body>
+</html>

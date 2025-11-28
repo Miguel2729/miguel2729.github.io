@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Jogo da Velha</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f0f0f0;
+    }
+    h1 {
+      margin-top: 20px;
+    }
+    #tabuleiro {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      grid-gap: 5px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+    .celula {
+      width: 100px;
+      height: 100px;
+      background: white;
+      font-size: 2.5em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px solid #333;
+    }
+    .celula:hover {
+      background: #e0e0e0;
+    }
+    #mensagem, #controles {
+      margin-top: 20px;
+      font-size: 1.2em;
+    }
+    button, select {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+  </style>
+</head>
+<body>
+  <h1>Jogo da Velha</h1>
+
+  <div id="controles">
+    <label>Modo de jogo:
+      <select id="modoJogo">
+        <option value="bot">Contra o Bot</option>
+        <option value="multiplayer">Multiplayer</option>
+      </select>
+    </label>
+    <br>
+    <label>Escolha seu símbolo:
+      <select id="simboloJogador">
+        <option value="X">X</option>
+        <option value="O">O</option>
+      </select>
+    </label>
+    <br>
+    <button onclick="reiniciarJogo()">Iniciar Jogo</button>
+  </div>
+
+  <div id="tabuleiro"></div>
+  <div id="mensagem"></div>
+
+  <script>
+    const tabuleiro = document.getElementById("tabuleiro");
+    const mensagem = document.getElementById("mensagem");
+    const modoJogoSelect = document.getElementById("modoJogo");
+    const simboloSelect = document.getElementById("simboloJogador");
+
+    let celulas = [];
+    let jogadorAtual = "X";
+    let jogadorHumano = "X";
+    let jogadorBot = "O";
+    let jogoAtivo = true;
+    let modoJogo = "bot";
+
+    function criarTabuleiro() {
+      tabuleiro.innerHTML = "";
+      celulas = [];
+      for (let i = 0; i < 9; i++) {
+        const celula = document.createElement("div");
+        celula.classList.add("celula");
+        celula.dataset.index = i;
+        celula.addEventListener("click", () => jogar(i));
+        tabuleiro.appendChild(celula);
+        celulas.push("");
+      }
+      mensagem.textContent = modoJogo === "bot" ? "Sua vez!" : "Vez do jogador X";
+    }
+
+    function jogar(index) {
+      if (!jogoAtivo || celulas[index] !== "") return;
+
+      celulas[index] = jogadorAtual;
+      atualizarTabuleiro();
+
+      if (verificarVitoria(jogadorAtual)) {
+        mensagem.textContent = `Jogador ${jogadorAtual} venceu! 🎉`;
+        jogoAtivo = false;
+        return;
+      }
+
+      if (celulas.every(c => c !== "")) {
+        mensagem.textContent = "Empate!";
+        jogoAtivo = false;
+        return;
+      }
+
+      if (modoJogo === "bot") {
+        jogadorAtual = jogadorBot;
+        mensagem.textContent = "Vez do bot...";
+        setTimeout(jogadaBot, 500);
+      } else {
+        jogadorAtual = jogadorAtual === "X" ? "O" : "X";
+        mensagem.textContent = `Vez do jogador ${jogadorAtual}`;
+      }
+    }
+
+    function jogadaBot() {
+      if (!jogoAtivo) return;
+      let vazias = celulas.map((v, i) => v === "" ? i : null).filter(i => i !== null);
+      let escolha = vazias[Math.floor(Math.random() * vazias.length)];
+      celulas[escolha] = jogadorBot;
+      atualizarTabuleiro();
+
+      if (verificarVitoria(jogadorBot)) {
+        mensagem.textContent = "O bot venceu! 😢";
+        jogoAtivo = false;
+        return;
+      }
+
+      if (celulas.every(c => c !== "")) {
+        mensagem.textContent = "Empate!";
+        jogoAtivo = false;
+        return;
+      }
+
+      jogadorAtual = jogadorHumano;
+      mensagem.textContent = "Sua vez!";
+    }
+
+    function atualizarTabuleiro() {
+      const divs = document.querySelectorAll(".celula");
+      divs.forEach((div, i) => {
+        div.textContent = celulas[i];
+      });
+    }
+
+    function verificarVitoria(simbolo) {
+      const combinacoes = [
+        [0,1,2], [3,4,5], [6,7,8],
+        [0,3,6], [1,4,7], [2,5,8],
+        [0,4,8], [2,4,6]
+      ];
+      return combinacoes.some(comb =>
+        comb.every(i => celulas[i] === simbolo)
+      );
+    }
+
+    function reiniciarJogo() {
+      modoJogo = modoJogoSelect.value;
+      jogadorHumano = simboloSelect.value;
+      jogadorBot = jogadorHumano === "X" ? "O" : "X";
+      jogadorAtual = "X";
+      jogoAtivo = true;
+      criarTabuleiro();
+    }
+
+    reiniciarJogo();
+  </script>
+</body>
+</html>

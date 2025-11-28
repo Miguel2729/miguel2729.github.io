@@ -1,0 +1,2619 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Home</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
+    body { 
+      margin: 0;
+      padding: 0;
+      background: none;
+      color: white;
+       background-color: var(--bg-color);
+       color: var(--text-color);
+    }
+    
+    :root {
+  --bg-color: #202020;
+  --text-color: #fff;
+}
+
+img {
+  filter: none !important;
+  color-scheme: light dark;
+}
+ 
+#conteudoPrincipal {
+  height: 100%;
+  width: 100%;
+}
+
+    #barraTarefas {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background: rgba(20, 20, 20, 0.95);
+      display: flex;
+      align-items: center;
+      padding: 0 15px;
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.6);
+      z-index: 1000;
+      gap: 5px;
+    }
+
+    #menuIniciar {
+      width: 50px;
+      height: 50px;
+      background: #E500FF;
+      color: white;
+      font-size: 24px;
+      text-align: center;
+      line-height: 50px;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    #appsRecentes {
+      display: flex;
+      gap: 8px;
+      flex: 1;
+      align-items: center;
+      overflow-x: auto;
+    }
+
+    #appsRecentes .icone {
+      background: #333;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    #appsRecentes .icone:hover {
+      background: #555;
+    }
+
+    #painelMenu {
+      position: fixed;
+      bottom: 70px;
+      left: 10px;
+      width: 600px; /* Aumentado de 300px para 600px */
+      max-height: 70vh;
+      background: rgba(20, 20, 20, 0.95);
+      border-radius: 8px;
+      padding: 10px;
+      box-shadow: 0 0 10px #000;
+      overflow-y: auto;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      display: flex; /* Adicionado para layout flexível */
+    }
+    
+        /* Divisão do painel em duas colunas */
+    #painelMenuEsquerdo {
+      width: 300px; /* Mantém o tamanho original */
+      padding-right: 10px;
+      border-right: 1px solid #444;
+    }
+
+    #painelMenuDireito {
+      width: 300px;
+      padding-left: 10px;
+    }
+
+    #painelMenu.aberto {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    h3 {
+      margin: 8px 0 4px;
+      font-size: 16px;
+      border-bottom: 1px solid #444;
+      padding-bottom: 4px;
+    }
+
+    .icone, .botao {
+      display: inline-block;
+      padding: 10px 12px;
+      margin: 4px 4px 0 0;
+      background: #333;
+      border-radius: 4px;
+      cursor: pointer;
+      user-select: none;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .icone:hover, .botao:hover {
+      background-color: #555;
+    }
+
+    .area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+
+    .botoes {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+#painelDireito {
+  margin-left: auto;
+  display: flex;
+  gap: 5px;
+  align-items: center; /* Centraliza verticalmente */
+  height: 60%; /* Obrigatório */
+  padding: 0 5px; /* Espaçamento interno opcional */
+}
+
+.painelMini {
+  background: transparent !important;
+  padding: 0 10px; /* Ajuste o padding horizontal (vertical deve ser 0) */
+  margin: 0; /* Remove margens */
+  border-radius: 0;
+  font-size: 12px;
+  cursor: default;
+  user-select: none;
+  height: 60%; /* Ocupa toda a altura do #painelDireito */
+  display: flex;
+  align-items: center; /* Centraliza o conteúdo verticalmente */
+  justify-content: center; /* Centraliza horizontalmente (opcional) */
+  transition: background 0.2s;
+}
+
+.painelMini:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Estilo específico para o relógio */
+#relogio {
+  font-family: 'Segoe UI', sans-serif;
+  font-weight: 400;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 80px;
+  height: 100%;
+}
+
+#relogio .hora {
+  font-size: 12px;
+}
+
+#relogio .data {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+    #painelRecentes {
+      position: fixed;
+      bottom: 70px;
+      right: 10px;
+      background: rgba(20, 20, 20, 0.95);
+      color: white;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px #000;
+      display: none;
+      max-width: 200px;
+      max-height: 50vh;
+      overflow-y: auto;
+      transition: opacity 0.2s ease;
+      opacity: 0;
+    }
+
+    #painelRecentes.aberto {
+      display: block;
+      opacity: 1;
+    }
+#areaTrabalho {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-image: url("wallpapers/wallpaper9.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 0; /* isso garante que ela fique no fundo */
+  top: 0;
+  left: 0;
+}
+.iconeDesktop {
+  width: 80px;
+  text-align: center;
+  cursor: pointer;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.iconeDesktop img {
+  width: 48px;
+  height: 48px;
+}
+.usuario-info {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  border-bottom: 1px solid #444;
+  background-color: rgba(0, 0, 0, 0.2);
+  z-index: 1;
+}
+
+.usuario-info img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.usuario-info span {
+  font-weight: bold;
+  color: white;
+  font-size: 16px;
+}
+
+#buscaApp {
+  width: 100%;
+  padding: 8px 10px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 50px;
+  font-size: 14px;
+  background-color: #222;
+  color: white;
+  width: calc(100% - 20px);
+}
+
+#botaoPower {
+  position: absolute;
+  bottom: 8px;
+  right: 10px;
+  cursor: pointer;
+}
+
+#botaoPower img {
+  width: 32px;
+  height: 32px;
+}
+
+.popupPower {
+  display: none;
+  position: absolute;
+  bottom: 40px;
+  right: 0;
+  background-color: #111;
+  border: 1px solid #444;
+  border-radius: 6px;
+  box-shadow: 0 0 6px #000;
+  overflow: hidden;
+  z-index: 999;
+}
+
+.popupPower div {
+  padding: 8px 12px;
+  color: white;
+  cursor: pointer;
+}
+
+.popupPower div:hover {
+  background-color: #333;
+}
+
+.menu-contextual {
+  position: absolute;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  z-index: 9999;
+  padding: 8px;
+  font-family: sans-serif;
+}
+.menu-contextual button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 6px 10px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.menu-contextual button:hover {
+  background-color: #ddd;
+}
+
+.loading-ring {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin-top: 30px;
+}
+
+.loading-ring div {
+  box-sizing: border-box;
+  display: block;
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border: 8px solid #00aaff;
+  border-radius: 50%;
+  animation: loadingRing 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+  border-color: #00aaff transparent transparent transparent;
+}
+
+.loading-ring div:nth-child(1) {
+  animation-delay: -0.45s;
+}
+.loading-ring div:nth-child(2) {
+  animation-delay: -0.3s;
+}
+.loading-ring div:nth-child(3) {
+  animation-delay: -0.15s;
+}
+
+@keyframes loadingRing {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+#bootAnimation {
+  position: fixed;
+  inset: 0;
+  background-color: black;
+  color: #00aaff;
+  font-size: 5em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', sans-serif;
+  z-index: 9999;
+}
+
+#bootLogo {
+  animation: floatUp 1.8s ease-out;
+  margin-bottom: 40px;
+}
+
+@keyframes floatUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+  .dia-evento {
+    border: 2px solid red !important;
+    border-radius: 50% !important;
+  }
+  
+  /* Painel de Configurações */
+#painelConfig {
+  position: fixed;
+  bottom: 70px;
+  right: 10px;
+  width: 250px;
+  background: rgba(20, 20, 20, 0.98);
+  color: white;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  display: none;
+  z-index: 999;
+  backdrop-filter: blur(10px);
+  border: 1px solid #444;
+}
+
+/* Controles deslizantes */
+#painelConfig input[type="range"] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 6px;
+  border-radius: 3px;
+  background: #444;
+  outline: none;
+  margin: 10px 0;
+}
+
+#painelConfig input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #0078D7;
+  cursor: pointer;
+  border: 2px solid white;
+}
+
+/* Botões do painel */
+#painelConfig button {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+#painelConfig button:hover {
+  background: #444;
+}
+
+/* Botão ⚙️ na barra de tarefas */
+#menuConfig {
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+#menuConfig:hover {
+  transform: rotate(90deg);
+  background: #333;
+}
+
+    #verTudo {
+      width: calc(100% - 20px); /* Ajuste para o padding */
+    }
+    
+    .icone {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  margin: 4px;
+  text-align: center;
+  background: #333;
+  border-radius: 4px;
+  transition: background 0.2s;
+  cursor: pointer;
+  user-select: none;
+}
+
+.icone:hover {
+  background: #555;
+}
+
+.icone img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  margin-bottom: 5px;
+}
+
+.icone span {
+  font-size: 12px;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* NOVOS ESTILOS PARA OS CONTROLES DESLIZANTES - ONE UI 7.0 STYLE */
+.oneui-slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  border-radius: 2px;
+  background: #444;
+  outline: none;
+  margin: 15px 0;
+  transition: all 0.2s ease;
+}
+
+.oneui-slider:hover {
+  background: #555;
+}
+
+.oneui-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0078D7;
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.oneui-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+.oneui-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #0078D7;
+  cursor: pointer;
+  border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.oneui-slider::-moz-range-thumb:hover {
+  transform: scale(1.15);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* Estilo para os rótulos */
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.slider-value {
+  font-weight: bold;
+  color: #0078D7;
+  min-width: 30px;
+  text-align: right;
+}
+
+/* Container para agrupar controles relacionados */
+.slider-group {
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.slider-group:last-child {
+  border-bottom: none;
+  margin-bottom: 15px;
+}
+
+/* Menu contextual para ícones de apps */
+.menu-contextual-app {
+  position: absolute;
+  background: rgba(30, 30, 30, 0.98);
+  border: 1px solid #444;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  padding: 6px 0;
+  min-width: 180px;
+  backdrop-filter: blur(10px);
+  font-family: sans-serif;
+}
+
+.menu-contextual-app button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 13px;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.menu-contextual-app button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.menu-contextual-app button:active {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.menu-contextual-app .separator {
+  height: 1px;
+  background-color: #444;
+  margin: 4px 0;
+}
+  </style>
+</head>
+<body>
+<div id="bootAnimation">
+
+<div id="bootLogo">entrando no perfil</div>
+
+<div class="loading-ring">
+  <div></div><div></div><div></div><div></div>
+</div>
+</div>
+
+<div id="conteudoPrincipal" style="display: none">
+<div id="areaTrabalho"></div>
+<div id="usuario" class="usuario-info">
+  <img id="userFoto" src="user/user_photo.jpg" alt="Foto do usuário">
+  <span id="userNome">Usuário</span>
+  <div style="margin-left: auto; display: flex; gap: 8px;">
+  <button id="botaoFS" title="Explorar arquivos" style="background: none; border: none; font-size: 24px; cursor: pointer;">📂</button>
+  <button id="botaoCalendario" title="Abrir calendário" style="background: none; border: none; font-size: 24px; cursor: pointer;">🗓</button>
+  <button id="botaoCaderno" title="Caderno virtual" style="background: none; border: none; font-size: 24px; cursor: pointer;">📒</button>
+</div>
+</div>
+<div id="painelMenu">
+  <div id="painelMenuEsquerdo">
+    <input type="text" id="buscaApp" placeholder="Pesquisar aplicativos..." />
+    <h3>Aplicativos</h3>
+    <div id="apps" class="area"></div>
+    <button id="verTudo" style="padding: 8px; margin-bottom: 10px;">Ver tudo</button>
+    <div id="resultadosPesquisa" class="area" style="display: none;"></div>
+
+    <h3>Ações</h3>
+    <div class="botoes">
+      <div class="botao" onclick="abrirMenu()">Menu</div>
+      <div class="botao" onclick="fecharTudo()">Fechar tudo</div>
+      <div class="botao" onclick="mostrarRecentes()">Recentes</div>
+    </div>
+  </div>
+
+  <div id="painelMenuDireito">
+    <h3 class="titulo-recentes">Recentemente usados</h3>
+    <div id="appsRecentesMenu" class="area"></div>
+  </div>
+
+  <!-- Mantenha o botão power com a imagem original: -->
+  <div id="botaoPower">
+    <img src="imgs/power.png" alt="Power">
+    <div id="menuPower" class="popupPower">
+      <div onclick="parent.postMessage('logoff', '*')">🚪 Sair</div>
+      <div onclick="parent.postMessage('reboot', '*')">🔄 Reiniciar</div>
+      <div onclick="parent.postMessage('desligar', '*')">⏻ Desligar</div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+  <!-- Painel flutuante de apps recentes -->
+  <div id="painelRecentes">Nenhum app recente</div>
+<img id="lixeira" src="imgs/lixeira.png" style="position:fixed;bottom:80px;right:10px;width:50px;height:50px;z-index:900;" />
+  <!-- Barra de tarefas -->
+  <div id="barraTarefas">
+    <div id="menuIniciar" onclick="alternarMenu()">☰</div>
+    <div id="appsRecentes"></div>
+    <div id="painelDireito">
+      <div id="relogio" class="painelMini">
+  <div class="hora">--:-- --</div>
+  <div class="data">--/--/----</div>
+</div>
+      <div id="rede" class="painelMini">Rede: ...</div>
+      <div id="temperatura" class="painelMini">Clima: ...</div>
+      <!-- Substitua o elemento com id="menuRecentes" por: -->
+<div id="menuConfig" class="painelMini" onclick="alternarConfig()">⚙️</div>
+
+<!-- Atualize o conteúdo do #painelConfig com este código: -->
+<div id="painelConfig" style="position:fixed;bottom:70px;right:10px;width:280px;background:rgba(30,30,30,0.98);color:white;padding:18px;border-radius:12px;box-shadow:0 5px 25px rgba(0,0,0,0.5);display:none;z-index:999;backdrop-filter:blur(15px);border:1px solid #444;">
+  <h3 style="margin-top:0;margin-bottom:20px;border-bottom:1px solid #444;padding-bottom:10px;font-size:16px;">Configurações</h3>
+  
+  <div class="slider-group">
+    <div class="slider-label">
+      <span>🔆 Brilho</span>
+      <span id="brilhoValue" class="slider-value">80%</span>
+    </div>
+    <input type="range" id="controleBrilho" class="oneui-slider" min="10" max="100" value="80">
+  </div>
+  
+  <div class="slider-group">
+    <div class="slider-label">
+      <span>🔊 Volume</span>
+      <span id="volumeValue" class="slider-value">50%</span>
+    </div>
+    <input type="range" id="controleVolume" class="oneui-slider" min="0" max="100" value="50">
+  </div>
+  
+  <div style="display:flex;justify-content:space-between;margin-top:15px;">
+    <button onclick="abrirCustomizacao()" style="background:#444;color:white;border:none;padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13px;transition:background 0.2s;">Customização</button>
+    <button onclick="abrirBluetooth()" style="background:#444;color:white;border:none;padding:8px 14px;border-radius:20px;cursor:pointer;font-size:13px;transition:background 0.2s;">Bluetooth</button>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+<div id="menuContextual" class="menu-contextual" style="display: none;"></div>
+
+<div id="painelFS" style="position:fixed;top:80px;right:20px;width:320px;max-height:70vh;overflow:auto;background:#111;border:1px solid #444;padding:10px;border-radius:8px;color:white;display:none;z-index:9999;font-family:sans-serif;">
+ <h3 style="display:flex;align-items:center;gap:8px;">
+  Arquivos virtuais
+  <button id="btnNovo" title="Novo item">➕️</button>
+  <button id="btnVisualizar" title="Visualizar todos (modo leitura)">🔍</button>
+</h3>
+  <div id="listaArquivos"></div>
+</div>
+</div>
+ <script>
+ function mostrarMenuContextualApp(appElement, nomeArquivo, nomeFormatado, isAppInstalado, x, y) {
+  // Remove menu existente
+  const menuExistente = document.querySelector('.menu-contextual-app');
+  if (menuExistente) {
+    menuExistente.remove();
+  }
+
+  // Cria novo menu
+  const menu = document.createElement('div');
+  menu.className = 'menu-contextual-app';
+  menu.style.left = `${x}px`;
+  menu.style.top = `${y}px`;
+
+  // Opções para todos os apps
+  const abrirBtn = document.createElement('button');
+  abrirBtn.textContent = '📂 Abrir';
+  abrirBtn.onclick = () => {
+    parent.postMessage(`abrir ${nomeArquivo}`, "*");
+    menu.remove();
+  };
+  menu.appendChild(abrirBtn);
+
+  const abrirAdminBtn = document.createElement('button');
+  abrirAdminBtn.textContent = '🛡️ Abrir como administrador';
+  abrirAdminBtn.onclick = () => {
+    parent.postMessage(`abrir_admin ${nomeArquivo}`, "*");
+    menu.remove();
+  };
+  menu.appendChild(abrirAdminBtn);
+
+  const atalhoBtn = document.createElement('button');
+  atalhoBtn.textContent = '📋 Criar atalho';
+  atalhoBtn.onclick = () => {
+    criarAtalhoAreaTrabalho(nomeArquivo, nomeFormatado);
+    menu.remove();
+  };
+  menu.appendChild(atalhoBtn);
+
+  // Apenas para apps instalados
+  if (isAppInstalado) {
+    const separator = document.createElement('div');
+    separator.className = 'separator';
+    menu.appendChild(separator);
+
+    const desinstalarBtn = document.createElement('button');
+    desinstalarBtn.textContent = '🗑️ Desinstalar';
+    desinstalarBtn.style.color = '#ff4444';
+    desinstalarBtn.onclick = () => {
+      if (confirm(`Deseja desinstalar "${nomeFormatado}"?`)) {
+        removerApp(nomeArquivo);
+        menu.remove();
+      }
+    };
+    menu.appendChild(desinstalarBtn);
+  }
+
+  // Adiciona ao documento
+  document.body.appendChild(menu);
+
+  // Fecha o menu ao clicar fora
+  const fecharMenu = (e) => {
+    if (!menu.contains(e.target)) {
+      menu.remove();
+      document.removeEventListener('click', fecharMenu);
+    }
+  };
+
+  setTimeout(() => {
+    document.addEventListener('click', fecharMenu);
+  }, 100);
+}
+
+// Função para criar atalho na área de trabalho
+function criarAtalhoAreaTrabalho(nomeArquivo, nomeFormatado) {
+  // Encontra o próximo slot disponível
+  const slotsOcupados = Array.from(document.querySelectorAll('.iconeDesktop'))
+    .map(icone => parseInt(icone.style.top) || 0)
+    .filter(top => top > 0);
+
+  let slot = 1;
+  while (slotsOcupados.includes(slot)) {
+    slot++;
+  }
+
+  // Cria o ícone na área de trabalho
+  criarIcone(nomeArquivo, nomeFormatado, slot, 'app');
+  
+  // Salva na estrutura de arquivos do usuário
+  salvarAtalhoUsuario(nomeArquivo, nomeFormatado, slot);
+  
+  Notificacao?.mostrar("Atalho criado", `Atalho para "${nomeFormatado}" criado na área de trabalho`);
+}
+
+// Função para salvar o atalho no files.json do usuário
+function salvarAtalhoUsuario(nomeArquivo, nomeFormatado, slot) {
+  const atalhoData = {
+    path: nomeArquivo,
+    nome: nomeFormatado,
+    slot: slot,
+    tipo: 'app'
+  };
+
+  // Carrega a estrutura atual ou cria nova
+  fetch(`${userFolder}files.json`)
+    .then(response => response.json())
+    .then(data => {
+      if (!data.config) data.config = {};
+      if (!data.config.icones_area_trabalho) data.config.icones_area_trabalho = [];
+      
+      // Adiciona o novo atalho
+      data.config.icones_area_trabalho.push(atalhoData);
+      
+      // Salva de volta (em um sistema real, você teria uma API para isso)
+      console.log('Atalho salvo:', atalhoData);
+      // Aqui você precisaria implementar a lógica para salvar no files.json
+    })
+    .catch(error => {
+      console.log('Criando nova estrutura de arquivos para atalhos');
+      // Cria estrutura básica se não existir
+      const novaEstrutura = {
+        config: {
+          icones_area_trabalho: [atalhoData]
+        }
+      };
+      // Salvar nova estrutura (implementar conforme seu sistema)
+    });
+}
+ 
+function getCustomKey(key) {
+  if (isVirtualUser) {
+    return `virtual_${virtualUserUID}_${key}`;
+  }
+  const folder = userFolder || 'user/'; // ✅ Fallback seguro
+  return `custom_${folder.replace(/\//g, '_')}_${key}`;
+}
+
+let userFolder = 'user/';
+let menuTimeout;
+let listaAplicativos = [];
+let lastPointerEvent = null;
+let appsRecentes = [];
+let isVirtualUser = false;
+let virtualUserUID = '';
+const responseCallbacks = {};
+// 1. Adicione estas variáveis no início do script, junto com as outras declarações
+let appsInstalados = []; // Armazenará os apps instalados pelo usuário
+const APPS_INSTALADOS_KEY = "apps_instalados"; // Chave para localStorage
+function getAppIconPath(appName) {
+  // Remove .html e caminhos de diretório
+  const cleanName = appName.replace('.html', '').split('/')[0];
+  // Substitui espaços por underscores e remove caracteres especiais
+  const iconName = cleanName.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+  // Tenta carregar o ícone personalizado
+  const customIconPath = `icons/${iconName}.png`;
+  
+  function isAppInstalado(nomeArquivo) {
+  const nomeFormatado = nomeArquivo.endsWith('.html') ? nomeArquivo : `${nomeArquivo}.html`;
+  return appsInstalados.includes(nomeFormatado);
+}
+  
+  // Verifica se o ícone existe (abordagem assíncrona)
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(customIconPath);
+    img.onerror = () => resolve('imgs/app.png'); // Fallback
+    img.src = customIconPath;
+  });
+}
+
+async function renderizarApps() {
+  const container = document.getElementById("apps");
+  container.innerHTML = "";
+  
+  // Mostra apenas os primeiros 8 apps por padrão
+  const appsToShow = listaAplicativos.slice(0, 8);
+  
+  for (const nomeArquivo of appsToShow) {
+    const nomeFormatado = formatarNomeApp(nomeArquivo);
+    const icone = await criarElementoIcone(nomeArquivo, nomeFormatado);
+    container.appendChild(icone);
+  }
+}
+
+function atualizarListaAplicativos() {
+  // Combina apps padrão e instalados (sem duplicatas)
+  fetch("apps.json")
+    .then(resp => resp.json())
+    .then(appsPadrao => {
+      listaAplicativos = [...new Set([...appsPadrao, ...appsInstalados])];
+      renderizarApps();
+    })
+    .catch(() => {
+      listaAplicativos = [...appsInstalados];
+      renderizarApps();
+    });
+}
+
+function formatarNomeApp(nomeArquivo) {
+  return nomeArquivo
+    .replace(".html", "")
+    .split("/")[0]
+    .replace(/_/g, ' ');
+}
+
+async function criarElementoIcone(nomeArquivo, nomeFormatado) {
+  const icone = document.createElement("div");
+  icone.className = "icone";
+
+  // Verifica se é um app instalado
+  const isAppInstalado = appsInstalados.includes(nomeArquivo);
+
+  // Container para ícone e texto
+  const container = document.createElement("div");
+  container.style.display = "flex";
+  container.style.flexDirection = "column";
+  container.style.alignItems = "center";
+  container.style.justifyContent = "center";
+  container.style.width = "100%";
+  container.style.height = "100%";
+  container.style.cursor = "pointer";
+
+  // Elemento de imagem
+  const img = document.createElement("img");
+  img.src = await getAppIconPath(nomeArquivo);
+  img.style.width = "32px";
+  img.style.height = "32px";
+  img.style.objectFit = "contain";
+  img.style.marginBottom = "5px";
+
+  // Elemento de texto
+  const nomeSpan = document.createElement("span");
+  nomeSpan.textContent = nomeFormatado;
+  nomeSpan.style.fontSize = "12px";
+  nomeSpan.style.textAlign = "center";
+  nomeSpan.style.wordBreak = "break-word";
+  nomeSpan.style.maxWidth = "70px";
+
+  // Monta a estrutura
+  container.appendChild(img);
+  container.appendChild(nomeSpan);
+  icone.appendChild(container);
+
+  // Clique esquerdo - abre normalmente (com diálogo)
+  icone.onclick = () => perguntarModoAbertura(nomeArquivo);
+
+  // Clique direito - menu contextual
+  icone.oncontextmenu = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    mostrarMenuContextualApp(icone, nomeArquivo, nomeFormatado, isAppInstalado, e.clientX, e.clientY);
+  };
+
+  return icone;
+}
+
+
+
+// 3. Adicione estas funções para gerenciamento de apps
+function instalarApp(nomeArquivo) {
+  const nomeFormatado = nomeArquivo.endsWith('.html') ? nomeArquivo : `${nomeArquivo}.html`;
+  
+  if (!appsInstalados.includes(nomeFormatado)) {
+    appsInstalados.push(nomeFormatado);
+    salvarAppsInstalados();
+    atualizarListaAplicativos(); // Adicione esta linha
+    console.log(`✅ App instalado: ${nomeFormatado}`);
+  }
+}
+
+function removerApp(nomeArquivo) {
+  const nomeFormatado = nomeArquivo.endsWith('.html') ? nomeArquivo : `${nomeArquivo}.html`;
+  
+  appsInstalados = appsInstalados.filter(app => app !== nomeFormatado);
+  salvarAppsInstalados();
+  atualizarListaAplicativos(); // Adicione esta linha
+  console.log(`❌ App removido: ${nomeFormatado} ou ${nomeArquivo}`);
+  parent.postMessage(`fechar ${nomeArquivo}`, `*`)
+}
+
+function salvarAppsInstalados() {
+  localStorage.setItem(getCustomKey(APPS_INSTALADOS_KEY), JSON.stringify(appsInstalados));
+}
+
+function recarregarAppsPadrao() {
+  fetch("apps.json")
+    .then(resp => resp.json())
+    .then(appsPadrao => {
+      listaAplicativos = [...new Set([...appsPadrao, ...appsInstalados])];
+      atualizarListaAplicativos();
+    })
+    .catch(() => {
+      listaAplicativos = [...appsInstalados];
+      atualizarListaAplicativos();
+    });
+}
+
+function criarUsuarioVirtual(nome, fotoBase64) {
+  // Gerar UID único
+  virtualUserUID = 'v_' + Math.random().toString(36).substr(2, 9) + Date.now().toString(36);
+  
+  // Salvar dados básicos do usuário
+  const userData = {
+    name: nome,
+    photo: `data:image/jpg;base64,${fotoBase64}`,
+    createdAt: new Date().toISOString()
+  };
+  
+  localStorage.setItem(`virtual_user_${virtualUserUID}`, JSON.stringify(userData));
+  
+  // Marcar como usuário virtual
+  isVirtualUser = true;
+  
+  // Criar configurações padrão
+  resetarConfiguracoesPadrao();
+  
+  // Definir wallpaper padrão
+  setUserWallpaper('wallpaper1.png');
+  
+  // Carregar dados
+  carregarDadosUsuario();
+  carregarConfiguracoes();
+}
+
+function abrirVisualizadorComRetry(path, tentativas = 0) {
+  const maxTentativas = 3;
+  const delay = 1000;
+  
+  parent.postMessage("abrir_admin visualizador_de_arquivos.html", "*");
+  
+  setTimeout(() => {
+    const visualizador = encontrarJanelaApp("visualizador_de_arquivos.html");
+    
+    if (visualizador && visualizador.contentWindow) {
+      visualizador.contentWindow.postMessage(`f2 abrir_arquivo ${path}`, "*");
+    } else if (tentativas < maxTentativas) {
+      console.log(`Tentativa ${tentativas + 1} - Visualizador não está pronto, tentando novamente...`);
+      abrirVisualizadorComRetry(path, tentativas + 1);
+    } else {
+      console.error("Visualizador não respondeu após várias tentativas");
+    }
+  }, delay);
+}
+
+function carregarEstruturaArquivos() {
+  fetch(`${userFolder}files.json`)
+    .then(response => response.json())
+    .then(data => {
+      document.querySelectorAll('.iconeDesktop').forEach(icone => icone.remove());
+      
+      if (data.config && data.config.icones_area_trabalho) {
+        data.config.icones_area_trabalho.forEach(item => {
+          const nome = item.path.split('/').pop();
+          criarIcone(item.path, nome, item.slot, item.path.endsWith('/') ? 'pasta' : 'arquivo');
+        });
+      }
+    })
+    .catch(error => {
+      console.error("Erro ao carregar files.json:", error);
+      criarIconesPadrao();
+    });
+}
+
+function criarIconesPadrao() {
+  const iconesPadrao = [
+    { path: "/apps/", nome: "Apps", slot: 1, tipo: "pasta" },
+    { path: "/documentos/", nome: "Documentos", slot: 2, tipo: "pasta" },
+    { path: "/documentos/notas.txt", nome: "notas.txt", slot: 3, tipo: "arquivo" }
+  ];
+  
+  iconesPadrao.forEach(icone => {
+    criarIcone(icone.path, icone.nome, icone.slot, icone.tipo);
+  });
+}
+
+function moverIcone(icone) {
+  console.log("Movendo ícone:", icone.dataset.nome);
+}
+
+function criarSubpasta(iconePasta) {
+  const nome = prompt("Nome da nova subpasta:");
+  if (nome) {
+    const caminhoPai = iconePasta.dataset.path;
+    const novoCaminho = `${caminhoPai}/${nome}`;
+    window.FileSystem.criarPasta(nome, caminhoPai);
+    const novoSlot = Math.floor(Math.random() * 20) + 1;
+    criarIcone(novoCaminho, nome, novoSlot, "pasta");
+  }
+}
+
+function mostrarPropriedades(icone) {
+  const props = {
+    "Nome": icone.dataset.nome,
+    "Tipo": icone.dataset.tipo,
+    "Caminho": icone.dataset.path,
+    "Tamanho": icone.dataset.tamanho || "N/A",
+    "Criado em": icone.dataset.criado || new Date().toLocaleString()
+  };
+  
+  let msg = "";
+  for (const [key, value] of Object.entries(props)) {
+    msg += `${key}: ${value}\n`;
+  }
+  
+  alert(msg);
+}
+
+function abrirItem(icone) {
+  // Evita múltiplas aberturas
+  if (icone._opening) return;
+  icone._opening = true;
+  
+  const tipo = icone.dataset.tipo;
+  const nome = icone.dataset.nome;
+  const caminho = icone.dataset.path;
+
+  switch(tipo) {
+    case "pasta":
+      // Verifica se já existe uma janela do visualizador aberta
+      const visualizadorExistente = encontrarJanelaApp("visualizador_de_arquivos.html");
+      if (visualizadorExistente) {
+        // Usa a janela existente
+        visualizadorExistente.contentWindow.postMessage(`f2 abrir_arquivo ${caminho}`, "*");
+        visualizadorExistente.parentElement.style.zIndex = 999999;
+      } else {
+        // Abre uma nova janela apenas se não existir
+        parent.postMessage("abrir visualizador_de_arquivos.html", "*");
+        setTimeout(() => {
+          const visualizador = encontrarJanelaApp("visualizador_de_arquivos.html");
+          if (visualizador) {
+            visualizador.contentWindow.postMessage(`f2 abrir_arquivo ${caminho}`, "*");
+          }
+        }, 500);
+      }
+      break;
+    case "app":
+      parent.postMessage(`abrir ${nome}.html`, "*");
+      break;
+    default:
+      // Para outros tipos de arquivo
+      parent.postMessage(`abrir visualizador_de_arquivos.html?file=${encodeURIComponent(caminho)}`, "*");
+  }
+  
+  // Reseta o flag após um pequeno delay
+  setTimeout(() => icone._opening = false, 1000);
+}
+
+function encontrarJanelaApp(nomeApp) {
+  try {
+    const iframes = Array.from(document.querySelectorAll(".janela iframe"));
+    return iframes.find(iframe => {
+      try {
+        return iframe.src.includes(nomeApp);
+      } catch {
+        return false;
+      }
+    });
+  } catch {
+    return null;
+  }
+}
+
+
+  // Função auxiliar para ler valores booleanos corretamente
+  const getBoolSetting = (key, defaultValue = true) => {
+    const value = localStorage.getItem(getCustomKey(key));
+    return value === null ? defaultValue : value === "true";
+  };
+
+function resetarConfiguracoesPadrao() {
+  const padroes = {
+    "showTopBar": "true",
+    "taskbarColor": "rgba(20, 20, 20, 0.95)",
+    "showDateTime": "true",
+    "showNetwork": "true",
+    "showWeather": "true",
+    "theme": "escuro",
+    "showRecentApps": "true",
+    "showSearchBar": "true",
+    "font": ""
+  };
+  
+  for (const [key, value] of Object.entries(padroes)) {
+    localStorage.setItem(getCustomKey(key), value);
+  }
+
+  carregarConfiguracoes();
+  Notificacao?.mostrar("Configurações", "Configurações resetadas para os valores padrão");
+} // Faltava este fechamento
+
+function carregarConfiguracoes() {
+  // Função auxiliar para ler valores booleanos corretamente
+  const getBoolSetting = (key, defaultValue = true) => {
+    const value = localStorage.getItem(getCustomKey(key));
+    return value === null ? defaultValue : value === "true";
+  };
+
+  // Barra superior
+  document.getElementById("usuario").style.display = 
+    getBoolSetting("showTopBar") ? "flex" : "none";
+
+  // Cor da barra de tarefas
+  const taskbarColor = localStorage.getItem(getCustomKey("taskbarColor"));
+  if (taskbarColor) {
+    document.getElementById("barraTarefas").style.background = taskbarColor;
+  }
+
+  // Itens da barra de tarefas
+  document.getElementById("relogio").style.display = 
+    getBoolSetting("showDateTime", true) ? "block" : "none";
+  
+  document.getElementById("rede").style.display = 
+    getBoolSetting("showNetwork", true) ? "block" : "none";
+  
+  document.getElementById("temperatura").style.display = 
+    getBoolSetting("showWeather", true) ? "block" : "none";
+
+  // Menu iniciar
+  document.getElementById("painelMenuDireito").style.display = 
+    getBoolSetting("showRecentApps", true) ? "block" : "none";
+  
+  const buscaAppContainer = document.getElementById("buscaApp").parentNode;
+  buscaAppContainer.style.display = 
+    getBoolSetting("showSearchBar", true) ? "block" : "none";
+
+  // Tema
+  const theme = localStorage.getItem(getCustomKey("theme"));
+  if (theme === "claro") {
+    document.documentElement.style.setProperty('--bg-color', '#f0f0f0');
+    document.documentElement.style.setProperty('--text-color', '#333');
+  } else {
+    document.documentElement.style.setProperty('--bg-color', '#202020');
+    document.documentElement.style.setProperty('--text-color', '#fff');
+  }
+}
+
+function carregarDadosUsuario() {
+  if (isVirtualUser) {
+    // Carrega dados do usuário virtual
+    const virtualUserData = JSON.parse(localStorage.getItem(`virtual_user_${virtualUserUID}`));
+    if (virtualUserData) {
+      document.getElementById("userNome").textContent = virtualUserData.name || "Usuário Virtual";
+      
+      // Converter base64 para imagem
+      if (virtualUserData.photo) {
+        document.getElementById("userFoto").src = virtualUserData.photo;
+      } else {
+        document.getElementById("userFoto").src = "user/user_photo.jpg";
+      }
+    }
+  } else {
+    // Código original para usuários físicos
+    fetch(`${userFolder}user_name.txt`)
+      .then(res => res.ok ? res.text() : Promise.reject())
+      .then(texto => {
+        document.getElementById("userNome").textContent = texto.trim() || "Convidado";
+        document.getElementById("userFoto").src = `${userFolder}user_photo.jpg`;
+      })
+      .catch(() => {
+        document.getElementById("userNome").textContent = "Convidado";
+        // CORREÇÃO: Usar userFolder mesmo no fallback
+        document.getElementById("userFoto").src = `${userFolder}user_photo.jpg`;
+      });
+  }
+    
+      // Carrega wallpaper (compatível com ambos)
+  const area = document.getElementById("areaTrabalho");
+  const wallpaperSalvo = getUserWallpaper();
+  
+  if (wallpaperSalvo) {
+    area.style.backgroundImage = `url("wallpapers/${wallpaperSalvo}")`;
+  } else {
+    area.style.backgroundImage = 'url("wallpapers/wallpaper1.png")';
+    setUserWallpaper('wallpaper1.png');
+  }
+}
+
+
+function iniciarToqueLongo(target, tipo, x, y) {
+  target._lastX = x;
+  target._lastY = y;
+  
+  menuTimeout = setTimeout(() => {
+    mostrarMenuContextual(target, tipo, x, y);
+  }, 600);
+}
+
+function cancelarToqueLongo() {
+  clearTimeout(menuTimeout);
+}
+
+const barra = [];
+
+function alternarMenu() {
+  const painel = document.getElementById("painelMenu");
+  painel.classList.toggle("aberto");
+}
+
+async function criarBotaoRecente(nome) {
+  const area = document.getElementById("appsRecentes");
+  if (barra.includes(nome)) return;
+
+  barra.push(nome);
+  const nomeFormatado = formatarNomeApp(nome);
+  const icone = await criarElementoIcone(nome, nomeFormatado);
+  
+  // Ajusta o estilo para a barra de tarefas
+  icone.style.flexDirection = "row";
+  icone.style.alignItems = "center";
+  icone.style.padding = "5px 10px";
+  icone.querySelector("img").style.marginRight = "5px";
+  icone.querySelector("img").style.marginBottom = "0";
+  icone.querySelector("span").style.fontSize = "11px";
+  
+  icone.onclick = () => {
+    parent.postMessage("recents " + nome, "*");
+    icone.remove();
+    const index = barra.indexOf(nome);
+    if (index !== -1) barra.splice(index, 1);
+  };
+
+  area.appendChild(icone);
+}
+
+function abrirMenu() {
+  parent.postMessage("abrir menu.html", "*");
+}
+
+function fecharTudo() {
+  parent.postMessage("fechar_tudo", "*");
+}
+
+function mostrarRecentes() {
+  barra.forEach(nome => {
+    parent.postMessage("recents " + nome, "*");
+  });
+}
+
+function alternarRecentes() {
+  const painel = document.getElementById("painelRecentes");
+  painel.classList.toggle("aberto");
+  painel.innerHTML = barra.length
+    ? barra.map(nome => `<div class="icone">${nome}</div>`).join("")
+    : "Nenhum app recente";
+}
+
+window.addEventListener("message", (e) => {
+  const debug = document.getElementById("debugMensagem");
+  debug.textContent = "Recebido: " + e.data;
+  debug.style.display = "block";
+  clearTimeout(debug._timer);
+  debug._timer = setTimeout(() => debug.style.display = "none", 3000);
+
+  if (e.data.startsWith("recents ")) {
+    const nome = e.data.split(" ")[1];
+    criarBotaoRecente(nome);
+  }
+  
+    if (e.data.startsWith("user:")) {
+    userFolder = `users/${e.data.split(':')[1].trim()}/`;
+    
+    // CORREÇÃO: Atualizar a foto do usuário imediatamente
+    document.getElementById("userFoto").src = `${userFolder}user_photo.jpg`;
+    
+    // Forçar recarregamento de todos os dados
+    carregarDadosUsuario();
+    carregarConfiguracoes();
+    carregarEstruturaArquivos(); // Se esta função existir
+    
+    // Atualizar ícones da área de trabalho
+    fetch(`${userFolder}files.json`)
+      .then(response => response.json())
+      .then(data => atualizarAreaTrabalho(data))
+      .catch(criarIconesPadrao);
+  }
+  
+  if (e.data.startsWith("custom-user:")) {
+    // Formato: "custom-user: photo=<base64> name=<nome>"
+    const parts = e.data.split(' ');
+    const photoPart = parts.find(p => p.startsWith('photo='));
+    const namePart = parts.find(p => p.startsWith('name='));
+    
+    const photoBase64 = photoPart ? photoPart.split('=')[1] : '';
+    const name = namePart ? decodeURIComponent(namePart.split('=')[1]) : 'Usuário Virtual';
+    
+    criarUsuarioVirtual(name, photoBase64);
+    
+    // Esconder animação de boot e mostrar interface
+    document.getElementById("bootAnimation").style.display = "none";
+    document.getElementById("conteudoPrincipal").style.display = "block";
+    
+    // Carregar ícones padrão
+    criarIconesPadrao();
+    return;
+  }
+  
+  // 4. Adicione isto ao listener de mensagens existente (dentro do window.addEventListener("message"))
+if (e.data.startsWith("install ")) {
+  const nomeArquivo = e.data.substring(8); // Remove "install "
+  instalarApp(nomeArquivo);
+} 
+else if (e.data.startsWith("delapp ")) {
+  const nomeArquivo = e.data.substring(7); // Remove "delapp "
+  removerApp(nomeArquivo);
+}
+  
+if (e.data.startsWith("notificar_app_aberto ")) {
+    const nomeArquivo = e.data.split(" ")[1];
+    const nomeFormatado = nomeArquivo.replace(".html", "");
+    
+    fetch("apps_using_user_data.json")
+        .then(response => response.json())
+        .then(appsComAcesso => {
+            if (appsComAcesso.includes(nomeFormatado)) {
+                const pastaUsuario = userFolder.replace('users/', '').replace(/\//g, '');
+                
+                // Primeiro abre o app
+                parent.postMessage(`abrir ${nomeArquivo}`, "*");
+                
+                // Depois de um pequeno delay, envia a mensagem user:
+                setTimeout(() => {
+                    const janelaApp = encontrarJanelaApp(nomeArquivo);
+                    if (janelaApp && janelaApp.contentWindow) {
+                        janelaApp.contentWindow.postMessage(`user: ${pastaUsuario}`, "*");
+                    } else {
+                        console.error("Janela do app não encontrada para enviar dados do usuário");
+                    }
+                }, 1000); // Aumentei o delay para garantir que o app carregou
+            } else {
+                // Se não precisa de dados do usuário, só abre o app
+                parent.postMessage(`abrir ${nomeArquivo}`, "*");
+            }
+        })
+        .catch(() => {
+            console.log("Arquivo apps_using_user_data.json não encontrado");
+            parent.postMessage(`abrir ${nomeArquivo}`, "*");
+        });
+}
+  
+  // Força a atualização do wallpaper
+  const wallpaperSalvo = getUserWallpaper();
+  if (wallpaperSalvo) {
+    const area = document.getElementById("areaTrabalho");
+    area.style.backgroundImage = `url("wallpapers/${wallpaperSalvo}")`;
+  }
+
+if (e.data.startsWith("w ")) {
+  const nomeWallpaper = e.data.split(" ")[1];
+  const area = document.getElementById("areaTrabalho");
+  if (area) {
+    area.style.backgroundImage = `url("wallpapers/${nomeWallpaper}")`;
+    setUserWallpaper(nomeWallpaper);
+    debug.textContent = "Wallpaper aplicado: " + nomeWallpaper;
+  }
+}
+
+  if (e.data.startsWith("f1 ")) {
+    const [cmd, ...args] = e.data.split(" ").slice(1);
+    switch(cmd) {
+      case "atualizar_icones":
+        atualizarIconesAreaTrabalho();
+        break;
+      case "novo_arquivo":
+        criarNovoArquivo(args[0], args[1]);
+        break;
+    }
+  }
+
+  if (e.data.startsWith("light ")) {
+    const valorStr = e.data.split(" ")[1];
+    const porcentagem = parseInt(valorStr);
+    if (!isNaN(porcentagem)) {
+      const brilho = Math.max(0.1, porcentagem / 100);
+      document.documentElement.style.filter = `brightness(${brilho})`;
+      debug.textContent = `🔆 Brilho para ${porcentagem}%`;
+    }
+  }
+  
+if (typeof e.data === 'string' && e.data.startsWith('p ')) {
+    const [prefix, type, ...data] = e.data.substring(2).split(' ');
+    
+    // Procura por callbacks correspondentes
+    for (const id in responseCallbacks) {
+      if (responseCallbacks[id].type === type) {
+        responseCallbacks[id].resolve(data[0]);
+        delete responseCallbacks[id];
+        break;
+      }
+    }
+  }  
+  
+  // Comandos de customização
+ if (e.data.startsWith("custom ")) {
+  const parts = e.data.split(" ");
+  const command = parts[1];
+  const value = parts.slice(2).join(" ");
+
+  switch(command) {
+    case "superiorbarra":
+      localStorage.setItem(getCustomKey("showTopBar"), value === "sim" ? "true" : "false");
+      document.getElementById("usuario").style.display = value === "sim" ? "flex" : "none";
+      break;
+
+    case "padrao":
+      resetarConfiguracoesPadrao();
+      break;
+ 
+case "barra":
+  if (parts[2] === "cor") {
+    const cor = parts[3];
+    localStorage.setItem(getCustomKey("taskbarColor"), cor);
+    document.getElementById("barraTarefas").style.background = cor;
+  } else {
+    const mostrar = parts[3] === "sim";
+    let settingKey;
+    let element;
+
+    switch(parts[2]) {
+      case "dataehora":
+        settingKey = "showDateTime";
+        element = document.getElementById("relogio");
+        break;
+      case "net":
+        settingKey = "showNetwork";
+        element = document.getElementById("rede");
+        break;
+      case "clima":
+        settingKey = "showWeather";
+        element = document.getElementById("temperatura");
+        break;
+      default:
+        return;
+    }
+
+    localStorage.setItem(getCustomKey(settingKey), mostrar ? "true" : "false");
+    element.style.display = mostrar ? "block" : "none";
+  }
+  break;
+
+case "menuIniciar":
+  const mostrarMenu = parts[3] === "sim";
+  let settingKeyMenu;
+  let elementMenu;
+
+  if (parts[2] === "recentes") {
+    settingKeyMenu = "showRecentApps";
+    elementMenu = document.getElementById("painelMenuDireito");
+  } else if (parts[2] === "barra") {
+    settingKeyMenu = "showSearchBar";
+    elementMenu = document.getElementById("buscaApp").parentNode;
+  } else {
+    return;
+  }
+
+  localStorage.setItem(getCustomKey(settingKeyMenu), mostrarMenu ? "true" : "false");
+  elementMenu.style.display = mostrarMenu ? "block" : "none";
+  break;
+        
+    case "tema":
+      localStorage.setItem(getCustomKey("theme"), value);
+      if (value === "claro") {
+        document.documentElement.style.setProperty('--bg-color', '#f0f0f0');
+        document.documentElement.style.setProperty('--text-color', '#333');
+      } else {
+        document.documentElement.style.setProperty('--bg-color', '#202020');
+        document.documentElement.style.setProperty('--text-color', '#fff');
+      }
+      break;
+        
+    case "font":
+      localStorage.setItem(getCustomKey("font"), value);
+      const fontLink = document.createElement('link');
+      fontLink.href = value;
+      fontLink.rel = 'stylesheet';
+      document.head.appendChild(fontLink);
+      break;
+  }
+}
+});
+
+function atualizarIconesAreaTrabalho() {
+  // Limpa ícones existentes
+  document.querySelectorAll(".iconeDesktop").forEach(icone => icone.remove());
+  
+  // Recria todos os ícones da estrutura
+  percorrerEstrutura(window.FileSystem.estrutura["/"]);
+}
+
+function percorrerEstrutura(estrutura, caminho = "/") {
+  for (const [nome, dados] of Object.entries(estrutura)) {
+    if (dados.tipo === "pasta") {
+      // Cria ícone para pasta
+      criarIcone(`${caminho}${nome}`, nome, 1, "pasta", dados);
+      // Recursão para subpastas
+      if (dados.conteudo) {
+        percorrerEstrutura(dados.conteudo, `${caminho}${nome}/`);
+      }
+    } else {
+      // Cria ícone para arquivo
+      criarIcone(`${caminho}${nome}`, nome, 1, dados.tipo, dados);
+    }
+  }
+}
+
+// 2. Substitua o fetch("apps.json") existente por esta função
+function carregarTodosAplicativos() {
+  return new Promise((resolve) => {
+    // Carrega apps padrão do arquivo apps.json
+    fetch("apps.json")
+      .then(resp => resp.json())
+      .then(appsPadrao => {
+        // Carrega apps instalados do localStorage
+        const instaladosSalvos = localStorage.getItem(getCustomKey(APPS_INSTALADOS_KEY));
+        appsInstalados = instaladosSalvos ? JSON.parse(instaladosSalvos) : [];
+        
+        // Combina ambas as listas (sem duplicatas)
+        listaAplicativos = [...new Set([...appsPadrao, ...appsInstalados])];
+        resolve();
+      })
+      .catch(error => {
+        console.error("Erro ao carregar apps padrão:", error);
+        // Fallback: usa apenas os instalados
+        listaAplicativos = [...appsInstalados];
+        resolve();
+      });
+  });
+}
+
+function formatarHoraWindows() {
+  const agora = new Date();
+  
+  // Formata hora no estilo Windows (ex: "3:45 PM")
+  let horas = agora.getHours();
+  const ampm = horas >= 12 ? 'PM' : 'AM';
+  horas = horas % 12;
+  horas = horas ? horas : 12; // Hora 0 vira 12 AM
+  
+  const minutos = agora.getMinutes().toString().padStart(2, '0');
+  
+  return `${horas}:${minutos} ${ampm}`;
+}
+
+function formatarDataWindows() {
+  const agora = new Date();
+  
+  // Formata data no estilo Windows (ex: "30/01/2024")
+  const dia = agora.getDate().toString().padStart(2, '0');
+  const mes = (agora.getMonth() + 1).toString().padStart(2, '0');
+  const ano = agora.getFullYear();
+  
+  return `${dia}/${mes}/${ano}`;
+}
+
+function atualizarRelogio() {
+  const relogio = document.getElementById("relogio");
+  if (!relogio) return;
+  
+  relogio.querySelector('.hora').textContent = formatarHoraWindows();
+  relogio.querySelector('.data').textContent = formatarDataWindows();
+  
+  // Adiciona hover effect para mostrar mais detalhes (opcional)
+  relogio.onmouseenter = () => {
+    const agora = new Date();
+    const diaSemana = agora.toLocaleDateString('pt-BR', { weekday: 'long' });
+    relogio.title = `${diaSemana.charAt(0).toUpperCase() + diaSemana.slice(1)}`;
+  };
+}
+
+// Inicia e atualiza a cada segundo
+atualizarRelogio();
+setInterval(atualizarRelogio, 1000);
+setInterval(atualizarRelogio, 1000);
+atualizarRelogio();
+
+function atualizarRede() {
+  const online = navigator.onLine ? "Online" : "Offline";
+  const nomeRede = "Wi-Fi";
+  document.getElementById("rede").textContent = `Rede: ${nomeRede} (${online})`;
+} 
+
+// Na função perguntarModoAbertura, adicione:
+async function perguntarModoAbertura(nomeArquivo) {
+    const nomeFormatado = nomeArquivo.replace(".html", "");
+    const userFolder = window.userFolder || 'user/';
+    const userId = userFolder.replace('users/', '').replace(/\//g, '');
+    
+    // 1. Verificação do controle parental (rápida e assíncrona)
+    const [parentalEnabled, isSupervised, isBlocked, remainingTime] = await Promise.all([
+        waitForResponse('parentalControlResponse', "p check parental-control enabled"),
+        waitForResponse('supervisionResponse', `p check ${userId} supervision`),
+        waitForResponse('blockResponse', `p check ${userId} app-blocked ${nomeFormatado}`),
+        waitForResponse('timeResponse', `p check ${userId} time`)
+    ]);
+
+    // 2. Bloqueia se necessário
+    if (parentalEnabled === 'true' && isSupervised === 'true') {
+        if (isBlocked === 'true') {
+            alert('Este aplicativo está bloqueado pelo controle parental.');
+            return;
+        }
+        
+        if (parseInt(remainingTime) <= 0) {
+            alert('Você atingiu seu limite diário de uso.');
+            return;
+        }
+        
+        // Inicia o timer de uso
+        parent.postMessage(`p startTimer ${userId} ${nomeFormatado}`, "*");
+    }
+
+    // 3. SEMPRE abre o diálogo, independente de precisar de dados do usuário
+    parent.postMessage("abrir dialogo.html", "*");
+    
+    // 4. Prepara e envia os dados do diálogo (com pequeno delay para garantir carregamento)
+    setTimeout(() => {
+        const dadosDialogo = {
+            type: "quiz",
+            msg: `Como deseja abrir ${nomeFormatado.replace(/_/g, ' ')}?`,
+            button1: [
+                `parent.postMessage("abrir ${nomeArquivo}", "*");
+                 parent.postMessage("p logApp ${userId} ${nomeFormatado} normal", "*")`,
+                "Modo Seguro"
+            ],
+            button2: [
+                `parent.postMessage("abrir_admin ${nomeArquivo}", "*");
+                 parent.postMessage("p logApp ${userId} ${nomeFormatado} admin", "*")`,
+                "Administrador"
+            ]
+        };
+        parent.postMessage("dialog " + JSON.stringify(dadosDialogo), "*");
+    }, 300);
+}
+
+// Versão melhorada do waitForResponse
+function waitForResponse(type, messageToSend = null) {
+    return new Promise((resolve) => {
+        const id = Math.random().toString(36).substr(2, 9);
+        responseCallbacks[id] = { type, resolve };
+        
+        if (messageToSend) {
+            parent.postMessage(messageToSend, "*");
+        }
+
+        setTimeout(() => {
+            if (responseCallbacks[id]) {
+                delete responseCallbacks[id];
+                resolve('false');
+            }
+        }, 200); // Timeout reduzido para 200ms
+    });
+}
+
+window.addEventListener("online", atualizarRede);
+window.addEventListener("offline", atualizarRede);
+atualizarRede();
+
+function getSlotPosition(slot) {
+  const coluna = (slot - 1) % 8;
+  const linha = Math.floor((slot - 1) / 8);
+  return {
+    left: 10 + coluna * 90,
+    top: 10 + linha * 110
+  };
+}
+
+function criarIcone(caminho, nome, slot, tipo, metadata = {}) {
+  const icone = document.createElement("div");
+  icone.className = "iconeDesktop";
+  icone.draggable = true;
+  
+  // Ícones diferentes para cada tipo
+  let iconImg;
+  switch(tipo) {
+    case "pasta":
+      iconImg = "imgs/folder.png";
+      break;
+    case "texto":
+      iconImg = "imgs/file_text.png";
+      break;
+    case "imagem":
+      iconImg = "imgs/file_image.png";
+      break;
+    case "audio":
+      iconImg = "imgs/file_audio.png";
+      break;
+    case "app":
+      iconImg = "imgs/file_app.png";
+      break;
+    default:
+      iconImg = "imgs/file.png";
+  }
+
+  icone.innerHTML = `
+    <img src="${iconImg}" alt="${tipo}">
+    <br>
+    <span class="nome-icone">${nome}</span>
+  `;
+  
+  // Armazena metadados no ícone
+  icone.dataset.path = caminho;
+  icone.dataset.tipo = tipo;
+  icone.dataset.nome = nome;
+  Object.entries(metadata).forEach(([key, value]) => {
+    icone.dataset[key] = value;
+  });
+
+  // Configura eventos
+  const img = icone.querySelector("img");
+  img.addEventListener("contextmenu", e => e.preventDefault());
+
+  icone.addEventListener("dblclick", () => abrirItem(icone));
+  icone.addEventListener("pointerdown", (e) => {
+    iniciarToqueLongo(icone, tipo, e.clientX, e.clientY);
+  });
+
+  // Posiciona na área de trabalho
+  const pos = getSlotPosition(Number(slot));
+  icone.style.left = pos.left + "px";
+  icone.style.top = pos.top + "px";
+
+  document.getElementById("areaTrabalho").appendChild(icone);
+  return icone;
+}
+
+const area = document.getElementById("areaTrabalho");
+
+area.addEventListener("dragover", e => {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+});
+
+area.addEventListener("drop", e => {
+  e.preventDefault();
+  try {
+    const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+    if (!data) return;
+
+    const icone = document.querySelector(`[data-path="${data.path}"]`);
+    if (icone) {
+      icone.style.left = (e.clientX - 40) + "px";
+      icone.style.top = (e.clientY - 40) + "px";
+    }
+  } catch (error) {
+    console.error("Erro ao processar drop:", error);
+  }
+});
+
+area.addEventListener("pointerdown", (e) => {
+  if (e.target === area) {
+    iniciarToqueLongo(area, "vazio", e.clientX, e.clientY);
+  }
+});
+
+area.addEventListener("pointerup", cancelarToqueLongo);
+area.addEventListener("pointerleave", cancelarToqueLongo);
+
+fetch(`${userFolder}files.json`)
+  .then(resp => resp.json())
+  .then(json => {
+    (json.pastas || []).forEach(([path, slot]) => {
+      const nome = path.split("/").pop();
+      criarIcone(path, nome, slot, "folder");
+    });
+
+    (json.arquivos || []).forEach(([path, slot]) => {
+      const nome = path.split("/").pop();
+      criarIcone(path, nome, slot, "file");
+    });
+  })
+  .catch(() => {
+    console.log("Não foi possível carregar files.json");
+  });
+
+const lixeira = document.getElementById("lixeira");
+lixeira.addEventListener("dragover", e => e.preventDefault());
+lixeira.addEventListener("drop", e => {
+  e.preventDefault();
+  try {
+    const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+    if (!data) return;
+
+    const icone = document.querySelector(`[data-path="${data.path}"]`);
+    if (icone && confirm(`Deseja mover "${data.nome}" para a lixeira?`)) {
+      icone.remove();
+    }
+  } catch (error) {
+    console.error("Erro ao processar drop na lixeira:", error);
+  }
+});
+
+// Substitua todas as ocorrências de fetch('user/...') por:
+fetch(`${userFolder}user_name.txt`)
+  .then(res => res.ok ? res.text() : Promise.reject())
+  .then(texto => {
+    document.getElementById("userNome").textContent = texto.trim() || "Convidado";
+    document.getElementById("userFoto").src = `${userFolder}user_photo.jpg`;
+  })
+  .catch(() => {
+    document.getElementById("userNome").textContent = "Convidado";
+    document.getElementById("userFoto").src = "user/user_photo.jpg";
+  });
+
+document.getElementById("botaoPower").addEventListener("click", () => {
+  const menu = document.getElementById("menuPower");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+});
+
+function mostrarMenuContextual(target, tipo, x, y) {
+  const menu = document.getElementById("menuContextual");
+  menu.innerHTML = "";
+
+  // Opções comuns
+  criarOpcao(menu, "Renomear", () => renomearIcone(target));
+  criarOpcao(menu, "Mover", () => moverIcone(target));
+
+  // Opções específicas por tipo
+  if (tipo === "pasta") {
+    criarOpcao(menu, "Abrir", () => abrirItem(target));
+    criarOpcao(menu, "Nova subpasta", () => criarSubpasta(target));
+  } else if (tipo === "app") {
+    criarOpcao(menu, "Executar", () => abrirItem(target));
+    criarOpcao(menu, "Propriedades", () => mostrarPropriedades(target));
+  } else {
+    criarOpcao(menu, "Abrir com", () => abrirItem(target));
+    criarOpcao(menu, "Visualizar", () => visualizarArquivo(target));
+  }
+
+  // Opção de exclusão sempre disponível
+  criarOpcao(menu, "Excluir", () => excluirItem(target));
+
+  // Mostra o menu na posição correta
+  menu.style.left = `${x}px`;
+  menu.style.top = `${y}px`;
+  menu.style.display = "block";
+}
+
+function criarOpcao(container, texto, callback) {
+  const botao = document.createElement("button");
+  botao.textContent = texto;
+  botao.onclick = (e) => {
+    e.stopPropagation();
+    container.style.display = "none";
+    callback();
+  };
+  container.appendChild(botao);
+}
+
+document.addEventListener("pointerdown", (e) => {
+  lastPointerEvent = e;
+});
+
+function isFirstTimeUser() {
+  if (isVirtualUser) {
+    // Para usuários virtuais, verifica se existe a flag no localStorage
+    return !localStorage.getItem(`virtual_user_first_time_${virtualUserUID}`);
+  }
+  // Para usuários físicos, mantém a lógica original
+  const firstTimeKey = `first_time_${userFolder.replace(/\//g, '_')}`;
+  return localStorage.getItem(firstTimeKey) === null;
+}
+
+function markUserAsNotFirstTime() {
+  if (isVirtualUser) {
+    // Para usuários virtuais, usa uma chave específica
+    localStorage.setItem(`virtual_user_first_time_${virtualUserUID}`, '1');
+  } else {
+    // Para usuários físicos, mantém a lógica original
+    const firstTimeKey = `first_time_${userFolder.replace(/\//g, '_')}`;
+    localStorage.setItem(firstTimeKey, '1');
+  }
+}
+
+
+setTimeout(() => {
+  try {
+    document.getElementById("bootAnimation").style.display = "none";
+    document.getElementById("conteudoPrincipal").style.display = "block";
+    
+    // Carrega apps instalados do localStorage
+    const instaladosSalvos = localStorage.getItem(getCustomKey(APPS_INSTALADOS_KEY));
+    appsInstalados = instaladosSalvos ? JSON.parse(instaladosSalvos) : [];
+    
+    // Carrega todos os apps (padrão + instalados) e renderiza
+    carregarTodosAplicativos().then(() => {
+      // Wallpaper
+      const wallpaperSalvo = getUserWallpaper();
+      const areaTrabalho = document.getElementById("areaTrabalho");
+      areaTrabalho.style.backgroundImage = wallpaperSalvo 
+        ? `url("wallpapers/${wallpaperSalvo}")`
+        : 'url("wallpapers/wallpaper1.png")';
+
+      // Ícones da área de trabalho
+      fetch(`${userFolder}files.json`)
+        .then(response => response.json())
+        .then(data => atualizarAreaTrabalho(data))
+        .catch(criarIconesPadrao);
+
+      // Configurações e dados do usuário
+      carregarConfiguracoes();
+      carregarDadosUsuario();
+
+      // Verificação de primeiro uso
+      if (isFirstTimeUser()) {
+        parent.postMessage("abrir_admin bem-vindo.html", "*");
+        markUserAsNotFirstTime();
+      }
+
+      // Relógio e rede
+      atualizarRelogio();
+      atualizarRede();
+    }).catch(error => {
+      console.error("Erro ao carregar apps:", error);
+    });
+
+  } catch (error) {
+    console.error("Erro durante o boot:", error);
+    document.getElementById("bootAnimation")?.remove();
+    document.getElementById("conteudoPrincipal").style.display = "block";
+    setTimeout(() => location.reload(), 2000);
+  }
+}, 7000);
+
+// Função de fallback para ícones padrão
+function criarIconesPadrao() {
+  const iconesPadrao = [
+    { path: "/apps/", nome: "Apps", slot: 1, tipo: "pasta" },
+    { path: "/documentos/", nome: "Documentos", slot: 2, tipo: "pasta" },
+    { path: "/documentos/notas.txt", nome: "notas.txt", slot: 3, tipo: "arquivo" }
+  ];
+
+  iconesPadrao.forEach(icone => {
+    criarIcone(icone.path, icone.nome, icone.slot, icone.tipo);
+  });
+}
+
+const btnFS = document.getElementById("botaoFS");
+const painelFS = document.getElementById("painelFS");
+const lista = document.getElementById("listaArquivos");
+
+btnFS.addEventListener("click", () => {
+  painelFS.style.display = painelFS.style.display === "none" ? "block" : "none";
+  renderizarArquivos();
+});
+
+function renderizarArquivos() {
+  lista.innerHTML = "";
+  const estrutura = window.FileSystem?.estrutura?.["/"];
+
+  if (!estrutura) {
+    lista.innerHTML = "<em>Nenhum arquivo disponível</em>";
+    return;
+  }
+
+  for (const nome in estrutura) {
+    const item = estrutura[nome];
+    const tipo = item.bin ? "📄" : "📁";
+
+    const div = document.createElement("div");
+    div.style.padding = "4px 0";
+    div.style.borderBottom = "1px solid #333";
+    div.innerHTML = `${tipo} ${nome} `;
+
+    if (item.bin) {
+      const btnEditar = document.createElement("button");
+      btnEditar.textContent = "✏️";
+      btnEditar.style.marginLeft = "10px";
+      btnEditar.onclick = () => abrirEditor(nome, item.bin);
+      div.appendChild(btnEditar);
+    }
+
+    lista.appendChild(div);
+  }
+}
+
+let arquivoAtual = null;
+
+function abrirEditor(nome, conteudo) {
+  arquivoAtual = nome;
+  document.getElementById("editorTitulo").textContent = `📝 Editando: ${nome}`;
+  document.getElementById("editorConteudo").value = conteudo;
+  document.getElementById("modalEditor").style.display = "flex";
+}
+
+document.getElementById("btnNovo").addEventListener("click", () => {
+  const nome = prompt("Nome do novo item:");
+  if (!nome) return;
+
+  const tipo = confirm("Criar como arquivo binário (OK) ou pasta (Cancelar)?");
+
+  if (tipo) {
+    const conteudo = prompt("Conteúdo inicial (texto):") ?? "";
+    FileSystem.criarArquivo(nome, conteudo);
+    Notificacao?.mostrar("Arquivo criado", `Criado "${nome}" com conteúdo.`);
+  } else {
+    FileSystem.criarPasta(nome);
+    Notificacao?.mostrar("Pasta criada", `Criada pasta "${nome}".`);
+  }
+
+  renderizarArquivos();
+});
+
+document.getElementById("btnVisualizar").addEventListener("click", () => {
+  const estrutura = FileSystem.estrutura?.["/"];
+  if (!estrutura) return alert("Nenhum conteúdo para exibir.");
+
+  let texto = "📁 Visualização da raiz:\n\n";
+  for (const nome in estrutura) {
+    const item = estrutura[nome];
+    texto += item.bin
+      ? `📄 ${nome} → ${item.bin.slice(0, 100)}\n`
+      : `📁 ${nome}\n`;
+  }
+
+  alert(texto);
+});
+
+function fecharEditor() {
+  document.getElementById("modalEditor").style.display = "none";
+  arquivoAtual = null;
+}
+
+function salvarArquivoEditado() {
+  const novoConteudo = document.getElementById("editorConteudo").value;
+  if (!arquivoAtual || !window.FileSystem?.estrutura?.["/"][arquivoAtual]) return;
+  
+  window.FileSystem.estrutura["/"][arquivoAtual].bin = novoConteudo;
+  fecharEditor();
+  renderizarArquivos();
+  Notificacao?.mostrar("Arquivo salvo", `Alterações em "${arquivoAtual}" foram salvas.`);
+}
+
+document.getElementById("botaoCalendario").addEventListener("click", () => {
+  const painel = document.getElementById("painelCalendario");
+  painel.style.display = painel.style.display === "none" ? "block" : "none";
+  gerarCalendario(new Date());
+});
+
+document.getElementById("botaoCaderno").addEventListener("click", () => {
+  const painel = document.getElementById("painelCaderno");
+  const texto = document.getElementById("cadernoTexto");
+  painel.style.display = painel.style.display === "block" ? "none" : "block";
+  texto.value = localStorage.getItem("notas") || "";
+});
+
+function salvarCaderno() {
+  const texto = document.getElementById("cadernoTexto").value;
+  localStorage.setItem("notas", texto);
+  Notificacao?.mostrar("Caderno", "Notas salvas com sucesso!");
+}
+
+function gerarCalendario(dataRef) {
+  const corpo = document.getElementById("corpoCalendario");
+  const titulo = document.getElementById("tituloMes");
+
+  const mes = dataRef.getMonth();
+  const ano = dataRef.getFullYear();
+
+  const dataInicio = new Date(ano, mes, 1);
+  const diaSemanaInicio = dataInicio.getDay();
+
+  const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+  const hoje = new Date();
+
+  titulo.textContent = dataRef.toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+
+  corpo.innerHTML = "";
+  let linha = document.createElement("tr");
+  for (let i = 0; i < diaSemanaInicio; i++) {
+    linha.appendChild(document.createElement("td"));
+  }
+
+  // Carrega eventos salvos
+  const eventosKey = `eventos_${userFolder.replace(/\//g, '_')}_${ano}_${mes}`;
+  const eventos = JSON.parse(localStorage.getItem(eventosKey)) || {};
+
+  for (let dia = 1; dia <= diasNoMes; dia++) {
+    if (linha.children.length === 7) {
+      corpo.appendChild(linha);
+      linha = document.createElement("tr");
+    }
+    const td = document.createElement("td");
+    td.textContent = dia;
+    td.style.padding = "6px";
+    td.style.cursor = "pointer";
+
+    // Verifica se é o dia atual
+    if (dia === hoje.getDate() && mes === hoje.getMonth() && ano === hoje.getFullYear()) {
+      td.style.background = "#0078D7";
+      td.style.color = "white";
+      td.style.borderRadius = "50%";
+    }
+    
+    // Verifica se tem evento
+    if (eventos[dia]) {
+      td.classList.add("dia-evento");
+      td.title = `Evento: ${eventos[dia]}`;
+    }
+
+    td.addEventListener("click", () => {
+      if (dia !== hoje.getDate() || mes !== hoje.getMonth() || ano !== hoje.getFullYear()) {
+        const nomeEvento = prompt(`Digite o nome do evento para ${dia}/${mes + 1}/${ano}:`, eventos[dia] || "");
+        if (nomeEvento !== null) {
+          if (nomeEvento) {
+            eventos[dia] = nomeEvento;
+            td.classList.add("dia-evento");
+            td.title = `Evento: ${nomeEvento}`;
+          } else {
+            delete eventos[dia];
+            td.classList.remove("dia-evento");
+            td.title = "";
+          }
+          localStorage.setItem(eventosKey, JSON.stringify(eventos));
+        }
+      }
+    });
+
+    linha.appendChild(td);
+  }
+
+  if (linha.children.length > 0) {
+    while (linha.children.length < 7) linha.appendChild(document.createElement("td"));
+    corpo.appendChild(linha);
+  }
+  
+  // Verifica eventos ao carregar
+  verificarEventosHoje();
+}
+
+function verificarEventosHoje() {
+  const hoje = new Date();
+  const dia = hoje.getDate();
+  const mes = hoje.getMonth();
+  const ano = hoje.getFullYear();
+  
+  const eventosKey = `eventos_${userFolder.replace(/\//g, '_')}_${ano}_${mes}`;
+  const eventos = JSON.parse(localStorage.getItem(eventosKey)) || {};
+  
+  if (eventos[dia]) {
+    alert(`evento hoje, Você tem um evento marcado: ${eventos[dia]}`);
+  }
+}
+
+async function mostrarTodosAplicativos() {
+  const botao = document.getElementById("verTudo");
+  const container = document.getElementById("apps");
+  const resultadosPesquisa = document.getElementById("resultadosPesquisa");
+  
+  if (botao.textContent === "Ocultar") {
+    // Voltar ao modo padrão com apenas 8 apps
+    container.innerHTML = "";
+    container.style.display = "flex";
+    container.style.flexWrap = "wrap";
+    container.style.gap = "6px";
+    resultadosPesquisa.style.display = "none";
+
+    await renderizarApps(); // Renderiza os 8 primeiros apps
+    botao.textContent = "Ver tudo";
+    return;
+  }
+
+  // Mostrar todos os apps
+  if (!listaAplicativos || listaAplicativos.length === 0) {
+    console.warn("Lista de aplicativos ainda não carregada.");
+    return;
+  }
+
+  container.innerHTML = "";
+  container.style.display = "flex";
+  container.style.flexWrap = "wrap";
+  container.style.gap = "6px";
+  resultadosPesquisa.style.display = "none";
+
+  for (const nomeArquivo of listaAplicativos) {
+    const nomeFormatado = formatarNomeApp(nomeArquivo);
+    const icone = await criarElementoIcone(nomeArquivo, nomeFormatado);
+    container.appendChild(icone);
+  }
+
+  botao.textContent = "Ocultar";
+}
+
+
+// 6. Atualize a função pesquisarAplicativos() para incluir apps instalados
+async function pesquisarAplicativos() {
+  const termo = document.getElementById("buscaApp").value.toLowerCase();
+  
+  if (!termo) {
+    document.getElementById("apps").style.display = "block";
+    document.getElementById("resultadosPesquisa").style.display = "none";
+    return;
+  }
+
+  const resultados = listaAplicativos.filter(app => 
+    app.replace('.html', '').toLowerCase().includes(termo)
+  );
+
+  const container = document.getElementById("resultadosPesquisa");
+  container.innerHTML = "";
+  
+  if (resultados.length === 0) {
+    container.innerHTML = '<em>Nenhum app encontrado</em>';
+  } else {
+    for (const nomeArquivo of resultados) {
+      const nomeFormatado = formatarNomeApp(nomeArquivo);
+      const icone = await criarElementoIcone(nomeArquivo, nomeFormatado);
+      container.appendChild(icone);
+    }
+  }
+
+  document.getElementById("apps").style.display = "none";
+  container.style.display = "grid";
+  container.style.gridTemplateColumns = "repeat(auto-fill, minmax(80px, 1fr))";
+  container.style.gap = "8px";
+}
+
+// Função auxiliar para criar botões de app
+function criarBotaoApp(nomeArquivo) {
+  const nome = nomeArquivo.replace('.html', '').replace(/_/g, ' ');
+  return `<div class="icone" onclick="perguntarModoAbertura('${nomeArquivo}')">${nome}</div>`;
+}
+
+function renomearIcone(target) {
+  const nomeAntigo = target.querySelector(".nome-icone")?.textContent || target.textContent.trim();
+  const img = target.querySelector("img");
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = nomeAntigo;
+  input.style.width = "70px";
+  input.style.textAlign = "center";
+  input.style.background = "#333";
+  input.style.color = "white";
+  input.style.border = "none";
+
+  const nomeSpan = target.querySelector(".nome-icone") || document.createElement("span");
+  nomeSpan.className = "nome-icone";
+  nomeSpan.style.display = "none";
+  target.appendChild(nomeSpan);
+
+  target.innerHTML = "";
+  target.appendChild(img);
+  target.appendChild(document.createElement("br"));
+  target.appendChild(input);
+
+  input.focus();
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      const novoNome = input.value.trim();
+      if (novoNome) {
+        target.innerHTML = "";
+        target.appendChild(img);
+        target.innerHTML += "<br>";
+        const novoNomeSpan = document.createElement("span");
+        novoNomeSpan.className = "nome-icone";
+        novoNomeSpan.textContent = novoNome;
+        target.appendChild(novoNomeSpan);
+        target.dataset.nome = novoNome;
+      }
+    }
+  });
+
+  input.addEventListener("blur", () => {
+    const novoNome = input.value.trim();
+    if (novoNome) {
+      target.innerHTML = "";
+      target.appendChild(img);
+      target.innerHTML += "<br>";
+      const novoNomeSpan = document.createElement("span");
+      novoNomeSpan.className = "nome-icone";
+      novoNomeSpan.textContent = novoNome;
+      target.appendChild(novoNomeSpan);
+      target.dataset.nome = novoNome;
+    }
+  });
+}
+
+
+ 
+function getWallpaperKey() {
+  return `wallpaper_${userFolder.replace(/\//g, '_')}`;
+}
+
+function getUserWallpaper() {
+  // 1. Primeiro tenta obter o wallpaper específico do usuário (físico ou virtual)
+  const wallpaperKey = getCustomKey("wallpaper");
+  const savedWallpaper = localStorage.getItem(wallpaperKey);
+  
+  // 2. Se encontrou um wallpaper salvo, retorna ele
+  if (savedWallpaper) {
+    return savedWallpaper;
+  }
+  
+  // 3. Fallback para usuários virtuais (retorna null para usar o padrão)
+  if (isVirtualUser) {
+    return null;
+  }
+  
+  // 4. Fallback para usuários físicos (compatibilidade com sistema antigo)
+  try {
+    // Verifica se existe um wallpaper padrão na pasta do usuário físico
+    const defaultWallpaper = 'wallpaper1.png';
+    const testUrl = `${userFolder}wallpapers/${defaultWallpaper}`;
+    
+    // Esta é uma verificação assíncrona simulada
+    // Na prática, você pode querer usar um fetch ou verificação real
+    return defaultWallpaper; // Assume que existe como fallback
+  } catch (e) {
+    console.warn("Wallpaper padrão não encontrado, usando fallback");
+    return 'wallpaper1.png'; // Fallback absoluto
+  }
+}
+
+function setUserWallpaper(wallpaper) {
+  if (!wallpaper) return;
+  
+  const wallpaperKey = getCustomKey("wallpaper");
+  
+  // Para usuários virtuais, verifica se é base64
+  if (isVirtualUser && wallpaper.startsWith('data:image')) {
+    // Se for uma imagem direta (base64), converte para nome de arquivo
+    const virtualWallpaperName = `virtual_wallpaper_${virtualUserUID}.jpg`;
+    localStorage.setItem(wallpaperKey, virtualWallpaperName);
+    
+    // Salva a imagem em outra chave
+    localStorage.setItem(`virtual_wallpaper_data_${virtualUserUID}`, wallpaper);
+  } else {
+    // Para usuários físicos ou nomes de arquivo normais
+    localStorage.setItem(wallpaperKey, wallpaper);
+  }
+  
+  // Aplica imediatamente o novo wallpaper
+  const area = document.getElementById("areaTrabalho");
+  if (wallpaper.startsWith('data:image')) {
+    area.style.backgroundImage = `url("${wallpaper}")`;
+  } else {
+    area.style.backgroundImage = `url("wallpapers/${wallpaper}")`;
+  }
+}
+
+function alternarConfig() {
+  const painel = document.getElementById("painelConfig");
+  painel.style.display = painel.style.display === "block" ? "none" : "block";
+  
+  // Fecha outros painéis
+  document.getElementById("painelRecentes").style.display = "none";
+  document.getElementById("painelMenu").classList.remove("aberto");
+}
+
+function abrirCustomizacao() {
+  parent.postMessage("abrir customizacao.html", "*");
+}
+
+function abrirBluetooth() {
+  parent.postMessage("abrir bluetooth.html", "*");
+}
+
+// Controles deslizantes
+document.getElementById("controleBrilho").addEventListener("input", (e) => {
+  parent.postMessage(`light ${e.target.value}%`, "*");
+});
+
+document.getElementById("controleVolume").addEventListener("input", (e) => {
+  parent.postMessage(`volume ${e.target.value}%`, "*");
+});
+
+function adicionarAppRecente(nomeArquivo) {
+  // Remove o app se já existir na lista
+  appsRecentes = appsRecentes.filter(app => app !== nomeArquivo);
+  
+  // Adiciona no início
+  appsRecentes.unshift(nomeArquivo);
+  
+  // Mantém apenas os 10 mais recentes
+  if (appsRecentes.length > 10) {
+    appsRecentes = appsRecentes.slice(0, 10);
+  }
+  
+  // Atualiza o armazenamento local
+  localStorage.setItem(`appsRecentes_${userFolder.replace(/\//g, '_')}`, JSON.stringify(appsRecentes));
+  
+  // Atualiza a exibição
+  atualizarAppsRecentesMenu();
+}
+
+// Função para carregar os apps recentes do armazenamento local
+function carregarAppsRecentes() {
+  const salvos = localStorage.getItem(`appsRecentes_${userFolder.replace(/\//g, '_')}`);
+  if (salvos) {
+    appsRecentes = JSON.parse(salvos);
+    atualizarAppsRecentesMenu();
+  }
+}
+
+// Função para atualizar a exibição dos apps recentes no menu
+async function atualizarAppsRecentesMenu() {
+  const container = document.getElementById("appsRecentesMenu");
+  container.innerHTML = "";
+  
+  if (appsRecentes.length === 0) {
+    container.innerHTML = "<em>Nenhum app usado recentemente</em>";
+    return;
+  }
+  
+  for (const nomeArquivo of appsRecentes) {
+    const nomeFormatado = formatarNomeApp(nomeArquivo);
+    const icone = await criarElementoIcone(nomeArquivo, nomeFormatado);
+    container.appendChild(icone);
+  }
+  
+  // Ajusta o layout para grade
+  container.style.display = "grid";
+  container.style.gridTemplateColumns = "repeat(auto-fill, minmax(80px, 1fr))";
+  container.style.gap = "8px";
+}
+
+window.addEventListener('load', carregarAppsRecentes);
+
+// Adiciona event listeners para os elementos
+document.getElementById("buscaApp").addEventListener("input", pesquisarAplicativos);
+document.getElementById("verTudo").addEventListener("click", mostrarTodosAplicativos);
+
+function atualizarAreaTrabalho(data) {
+  document.querySelectorAll('.iconeDesktop').forEach(icone => icone.remove());
+  
+  if (data.config && data.config.icones_area_trabalho) {
+    data.config.icones_area_trabalho.forEach(item => {
+      const nome = item.nome || item.path.split('/').pop();
+      criarIcone(item.path, nome, item.slot || 1, item.tipo || (item.path.endsWith('/') ? 'pasta' : 'arquivo'));
+    });
+  } else {
+    criarIconesPadrao();
+  }
+}
+</script>
+<div id="modalEditor" style="position:fixed; inset:0; background:rgba(0,0,0,0.75); display:none; align-items:center; justify-content:center; z-index:10000;">
+  <div style="background:#111; padding:20px; border-radius:10px; width:500px; max-width:90%; color:white; display:flex; flex-direction:column;">
+    <h3 id="editorTitulo">Editar arquivo</h3>
+    <textarea id="editorConteudo" style="flex:1; min-height:200px; margin-top:10px; background:#222; color:#fff; border:none; padding:10px; font-family:monospace;"></textarea>
+    <div style="margin-top:10px; display:flex; justify-content:space-between;">
+      <button onclick="salvarArquivoEditado()" style="padding:8px 14px;">💾 Salvar</button>
+      <button onclick="fecharEditor()" style="padding:8px 14px;">❌ Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div id="painelCalendario" style="position:fixed;top:100px;right:20px;width:280px;background:#111;color:white;border:1px solid #444;border-radius:10px;padding:10px;display:none;z-index:9999;font-family:sans-serif;">
+  <div id="tituloMes" style="text-align:center;font-weight:bold;margin-bottom:10px;"></div>
+  <table style="width:100%;border-collapse:collapse;text-align:center;">
+    <thead>
+      <tr style="color:#aaa;">
+        <th>Dom</th><th>Seg</th><th>Ter</th><th>Qua</th><th>Qui</th><th>Sex</th><th>Sáb</th>
+      </tr>
+    </thead>
+    <tbody id="corpoCalendario"></tbody>
+  </table>
+</div>
+
+<div id="painelCaderno" style="position:fixed; top:100px; right:320px; width:300px; height:300px; background:#111; color:white; border:1px solid #444; border-radius:10px; padding:10px; display:none; z-index:9999; font-family:sans-serif;">
+  <h3 style="margin-top:0;">Caderno virtual</h3>
+  <textarea id="cadernoTexto" style="width:100%;height:80%;background:#222;color:#fff;border:none;padding:8px;font-family:monospace;"></textarea>
+  <button onclick="salvarCaderno()" style="margin-top:8px;">💾 Salvar</button>
+</div>
+
+<div id="debugMensagem" style="position:fixed;top:10px;left:50%;transform:translateX(-50%);background:#000;color:#fff;padding:8px 12px;border-radius:6px;font-size:14px;z-index:9999;display:none;"></div>
+
+
+</body>
+</html>

@@ -1,0 +1,23 @@
+body {
+  font-family: sans-serif;
+  background: #111;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.ipod {
+  background: #333;
+  padding: 20px;
+  border-radius: 15px;
+  width: 300px;
+}
+input, audio {
+  margin-top: 10px;
+  width: 100%;
+}
+li {
+  cursor: pointer;
+  margin: 5px 0;
+}

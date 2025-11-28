@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>desktop virtual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" href="favicon.png" type="image/png">
+  <style>
+  * {
+  cursor: url('imgs/mouse.png'), auto !important;
+}
+  
+html, body {
+  background-color: black;
+  background-image: url('wallpapers/wallpaper4.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  min-width: 1024px;
+  overflow-x: auto;
+}
+
+body {
+  margin: 0;
+  background: #202020;
+  font-family: sans-serif;
+  overflow: hidden;
+}
+
+img {
+  filter: none !important;
+  color-scheme: light dark;
+}
+
+iframe#homeIframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  border: none;
+  display: block;
+  z-index: 10;
+}
+
+#areaDeTrabalho {
+  position: relative;
+  width: 100%;
+  height: calc(100vh - 250px);
+  overflow: hidden;
+  z-index: 5;
+}
+
+.janela {
+  position: fixed;
+  width: 600px;
+  height: 400px;
+  background: #2c2c2c;
+  border: 2px solid #444;
+  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  z-index: 999999;
+  border-radius: 20px;
+  transition: transform 0.1s ease-out;
+  transition: 
+    transform 0.3s ease-out,
+    width 0.3s ease-out,
+    height 0.3s ease-out,
+    opacity 0.2s ease-out;
+  transform-origin: center center;
+}
+
+.janela-abrindo {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+/* Animação ao fechar */
+.janela-fechando {
+  transform: scale(0.9) translateY(20px);
+  opacity: 0;
+}
+
+/* Estado maximizado */
+.janela-maximizada {
+  transition: 
+    width 0.3s ease-out,
+    height 0.3s ease-out,
+    top 0.3s ease-out,
+    left 0.3s ease-out;
+}
+
+.splash-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-color: #f0f0f0;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+  transition: opacity 0.3s ease-out;
+}
+
+.barra {
+  background: #333;
+  color: white;
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+  border-radius: 8px;
+}
+
+.titulo {
+  font-size: 14px;
+  flex: 1;
+}
+
+.icones {
+  display: flex;
+  gap: 6px;
+}
+
+.icones img {
+  width: 24px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.conteudo {
+  flex: 1;
+  overflow: hidden;
+}
+
+.conteudo iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+.alca-resize {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  right: 0;
+  bottom: 0;
+  background: #555;
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 1;
+}
+
+#notificacao {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,0.85);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: sans-serif;
+  z-index: 9999;
+  display: none;
+  pointer-events: none;
+}
+#hudVolume {
+  position: fixed;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 300px;
+  height: 20px;
+  background-color: black;
+  border: 2px solid #000;
+  border-radius: 6px;
+  display: none;
+  z-index: 999999999;
+}
+
+#hudVolume .barra {
+  height: 100%;
+  background-color: blue;
+  border-radius: 4px;
+  width: 50%; /* Volume inicial: 50% */
+  transition: width 0.2s ease;
+}
+
+@keyframes wobble {
+  0%   { transform: translate(0, 0) rotate(0deg); }
+  15%  { transform: translate(-4px, 2px) rotate(-1.5deg); }
+  30%  { transform: translate(3px, -2px) rotate(1.2deg); }
+  45%  { transform: translate(-2px, 1px) rotate(-1deg); }
+  60%  { transform: translate(1px, -1px) rotate(0.6deg); }
+  75%  { transform: translate(-1px, 1px) rotate(-0.3deg); }
+  100% { transform: translate(0, 0) rotate(0deg); }
+}
+
+ #modalFullscreen {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+ #modalContent {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    font-family: sans-serif;
+  }
+
+ #modalContent button {
+    margin: 10px;
+    padding: 10px 20px;
+    font-size: 16px;
+  }
+.janela.wobble {
+  animation: wobble 0.35s ease-out;
+}
+
+#selecionador {
+  position: absolute;
+  border: 1px solid #3399ff;
+  background-color: rgba(51, 153, 255, 0.2);
+  display: none;
+  pointer-events: none;
+  z-index: 9998;
+}
+
+#menuContextual {
+  position: fixed;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 8px 0;
+  display: none;
+  z-index: 9999;
+}
+
+#menuContextual button {
+  display: block;
+  width: 100%;
+  padding: 8px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+
+#menuContextual button:hover {
+  background: #f0f0f0;
+}
+
+    #bootScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 9999999;
+      transition: opacity 0.5s ease-out;
+    }
+    
+    .boot-logo {
+      width: 100px;
+      height: 100px;
+      margin-bottom: 30px;
+      animation: bootPulse 2s infinite ease-in-out;
+    }
+    
+    .boot-progress {
+      width: 300px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .boot-progress-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 0%;
+      background: #0078d7;
+      transition: width 0.3s ease;
+    }
+    
+    .boot-text {
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      font-size: 14px;
+      margin-top: 20px;
+      opacity: 0.8;
+    }
+    
+    @keyframes bootPulse {
+      0% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); opacity: 0.8; }
+    }
+    
+    .botao-janela {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: none;
+  font-weight: bold;
+  font-size: 16px;
+  color: white;
+  margin-left: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.botao-fechar {
+  background-color: #e81123; /* vermelho Windows 7 */
+}
+
+.botao-minimizar {
+  background-color: #FFDD00; /* amarelo suave */
+  color: black;
+}
+
+.botao-maximizar {
+  background-color: #16c60c; /* verde Windows 7 */
+}
+  </style>
+</head>
+<body>
+<!-- Tela de Boot (nova adição) -->
+<div id="bootScreen">
+  <img src="imgs/logo.png" class="boot-logo" alt="Logo do Sistema">
+  <div class="boot-progress">
+    <div class="boot-progress-bar" id="bootProgress"></div>
+  </div>
+  <div class="boot-text" id="bootStatus">Inicializando...</div>
+</div>
+
+<!-- HTML: Container do modal -->
+<div id="modalFullscreen" style="display: none;">
+  <div id="modalContent">
+    <p>⚠️ para melhor experiência visual ative o modo tela cheia e modo site para desktop ⚠️</p>
+    <button onclick="cancelar()">não ativar</button>
+    <button onclick="ativarTelaCheia()">ativar Tela cheia</button>
+  </div>
+</div>
+
+<div id="areaDeTrabalho"></div>
+<iframe id="homeIframe" src="logon.html"></iframe>
+<div id="notificacao" style="/* mesmo estilo... */"></div>
+<div id="hudVolume">
+  <div class="barra"></div>
+</div>
+<script>
+async function getAppIconPath(appName) {
+  const cleanName = appName.replace('.html', '').split('/')[0];
+  const iconName = cleanName.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+  const customIconPath = `icons/${iconName}.png`;
+  
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(customIconPath);
+    img.onerror = () => resolve('imgs/app.png');
+    img.src = customIconPath;
+  });
+}
+
+function formatarNomeApp(nomeArquivo) {
+  return nomeArquivo
+    .replace(".html", "")
+    .split("/")[0]
+    .replace(/_/g, ' ');
+}
+
+// Ouvinte de mensagens para comandos Bluetooth
+window.addEventListener('message', async (event) => {
+  const data = event.data;
+  
+  // Verificar se a mensagem é para este ouvinte
+  if (typeof data === 'string' && data.startsWith('blue-')) {
+    const parts = data.split(' ');
+    const command = parts[0];
+    
+    try {
+      switch(command) {
+        case 'blue-v':
+          await scanDevices();
+          break;
+          
+        case 'blue-connect':
+          if (parts.length >= 3) {
+            const name = parts[1].replace(/['"]/g, ''); // Remover aspas se presentes
+            const type = parts[2].replace(/['"]/g, ''); // Remover aspas se presentes
+            await connectToDevice(name, type);
+          } else {
+            throw new Error('Parâmetros insuficientes para blue-connect. Use: blue-connect "nome" "tipo"');
+          }
+          break;
+          
+        case 'blue-desconnect':
+          if (parts.length >= 2) {
+            const name = parts[1].replace(/['"]/g, ''); // Remover aspas se presentes
+            await disconnectDevice(name);
+          } else {
+            throw new Error('Parâmetros insuficientes para blue-desconnect. Use: blue-desconnect "nome"');
+          }
+          break;
+          
+        default:
+          throw new Error(`Comando não reconhecido: ${command}`);
+      }
+    } catch (error) {
+      // Enviar mensagem de erro de volta para o parent
+      if (window.parent && window.parent.postMessage) {
+        window.parent.postMessage({
+          type: 'bluetooth-error',
+          error: error.message
+        }, '*');
+      }
+    }
+  }
+});
+
+// Variável para armazenar dispositivos conectados
+const connectedDevices = new Map();
+
+// Função para escanear dispositivos Bluetooth
+async function scanDevices() {
+  try {
+    // Verificar se a API Bluetooth está disponível
+    if (!navigator.bluetooth) {
+      throw new Error('API Bluetooth não suportada neste navegador');
+    }
+    
+    // Solicitar dispositivos Bluetooth próximos
+    const devices = await navigator.bluetooth.getDevices();
+    
+    // Filtrar apenas os tipos de dispositivos que nos interessam
+    const filteredDevices = [];
+    
+    for (const device of devices) {
+      // Tentar determinar o tipo do dispositivo pelo nome
+      let type = 'unknown';
+      
+      if (device.name && device.name.match(/fone|headset|headphone|som|sound|audio|jbl|sony|bose/i)) {
+        type = 'sound';
+      } else if (device.name && device.name.match(/projetor|projector|epson|benq|optoma/i)) {
+        type = 'proj';
+      } else if (device.name && device.name.match(/tela|screen|monitor|display|lg|samsung/i)) {
+        type = 'screen';
+      }
+      
+      filteredDevices.push({
+        name: device.name,
+        id: device.id,
+        type: type
+      });
+    }
+    
+    // Enviar os dispositivos encontrados de volta para o parent
+    if (window.parent && window.parent.postMessage) {
+      window.parent.postMessage({
+        type: 'bluetooth-devices',
+        devices: filteredDevices
+      }, '*');
+    }
+  } catch (error) {
+    throw new Error(`Falha ao escanear dispositivos: ${error.message}`);
+  }
+}
+
+// Função para conectar a um dispositivo Bluetooth
+async function connectToDevice(name, type) {
+  try {
+    // Verificar se a API Bluetooth está disponível
+    if (!navigator.bluetooth) {
+      throw new Error('API Bluetooth não suportada neste navegador');
+    }
+    
+    let options = {};
+    
+    // Configurar filtros baseados no tipo de dispositivo
+    switch(type) {
+      case 'sound':
+        options = {
+          filters: [
+            { name: name },
+            { services: ['audio_sink', 'handsfree'] }
+          ],
+          optionalServices: ['generic_access']
+        };
+        break;
+        
+      case 'proj':
+      case 'screen':
+        options = {
+          filters: [
+            { name: name },
+            { services: ['serial_port'] }
+          ],
+          optionalServices: ['generic_access']
+        };
+        break;
+        
+      default:
+        options = {
+          filters: [{ name: name }],
+          optionalServices: ['generic_access']
+        };
+    }
+    
+    // Solicitar dispositivo Bluetooth
+    const device = await navigator.bluetooth.requestDevice(options);
+    
+    // Conectar ao dispositivo
+    const server = await device.gatt.connect();
+    
+    // Armazenar dispositivo conectado
+    connectedDevices.set(name, {
+      device: device,
+      server: server,
+      type: type
+    });
+    
+    // Enviar confirmação de conexão para o parent
+    if (window.parent && window.parent.postMessage) {
+      window.parent.postMessage({
+        type: 'bluetooth-connected',
+        name: name,
+        deviceType: type
+      }, '*');
+    }
+    
+    // Configurar listeners para eventos de desconexão
+    device.addEventListener('gattserverdisconnected', () => {
+      connectedDevices.delete(name);
+      
+      if (window.parent && window.parent.postMessage) {
+        window.parent.postMessage({
+          type: 'bluetooth-disconnected',
+          name: name,
+          reason: 'device_disconnected'
+        }, '*');
+      }
+    });
+    
+  } catch (error) {
+    throw new Error(`Falha ao conectar com ${name}: ${error.message}`);
+  }
+}
+
+// Função para desconectar um dispositivo Bluetooth
+async function disconnectDevice(name) {
+  try {
+    const deviceInfo = connectedDevices.get(name);
+    
+    if (!deviceInfo) {
+      throw new Error(`Dispositivo ${name} não está conectado`);
+    }
+    
+    // Desconectar o dispositivo
+    if (deviceInfo.device.gatt.connected) {
+      deviceInfo.device.gatt.disconnect();
+    }
+    
+    // Remover da lista de dispositivos conectados
+    connectedDevices.delete(name);
+    
+    // Enviar confirmação de desconexão para o parent
+    if (window.parent && window.parent.postMessage) {
+      window.parent.postMessage({
+        type: 'bluetooth-disconnected',
+        name: name,
+        reason: 'user_request'
+      }, '*');
+    }
+    
+  } catch (error) {
+    throw new Error(`Falha ao desconectar ${name}: ${error.message}`);
+  }
+}
+
+// Funções auxiliares necessárias
+const RAM = {
+    enabled: false,
+    space: 64, // MB
+    maxSpace: 3072, // 3GB em MB
+    minSpace: 64, // MB
+    init: function() {
+        if (!this.enabled) return;
+        this.memory = new ArrayBuffer(this.space * 1024 * 1024);
+        console.log(`RAM virtual inicializada com ${this.space}MB`);
+    },
+    setSpace: function(size) {
+        size = parseInt(size);
+        if (size < this.minSpace) size = this.minSpace;
+        if (size > this.maxSpace) size = this.maxSpace;
+        this.space = size;
+        if (this.enabled) this.init();
+    }
+};
+
+const PerformanceConfig = {
+    jsOptimization: false,
+    dataCompression: false,
+    graphicsOptimization: false
+};
+
+const DevelopmentConfig = {
+    detailedConsole: false,
+    debugMode: false,
+    debugInfo: null,
+    updateDebugInfo: function(text) {
+        if (!this.debugMode) {
+            if (this.debugInfo) {
+                document.body.removeChild(this.debugInfo);
+                this.debugInfo = null;
+            }
+            return;
+        }
+        
+        if (!this.debugInfo) {
+            this.debugInfo = document.createElement('div');
+            this.debugInfo.style.position = 'fixed';
+            this.debugInfo.style.top = '0';
+            this.debugInfo.style.left = '0';
+            this.debugInfo.style.backgroundColor = 'rgba(0,0,0,0.7)';
+            this.debugInfo.style.color = 'white';
+            this.debugInfo.style.padding = '5px';
+            this.debugInfo.style.zIndex = '9999';
+            document.body.appendChild(this.debugInfo);
+        }
+        
+        this.debugInfo.textContent = text;
+    }
+};
+
+// Handler para mensagens
+window.addEventListener('message', function(event) {
+    const message = event.data;
+    
+    // Handler para RAM
+    if (message.startsWith('ram ')) {
+        const command = message.substring(4).trim();
+        
+        if (command === 'disable') {
+            RAM.enabled = false;
+            RAM.memory = null;
+            console.log('RAM virtual desabilitada');
+        } else if (command === 'enable') {
+            RAM.enabled = true;
+            RAM.init();
+            console.log('RAM virtual habilitada');
+        } else if (command.startsWith('space=')) {
+            const space = command.substring(6);
+            RAM.setSpace(space);
+            console.log(`Espaço da RAM virtual configurado para ${RAM.space}MB`);
+        }
+    }
+    // Handler para desempenho
+    else if (message.startsWith('desempenho ')) {
+        const command = message.substring(11).trim();
+        
+        if (command.startsWith('js_oti=')) {
+            const value = command.substring(7) === 'true';
+            PerformanceConfig.jsOptimization = value;
+            console.log(`Otimização JavaScript ${value ? 'ativada' : 'desativada'}`);
+        } else if (command.startsWith('dados_comprimir=')) {
+            const value = command.substring(16) === 'true';
+            PerformanceConfig.dataCompression = value;
+            console.log(`Compressão de dados ${value ? 'ativada' : 'desativada'}`);
+        } else if (command.startsWith('oti_gra=')) {
+            const value = command.substring(8) === 'true';
+            PerformanceConfig.graphicsOptimization = value;
+            console.log(`Otimização gráfica ${value ? 'ativada' : 'desativada'}`);
+        }
+    }
+    // Handler para development
+    else if (message.startsWith('development ')) {
+        const command = message.substring(11).trim();
+        
+        if (command.startsWith('con_info=')) {
+            const value = command.substring(9) === 'true';
+            DevelopmentConfig.detailedConsole = value;
+            console.log(`Console detalhado ${value ? 'ativado' : 'desativado'}`);
+        } else if (command.startsWith('debug=')) {
+            const value = command.substring(6) === 'true';
+            DevelopmentConfig.debugMode = value;
+            DevelopmentConfig.updateDebugInfo(value ? 'Modo debug ativado' : '');
+            console.log(`Modo debug ${value ? 'ativado' : 'desativado'}`);
+        }
+    }
+    
+    // Atualiza informações de debug se necessário
+    if (DevelopmentConfig.debugMode) {
+        const debugText = `RAM: ${RAM.enabled ? `${RAM.space}MB` : 'off'} | ` +
+                         `JS Opt: ${PerformanceConfig.jsOptimization} | ` +
+                         `Compress: ${PerformanceConfig.dataCompression} | ` +
+                         `GFX Opt: ${PerformanceConfig.graphicsOptimization}`;
+        DevelopmentConfig.updateDebugInfo(debugText);
+    }
+});
+
+let inicio = { x: 0, y: 0 };
+
+function verificarOrigemConfig() {
+ return true
+}
+
+function listarPermissoes() {
+  console.group("Permissões do Sistema");
+  console.log("Permissões disponíveis:");
+  console.table(permissoesSistema.permissoesDisponiveis);
+  
+  console.log("Permissões concedidas:");
+  const perms = {};
+  for (const app in permissoesSistema.permissoes) {
+    perms[app] = [...permissoesSistema.permissoes[app]].join(", ");
+  }
+  console.table(perms);
+  console.groupEnd();
+}
+
+
+// Sistema de Permissões
+const permissoesSistema = {
+  // Todas as permissões disponíveis com suas descrições
+  permissoesDisponiveis: [
+    { name: "Acesso à Localização", key: "geolocation" },
+    { name: "Acesso ao Microfone", key: "audio_capture" },
+    { name: "Acesso à Câmera", key: "video_capture" },
+    { name: "Acesso ao Bluetooth", key: "bluetooth" },
+    { name: "Acesso a Arquivos", key: "file_system" },
+    { name: "Acesso à Notificações", key: "notifications" },
+    { name: "Acesso à Rede", key: "network" },
+    { name: "Acesso ao Armazenamento", key: "storage" },
+    { name: "Executar em Segundo Plano", key: "background" }
+  ],
+  
+  // Estrutura de armazenamento: { [app]: Set([perm1, perm2]) }
+  permissoes: {},
+  appAdmin: 'config.html', // Apenas este app pode gerenciar permissões
+
+  // Verifica se uma permissão é válida
+  permissaoValida(permissao) {
+    return this.permissoesDisponiveis.some(p => p.key === permissao);
+  },
+
+  // Verifica se um app tem permissão
+  // Modifique a função verificarPermissão para ignorar o homeIframe
+verificarPermissao(app, permissao) {
+  // Se for o homeIframe ou similar, sempre retorna true
+  if (app.includes('home.html') || app.includes('logon.html') || app.includes('bsod.html') || app.includes('recovery.html')) {
+    return true;
+  }
+  
+  if (!this.permissaoValida(permissao)) return false;
+  return this.permissoes[app]?.has(permissao) || false;
+},
+
+  // Adiciona permissão (apenas pelo app admin)
+  adicionarPermissao(origem, app, permissao) {
+    if (!this.verificarAppAdmin(origem)) return false;
+    if (!this.permissaoValida(permissao)) return false;
+    
+    if (!this.permissoes[app]) {
+      this.permissoes[app] = new Set();
+    }
+    this.permissoes[app].add(permissao);
+    this.salvarNoLocalStorage();
+    
+    // Notifica o app sobre a nova permissão
+    this.notificarApp(app, permissao, true);
+    return true;
+  },
+
+  // Remove permissão (apenas pelo app admin)
+  removerPermissao(origem, app, permissao) {
+    if (!this.verificarAppAdmin(origem)) return false;
+    if (!this.permissaoValida(permissao)) return false;
+    
+    if (this.permissoes[app]) {
+      const removido = this.permissoes[app].delete(permissao);
+      if (removido) {
+        this.salvarNoLocalStorage();
+        // Notifica o app sobre a remoção da permissão
+        this.notificarApp(app, permissao, false);
+      }
+      return removido;
+    }
+    return false;
+  },
+
+  // Verifica se a origem é o app admin
+verificarAppAdmin(origem) {
+ return true;
+},
+
+  // Notifica um app sobre mudança de permissão
+  notificarApp(app, permissao, concedida) {
+    const iframe = encontrarJanelaApp(app);
+    if (iframe && iframe.contentWindow) {
+      iframe.contentWindow.postMessage(
+        `perm_update:${permissao}:${concedida ? 'granted' : 'denied'}`,
+        '*'
+      );
+    }
+  },
+
+  // Carrega permissões do localStorage
+  carregarDoLocalStorage() {
+    const salvo = localStorage.getItem('permissoesSistema');
+    if (salvo) {
+      const parsed = JSON.parse(salvo);
+      for (const app in parsed) {
+        // Filtra apenas permissões válidas ao carregar
+        this.permissoes[app] = new Set(
+          parsed[app].filter(p => this.permissaoValida(p))
+        );
+      }
+    }
+  },
+
+  // Salva permissões no localStorage
+  salvarNoLocalStorage() {
+    const paraSalvar = {};
+    for (const app in this.permissoes) {
+      paraSalvar[app] = [...this.permissoes[app]];
+    }
+    localStorage.setItem('permissoesSistema', JSON.stringify(paraSalvar));
+  },
+
+  // Processa mensagens de permissão
+  processarMensagem(e, data) {
+    const partes = data.split(' ');
+    const comando = partes[0];
+    const app = partes[1];
+    const permissao = partes[2];
+
+    switch(comando) {
+      case 'perm_check':
+        return this.verificarPermissao(app, permissao);
+      
+      case 'perm_add':
+        return this.adicionarPermissao(e.origin, app, permissao);
+      
+      case 'perm_remove':
+        return this.removerPermissao(e.origin, app, permissao);
+      
+      case 'perm_request': {
+        // Mostra um diálogo personalizado para o usuário
+        const permissaoInfo = this.permissoesDisponiveis.find(p => p.key === permissao);
+        const permissaoNome = permissaoInfo ? permissaoInfo.name : permissao;
+        
+        // Cria uma janela de diálogo para solicitação de permissão
+        const dialogId = 'permDialog_' + Date.now();
+        const dialogHtml = `
+          <div style="padding: 20px; font-family: sans-serif;">
+            <h3 style="margin-top: 0;">Solicitação de Permissão</h3>
+            <p>O aplicativo <strong>${app}</strong> deseja acessar:</p>
+            <p><strong>${permissaoNome}</strong></p>
+            <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+              <button onclick="window.parent.postMessage('${dialogId}_deny', '*')" 
+                style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px;">
+                Negar
+              </button>
+              <button onclick="window.parent.postMessage('${dialogId}_allow', '*')" 
+                style="padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 4px;">
+                Permitir
+              </button>
+            </div>
+          </div>
+        `;
+        
+        // Abre o diálogo em uma nova janela
+        criarJanela('dialogo.html', false, {
+          titulo: 'Solicitação de Permissão',
+          conteudo: dialogHtml,
+          largura: '400px',
+          altura: 'auto'
+        });
+        
+        // Retorna uma promessa que será resolvida quando o usuário responder
+        return new Promise((resolve) => {
+          const handler = (event) => {
+            if (typeof event.data === 'string') {
+              if (event.data === `${dialogId}_allow`) {
+                if (this.verificarAppAdmin(e.origin)) {
+                  this.adicionarPermissao(e.origin, app, permissao);
+                }
+                resolve(true);
+                window.removeEventListener('message', handler);
+              } else if (event.data === `${dialogId}_deny`) {
+                resolve(false);
+                window.removeEventListener('message', handler);
+              }
+            }
+          };
+          window.addEventListener('message', handler);
+        });
+      }
+    }
+  }
+};
+
+// Função auxiliar para encontrar uma janela de app
+function encontrarJanelaApp(nomeApp) {
+  const janelas = document.querySelectorAll('.janela');
+  for (const janela of janelas) {
+    const iframe = janela.querySelector('iframe');
+    if (iframe && iframe.src.includes(nomeApp)) {
+      return iframe;
+    }
+  }
+  return null;
+}
+
+// Inicializa o sistema de permissões
+permissoesSistema.carregarDoLocalStorage();
+
+// Adiciona ao objeto global para acesso via console
+window.permissoes = {
+  listar: listarPermissoes,
+  sistema: permissoesSistema
+};
+
+
+// Novo código para gerenciar a tela de boot
+(async function() {
+  const bootScreen = document.getElementById('bootScreen');
+  const bootProgress = document.getElementById('bootProgress');
+  const bootStatus = document.getElementById('bootStatus');
+  
+  // Função para atualizar o progresso
+  function updateBootProgress(percent, message) {
+    bootProgress.style.width = `${percent}%`;
+    if (message) bootStatus.textContent = message;
+  }
+  
+  // Simula o processo de boot
+  updateBootProgress(5, "Preparando a inicialização");
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  updateBootProgress(10, "Inicializando sistema...");
+  
+  // Fase 1: Pré-inicialização
+  await new Promise(resolve => setTimeout(resolve, 600));
+  updateBootProgress(25, "Inicializando scripts");
+  
+  // Fase 2: Carregar scripts principais
+  await new Promise(resolve => setTimeout(resolve, 810));
+  updateBootProgress(45, "obtendo os dados do localStorage");
+  
+  // Fase 3: Inicializar dispositivos
+  try {
+    await new Promise((resolve, reject) => {
+      const deviceCheck = setInterval(() => {
+        if (window.devicesInitialized) {
+          clearInterval(deviceCheck);
+          resolve();
+        }
+      }, 425);
+      
+      // Timeout para garantir que não fique travado
+      setTimeout(() => {
+        clearInterval(deviceCheck);
+        resolve(); // Continua mesmo se houver erro
+      }, 3000);
+    });
+    updateBootProgress(70, "tudo iniciado");
+  } catch (e) {
+    console.error("Erro na inicialização de dispositivos:", e);
+    updateBootProgress(70, "Alguns componentes não responderam...");
+  }
+  
+  // Fase 4: Carregar scripts adicionais
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  updateBootProgress(90, "Preparando área de trabalho...");
+  
+  // Aguarda os 3 segundos finais conforme solicitado
+  await new Promise(resolve => setTimeout(resolve, 3000));
+  updateBootProgress(100, "Pronto");
+  
+  // Esconde a tela de boot
+  bootScreen.style.opacity = '0';
+  setTimeout(() => {
+    bootScreen.style.display = 'none';
+    // Mostra o modal de tela cheia após o boot
+    mostrarModal();
+  }, 500);
+  
+  // Marca que o boot foi concluído
+  window.bootCompleted = true;
+})();
+
+// Modificação no deviceManager.js para marcar quando os dispositivos estão prontos
+(async function () {
+  // ... código existente do deviceManager.js ...
+  
+  // No final, após carregar todos os dispositivos:
+  window.devicesInitialized = true;
+})();
+
+
+<!-- JavaScript: Funções para mostrar modal e controlar fullscreen -->
+  function mostrarModal() {
+    document.getElementById('modalFullscreen').style.display = 'flex';
+  }
+
+  function cancelar() {
+    document.getElementById('modalFullscreen').style.display = 'none';
+  }
+
+  function ativarTelaCheia() {
+    const elemento = document.documentElement;
+    if (elemento.requestFullscreen) {
+      elemento.requestFullscreen();
+    } else if (elemento.webkitRequestFullscreen) {
+      elemento.webkitRequestFullscreen();
+    } else if (elemento.msRequestFullscreen) {
+      elemento.msRequestFullscreen();
+    }
+    cancelar(); // fecha o modal após ativar tela cheia
+  }
+
+  // Chama o modal ao carregar a página
+  window.onload = mostrarModal;
+
+// deviceManager.js
+
+(async function () {
+  const fs = window.require?.('fs');
+  const path = window.require?.('path');
+
+  if (!fs || !path) {
+    console.error('Este ambiente não permite acesso ao sistema de arquivos.');
+    return;
+  }
+
+  const devicesPath = path.resolve(__dirname, 'devices');
+  const devicesJsonPath = path.resolve(devicesPath, '..', 'devices.json');
+
+  // Validação do nome do dispositivo
+  function isNomeValido(nome) {
+    return /^[A-Z0-9]+$/.test(nome);
+  }
+
+  function isSubpath(parent, child) {
+    const relative = path.relative(parent, child);
+    return !!relative && !relative.startsWith('..') && !path.isAbsolute(relative);
+  }
+
+  try {
+    const devicesRaw = fs.readFileSync(devicesJsonPath, 'utf-8');
+    const devicesList = JSON.parse(devicesRaw);
+
+    for (const deviceName of devicesList) {
+      if (!isNomeValido(deviceName)) {
+        console.warn(`Nome de dispositivo inválido: ${deviceName}`);
+        continue;
+      }
+
+      const deviceDir = path.resolve(devicesPath, deviceName);
+      const deviceBrain = path.join(deviceDir, 'deviceBrain.js');
+
+      if (!isSubpath(devicesPath, deviceDir)) {
+        console.error(`Tentativa de acesso fora da pasta permitida: ${deviceDir}`);
+        continue;
+      }
+
+      if (fs.existsSync(deviceBrain)) {
+        const deviceScript = fs.readFileSync(deviceBrain, 'utf-8');
+
+        // Executar o script em sandbox (simples e isolada)
+        const sandbox = {
+          console,
+          deviceName,
+          require: undefined,
+          process: undefined,
+        };
+
+        const func = new Function('sandbox', `
+          with(sandbox) {
+            (function() {
+              ${deviceScript}
+            })();
+          }
+        `);
+        func(sandbox);
+      } else {
+        console.warn(`Arquivo deviceBrain.js não encontrado em ${deviceDir}`);
+      }
+    }
+  } catch (err) {
+    console.error('Erro ao inicializar dispositivos:', err);
+  }
+})();
+
+  (async function loadScripts() {
+    try {
+      const response = await fetch('scripts.json');
+      const scriptList = await response.json();
+
+      if (Array.isArray(scriptList)) {
+        for (const scriptName of scriptList) {
+          const script = document.createElement('script');
+          script.src = `scripts/${scriptName}`;
+          script.async = false; // Garante que a ordem seja mantida
+          document.head.appendChild(script);
+        }
+      } else {
+        console.error('Formato inválido no scripts.json');
+      }
+    } catch (error) {
+      console.error('Erro ao carregar scripts:', error);
+    }
+  })();
+
+const posicoesJanelas = {};
+let rebootCount = Number(localStorage.getItem("rebootCount")) || 0;
+
+function mostrarMensagem(texto) {
+  const msg = document.getElementById("notificacao");
+  msg.textContent = texto;
+  msg.style.display = "block";
+  clearTimeout(msg.timer);
+  msg.timer = setTimeout(() => {
+    msg.style.display = "none";
+  }, 2000);
+}
+
+// Verifica se o iframe carregou corretamente, senão troca por BSOD
+document.getElementById("homeIframe").addEventListener("error", () => {
+  document.getElementById("homeIframe").src = "bsod.html";
+});
+
+document.getElementById("homeIframe").addEventListener("load", () => {
+  const iframe = document.getElementById("homeIframe");
+  try {
+    const test = iframe.contentWindow.document;
+    // se carregar bem, zera contagem de reboot
+    if (!iframe.src.includes("bsod.html")) rebootCount = 0;
+  } catch (e) {
+    iframe.src = "bsod.html";
+  }
+});
+
+// Mensagens recebidas
+window.addEventListener("message", (e) => {
+  // 1️⃣ Repassa "user:" para TODOS os iframes (exceto o remetente)
+  if (e.data.startsWith("user:")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+  
+  if (e.data.startsWith("custom-user:")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+  
+    if (e.data.startsWith("install")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+  
+    if (e.data.startsWith("delapp")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+  
+    if (e.data.startsWith("custom-user-selected:")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+  
+    if (e.data.startsWith("notificar_app_aberto")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+  
+      if (e.data.startsWith("imgbin")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+  
+if (typeof e.data === 'string' && e.data.startsWith('perm_')) {
+    (async () => {
+        const resultado = await permissoesSistema.processarMensagem(e, e.data);
+        
+        // Responde ao remetente com o resultado
+        if (e.source && !e.source.closed) {
+            e.source.postMessage(`${e.data}_result ${resultado}`, e.origin);
+        }
+    })();
+    return;
+}
+  
+        if (e.data.startsWith("p")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+
+if (e.data.startsWith("abrir ")) {
+    const nome = e.data.split(" ")[1];
+    const existente = Array.from(document.querySelectorAll(".janela")).find(j => {
+      const titulo = j.querySelector(".titulo")?.textContent;
+      return titulo === nome || titulo + ".html" === nome;
+    });
+    if (!existente) {
+      criarJanela(nome);
+      mostrarMensagem(`Abrindo: ${nome}`);
+    } else {
+      mostrarMensagem(`Janela já está aberta: ${nome}`);
+    }
+    return; // Encerra o processamento aqui
+}
+
+
+  // ✅ Versão ORIGINAL do comando "abrir_admin" (sem modificações)
+  if (e.data.startsWith("abrir_admin ")) {
+    const nome = e.data.split(" ")[1];
+    const existente = Array.from(document.querySelectorAll(".janela")).find(j => {
+      const titulo = j.querySelector(".titulo")?.textContent;
+      return titulo === nome || titulo + ".html" === nome;
+    });
+    if (!existente) {
+      criarJanela(nome, true); // O segundo argumento `true` indica modo admin
+      mostrarMensagem(`Abrindo com privilégios: ${nome}`);
+    } else {
+      mostrarMensagem(`Janela já está aberta: ${nome}`);
+    }
+  }
+
+  // 2️⃣ Repassa "user-selected:" para TODOS os iframes (exceto o remetente)
+  if (e.data.startsWith("user-selected:")) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+
+  if (e.data === "recovery") {
+    document.getElementById("homeIframe").src = "recovery.html";
+  }
+  
+  if (e.data === "logoff") {
+    document.getElementById("homeIframe").src = "logon.html";
+  }
+
+  if (e.data === "BSOD") {
+    document.getElementById("homeIframe").src = "bsod.html";
+  }
+
+  if (e.data === "installer") {
+    document.getElementById("homeIframe").src = "installer/index.html";
+  }
+
+  if (e.data === "home") {
+    document.getElementById("homeIframe").src = "home.html";
+  }
+
+  if (e.data === "fastboot") {
+    document.getElementById("homeIframe").src = "fastboot.html";
+  }
+  
+  // Comandos de desenvolvimento (apenas do config.html)
+if (typeof e.data === 'string' && e.data.startsWith("dev ") && verificarOrigemConfig(e.origin)) {
+  const comando = e.data.substring(4);
+  
+  if (comando === "con enable") {
+    // Carrega scripts/con.js
+    const script = document.createElement('script');
+    script.src = './scripts/con.js';
+    script.onload = () => mostrarMensagem("Console de desenvolvimento ativado");
+    script.onerror = () => mostrarMensagem("Erro ao carregar con.js");
+    document.head.appendChild(script);
+    
+  } else if (comando === "con disable") {
+    // Descarrega scripts/con.js
+    const scripts = document.querySelectorAll('script[src="./scripts/con.js"]');
+    scripts.forEach(script => script.remove());
+    mostrarMensagem("Console de desenvolvimento desativado");
+    
+  } else if (comando.startsWith("window_sandbox=")) {
+    // Define sandbox padrão para novas janelas
+    const sandbox = comando.substring("window_sandbox=".length);
+    window.sandboxPadrao = sandbox;
+    mostrarMensagem(`Sandbox padrão definido para: ${sandbox}`);
+    
+  } else if (comando.startsWith("js_argument=")) {
+    // Define argumento JS global
+    const argumento = comando.substring("js_argument=".length);
+    window.jsArgument = argumento;
+    try {
+      // Tenta executar o argumento como código JS
+      if (argumento) eval(argumento);
+      mostrarMensagem(`Argumento JS definido: ${argumento}`);
+    } catch (err) {
+      mostrarMensagem(`Erro no argumento JS: ${err.message}`);
+    }
+    
+  } else if (comando.startsWith("desempenho=")) {
+    // Ativa/desativa otimizações de desempenho
+    const valor = comando.substring("desempenho=".length).toLowerCase();
+    const otimizar = valor === "true";
+    
+    if (otimizar) {
+      // Aplica otimizações
+      document.querySelectorAll('.janela').forEach(janela => {
+        janela.style.willChange = 'transform';
+        janela.style.backfaceVisibility = 'hidden';
+      });
+      mostrarMensagem("Otimizações de desempenho ativadas");
+    } else {
+      // Remove otimizações
+      document.querySelectorAll('.janela').forEach(janela => {
+        janela.style.willChange = '';
+        janela.style.backfaceVisibility = '';
+      });
+      mostrarMensagem("Otimizações de desempenho desativadas");
+    }
+  }
+}
+
+  if (e.data.startsWith("light ")) {
+    const valorStr = e.data.split(" ")[1];
+    const porcentagem = parseInt(valorStr);
+
+    if (!isNaN(porcentagem) && porcentagem >= 0 && porcentagem <= 100) {
+      const brilho = Math.max(0.1, porcentagem / 100); // brilho mínimo de 10%
+      document.documentElement.style.filter = `brightness(${brilho})`;
+    }
+  }
+
+  if (e.data.startsWith("w ")) {
+    const home = document.getElementById("homeIframe");
+    if (home && home.contentWindow) {
+      home.contentWindow.postMessage(e.data, "*");
+    }
+  }
+  
+  if (e.data === 'fechar_tudo') {
+    // Fecha todas as janelas (.janela) e salva suas posições
+    document.querySelectorAll('.janela').forEach(janela => {
+        const titulo = janela.querySelector('.titulo')?.textContent;
+        if (titulo) {
+            posicoesJanelas[titulo] = {
+                top: janela.style.top,
+                left: janela.style.left
+            };
+        }
+        janela.remove();
+    });
+    
+    // Atualiza o localStorage com as posições (opcional)
+    localStorage.setItem("posicoesJanelas", JSON.stringify(posicoesJanelas));
+    
+    // Mostra notificação (usando sua função existente)
+    mostrarMensagem("Todas as janelas foram fechadas");
+}
+  
+if (e.data === 'desligar') {
+    // 1. Deixa a tela preta
+    document.body.style.backgroundColor = 'black';
+    document.body.style.backgroundImage = 'none';
+    document.body.innerHTML = ''; // Limpa todo o conteúdo
+    
+    // 2. Fecha todas as janelas de apps
+    document.querySelectorAll('.janela').forEach(janela => janela.remove());
+    
+    // 3. Encerra scripts dinâmicos
+    const scripts = Array.from(document.querySelectorAll('script[src]'));
+    scripts.forEach(script => {
+        // Remove o script do DOM
+        script.remove();
+        
+        // Cancela requisições pendentes (simulado)
+        if (script.src) {
+            const url = new URL(script.src);
+            window[url.pathname.replace(/\W/g, '_')] = null; // Invalida cache simbólico
+        }
+    });
+    
+    // 4. Remove event listeners críticos
+    const clone = window.cloneNode(); // Técnica para limpar listeners
+    window.parent.replaceChild(clone, window);
+    
+    // 5. Opcional: força coleta de lixo (não garantido)
+    if (window.gc) window.gc();
+}
+    
+    // Verifica se a mensagem recebida é "reboot"
+    if (event.data === 'reboot') {
+        // Reinicia a página recarregando-a
+        window.location.reload();
+    }
+
+  // ✅ CORREÇÃO: Aqui usamos `e` em vez de `event`
+  if (typeof e.data === 'string' && e.data.startsWith('custom')) {
+    const iframes = document.querySelectorAll("iframe");
+    iframes.forEach(iframe => {
+      if (iframe.contentWindow !== e.source) { // Evita loop (adicionei essa verificação)
+        iframe.contentWindow.postMessage(e.data, "*");
+      }
+    });
+  }
+
+  if (e.data.startsWith("fechar ")) {
+    const nome = e.data.split(" ")[1];
+    const janela = Array.from(document.querySelectorAll(".janela")).find(j => {
+      const titulo = j.querySelector(".titulo")?.textContent;
+      return titulo === nome || titulo + ".html" === nome;
+    });
+    if (janela) {
+      janela.remove();
+    }
+  }
+});
+
+const area = document.getElementById("areaDeTrabalho");
+let zIndexAtual = 10;
+
+// Recarrega posições salvas se existirem
+const salvas = localStorage.getItem("posicoesJanelas");
+if (salvas) {
+  Object.assign(posicoesJanelas, JSON.parse(salvas));
+}
+
+async function criarJanela(nomeArquivo, isAdmin = false) {
+    // 1. Verifica se a janela já existe
+    const existente = Array.from(document.querySelectorAll(".janela")).find(j => {
+        const titulo = j.querySelector(".titulo")?.textContent;
+        return titulo === nomeArquivo || titulo + ".html" === nomeArquivo;
+    });
+
+    if (existente) {
+        existente.style.display = "block";
+        existente.style.zIndex = ++zIndexAtual;
+        return;
+    }
+
+    // 2. Carrega configurações do manifest com valores padrão
+    let config = {
+        maximizable: true,
+        minimizable: true,
+        resizable: true,
+        width: "600px",
+        height: "400px"
+    };
+    
+    try {
+        const resposta = await fetch(`manifest/${nomeArquivo.replace(".html", ".json")}`);
+        if (resposta.ok) {
+            const manifest = await resposta.json();
+            config = { ...config, ...manifest }; // Sobrescreve com valores do manifest
+        }
+    } catch (e) {
+        console.warn("Manifesto não encontrado ou inválido para", nomeArquivo);
+    }
+
+    // 3. Cria a janela com animação de abertura
+    const janela = document.createElement("div");
+    janela.className = "janela janela-abrindo";
+    janela.style.zIndex = ++zIndexAtual;
+    janela.style.width = config.width;
+    janela.style.height = config.height;
+
+    // Posicionamento inicial
+    const pos = posicoesJanelas[nomeArquivo];
+    if (pos) {
+        janela.style.top = pos.top;
+        janela.style.left = pos.left;
+    } else {
+        janela.style.top = "50%";
+        janela.style.left = "50%";
+        janela.style.transform = "translate(-50%, -50%) scale(0.9)";
+    }
+
+    // 4. Cria a splash screen
+    const splash = document.createElement("div");
+    splash.className = "splash-screen";
+    
+    // Verifica se a splash screen existe
+    const splashImg = `splash/${nomeArquivo.replace('.html', '.png')}`;
+    const splashExists = await fetch(splashImg, { method: 'HEAD' }).then(res => res.ok).catch(() => false);
+    
+    if (splashExists) {
+        splash.style.backgroundImage = `url('${splashImg}')`;
+    } else {
+        splash.innerHTML = `
+            <div class="splash-loading">
+                <div class="splash-spinner"></div>
+                <div>${limparNome(nomeArquivo).replace(/_/g, " ")}</div>
+            </div>
+        `;
+    }
+
+    // 5. Cria o conteúdo (inicialmente oculto)
+    const conteudo = document.createElement("div");
+    conteudo.className = "conteudo";
+    conteudo.style.display = "none";
+
+    const iframe = document.createElement("iframe");
+    iframe.src = "apps/" + nomeArquivo;
+    iframe.setAttribute("data-app", nomeArquivo);
+
+    // Configuração de sandbox
+    if (!isAdmin) {
+        const sandboxRules = ["allow-scripts", "allow-same-origin"];
+        if (!nomeArquivo.includes('home.html') && !nomeArquivo.includes('logon.html') && 
+            !nomeArquivo.includes('bsod.html') && !nomeArquivo.includes('recovery.html')) {
+            
+            if (permissoesSistema.verificarPermissao(nomeArquivo, "geolocation")) {
+                sandboxRules.push("allow-geolocation");
+            }
+            if (permissoesSistema.verificarPermissao(nomeArquivo, "audio_capture")) {
+                sandboxRules.push("allow-microphone");
+            }
+            if (permissoesSistema.verificarPermissao(nomeArquivo, "video_capture")) {
+                sandboxRules.push("allow-camera");
+            }
+        }
+        iframe.sandbox = sandboxRules.join(" ");
+    }
+
+    // 6. Barra de título e controles (respeitando o manifest)
+    const barra = document.createElement("div");
+    barra.className = "barra";
+
+    // Container para ícone e título
+    const tituloContainer = document.createElement("div");
+    tituloContainer.style.display = "flex";
+    tituloContainer.style.alignItems = "center";
+    tituloContainer.style.gap = "8px";
+
+    // Ícone do app
+    const iconeImg = document.createElement("img");
+    iconeImg.src = await getAppIconPath(nomeArquivo);
+    iconeImg.style.width = "16px";
+    iconeImg.style.height = "16px";
+    iconeImg.style.objectFit = "contain";
+
+    // Nome do app
+    const titulo = document.createElement("div");
+    titulo.className = "titulo";
+    titulo.textContent = formatarNomeApp(nomeArquivo);
+
+    // Adiciona ícone e título ao container
+    tituloContainer.appendChild(iconeImg);
+    tituloContainer.appendChild(titulo);
+
+    const icones = document.createElement("div");
+    icones.className = "icones";
+
+// Botão fechar (sempre visível)
+const fecharBtn = document.createElement("button");
+fecharBtn.className = "botao-janela botao-fechar";
+fecharBtn.textContent = "X";
+fecharBtn.onclick = () => {
+    janela.classList.add("janela-fechando");
+    setTimeout(() => {
+        posicoesJanelas[nomeArquivo] = {
+            top: janela.style.top,
+            left: janela.style.left
+        };
+        localStorage.setItem("posicoesJanelas", JSON.stringify(posicoesJanelas));
+        
+        // Remove da lista de minimizadas se estiver lá
+        if (window.janelasMinimizadas) {
+            window.janelasMinimizadas = window.janelasMinimizadas.filter(j => j.nome !== nomeArquivo);
+        }
+        
+        janela.remove();
+    }, 300);
+};
+    icones.appendChild(fecharBtn);
+
+    // Botão maximizar (condicional)
+    if (config.maximizable !== false) {
+        const fullBtn = document.createElement("button");
+        fullBtn.className = "botao-janela botao-maximizar";
+        fullBtn.textContent = "⛶";
+        let full = false, original = {};
+        
+        fullBtn.onclick = () => {
+            if (!full) {
+                // Salva o estado original ANTES de qualquer transformação
+                const estilo = window.getComputedStyle(janela);
+                original = {
+                    top: estilo.top,
+                    left: estilo.left,
+                    width: estilo.width,
+                    height: estilo.height,
+                    transform: estilo.transform
+                };
+                
+                // Prepara para maximizar (mantendo a classe para animação)
+                janela.classList.add("janela-maximizada");
+                
+                // Aplica as propriedades maximizadas
+                Object.assign(janela.style, {
+                    top: "0",
+                    left: "0",
+                    width: "calc(100vw - 4px)", // Ajuste fino para bordas
+                    height: "calc(100vh - 4px)",
+                    transform: "none", // Remove transformações anteriores
+                    transition: "all 0.3s ease-out"
+                });
+            } else {
+                // Restaura o estado original
+                janela.classList.remove("janela-maximizada");
+                Object.assign(janela.style, {
+                    top: original.top,
+                    left: original.left,
+                    width: original.width,
+                    height: original.height,
+                    transform: original.transform
+                });
+            }
+            full = !full;
+        };
+        icones.appendChild(fullBtn);
+    }
+
+// Botão minimizar (condicional)
+if (config.minimizable !== false) {
+    const barBtn = document.createElement("button");
+    barBtn.className = "botao-janela botao-minimizar";
+    barBtn.textContent = "_";
+    barBtn.onclick = () => {
+        // Em vez de remover, apenas esconde a janela
+        janela.style.display = "none";
+        
+        // Adiciona à lista de janelas minimizadas
+        if (!window.janelasMinimizadas) {
+            window.janelasMinimizadas = [];
+        }
+        window.janelasMinimizadas.push({
+            elemento: janela,
+            nome: nomeArquivo
+        });
+        
+        // Notifica a barra de tarefas (homeIframe)
+        document.getElementById("homeIframe").contentWindow.postMessage("recents " + nomeArquivo, "*");
+    };
+    icones.appendChild(barBtn);
+}
+
+    barra.append(tituloContainer, icones);
+    janela.append(barra, splash, conteudo);
+    conteudo.appendChild(iframe);
+
+    // 7. Adiciona redimensionamento (condicional)
+    if (config.resizable !== false) {
+        const alca = document.createElement("div");
+        alca.className = "alca-resize";
+        janela.appendChild(alca);
+        alca.addEventListener("touchstart", iniciarResizeMobile, { passive: false });
+        alca.addEventListener("mousedown", iniciarResizeDesktop);
+    }
+
+    // 8. Adiciona ao DOM
+    document.body.appendChild(janela);
+    ativarMovimento(janela, barra);
+
+    // 9. Quando o iframe carregar, esconde a splash
+    iframe.addEventListener("load", () => {
+        splash.style.opacity = "0";
+        setTimeout(() => {
+            splash.style.display = "none";
+            conteudo.style.display = "block";
+        }, 300);
+    });
+
+    // 10. Finaliza animação de abertura
+    setTimeout(() => {
+        janela.classList.remove("janela-abrindo");
+        if (!pos) janela.style.transform = "translate(-50%, -50%)";
+    }, 10);
+}
+
+function ativarMovimento(janela, barra) {
+  let movendo = false, offsetX, offsetY;
+  barra.addEventListener("mousedown", (e) => {
+    let lastMoveTime = Date.now();
+let lastX = e.clientX;
+let lastY = e.clientY;
+
+
+function moverMouse(ev) {
+  const now = Date.now();
+  const deltaT = now - lastMoveTime || 16;
+  const deltaX = ev.clientX - lastX;
+  const deltaY = ev.clientY - lastY;
+  const velocidade = Math.sqrt(deltaX**2 + deltaY**2) / deltaT;
+
+  janela.style.left = (ev.clientX - offsetX) + "px";
+  janela.style.top = (ev.clientY - offsetY) + "px";
+
+  if (velocidade > 0.5) { // ajustável — sensibilidade
+    janela.style.transition = "transform 0.1s ease-out";
+    janela.style.transform = `rotate(${(Math.random() - 0.5) * 2}deg) skew(${(Math.random() - 0.5) * 1.5}deg, ${(Math.random() - 0.5) * 1.5}deg)`;
+
+    requestAnimationFrame(() => {
+      janela.style.transform = "";
+    });
+  }
+
+  lastMoveTime = now;
+  lastX = ev.clientX;
+  lastY = ev.clientY;
+}
+
+
+    function soltarMouse() {
+      movendo = false;
+ posicoesJanelas[janela.querySelector(".titulo").textContent] = {
+        top: janela.style.top,
+        left: janela.style.left
+      };
+      localStorage.setItem("posicoesJanelas", JSON.stringify(posicoesJanelas));
+      document.removeEventListener("mousemove", moverMouse);
+      document.removeEventListener("mouseup", soltarMouse);
+    }
+
+    document.addEventListener("mousemove", moverMouse);
+    document.addEventListener("mouseup", soltarMouse);
+  });
+
+  barra.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    const rect = janela.getBoundingClientRect();
+    offsetX = touch.clientX - rect.left;
+    offsetY = touch.clientY - rect.top;
+    movendo = true;
+lastMoveTime = Date.now();
+lastX = touch.clientX;
+lastY = touch.clientY;
+
+  }, { passive: false });
+
+barra.addEventListener("touchmove", (e) => {
+  if (!movendo) return;
+  const touch = e.touches[0];
+  const now = Date.now();
+
+  const deltaT = now - lastMoveTime || 16;
+  const deltaX = touch.clientX - lastX;
+  const deltaY = touch.clientY - lastY;
+  const velocidade = Math.sqrt(deltaX**2 + deltaY**2) / deltaT;
+
+  janela.style.left = (touch.clientX - offsetX) + "px";
+  janela.style.top = (touch.clientY - offsetY) + "px";
+
+  if (velocidade > 0.5) {
+    janela.style.transition = "transform 0.1s ease-out";
+    janela.style.transform = `rotate(${(Math.random() - 0.5) * 2}deg) skew(${(Math.random() - 0.5) * 1.5}deg, ${(Math.random() - 0.5) * 1.5}deg)`;
+    requestAnimationFrame(() => {
+      janela.style.transform = "";
+    });
+  }
+
+  lastMoveTime = now;
+  lastX = touch.clientX;
+  lastY = touch.clientY;
+}, { passive: false });
+
+
+  barra.addEventListener("touchend", () => {
+    movendo = false;
+    posicoesJanelas[janela.querySelector(".titulo").textContent] = {
+      top: janela.style.top,
+      left: janela.style.left
+    };
+    localStorage.setItem("posicoesJanelas", JSON.stringify(posicoesJanelas));
+  });
+}
+
+  // ...
+
+  function iniciarResizeDesktop(e) {
+    e.preventDefault();
+    const janela = e.currentTarget.parentElement;
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = janela.offsetWidth;
+    const startH = janela.offsetHeight;
+
+    function resize(ev) {
+      janela.style.width = (startW + ev.clientX - startX) + "px";
+      janela.style.height = (startH + ev.clientY - startY) + "px";
+    }
+
+    function stop() {
+      document.removeEventListener("mousemove", resize);
+      document.removeEventListener("mouseup", stop);
+    }
+
+    document.addEventListener("mousemove", resize);
+    document.addEventListener("mouseup", stop);
+  }
+
+  function iniciarResizeMobile(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const janela = e.currentTarget.parentElement;
+    const startX = touch.clientX;
+    const startY = touch.clientY;
+    const startW = janela.offsetWidth;
+    const startH = janela.offsetHeight;
+
+    function resize(ev) {
+      const t = ev.touches[0];
+      janela.style.width = (startW + t.clientX - startX) + "px";
+      janela.style.height = (startH + t.clientY - startY) + "px";
+    }
+
+    function stop() {
+      document.removeEventListener("touchmove", resize);
+      document.removeEventListener("touchend", stop);
+    }
+
+    document.addEventListener("touchmove", resize, { passive: false });
+    document.addEventListener("touchend", stop, { passive: false });
+  }
+
+// Variáveis globais
+let modoSelecao = false;
+let janelas = [];
+let indiceJanelaAtual = 0;
+
+// Função para destacar a janela atual
+function destacarJanelaAtual() {
+    janelas.forEach((janela, indice) => {
+        janela.style.border = indice === indiceJanelaAtual ? "2px solid blue" : "2px solid #444";
+    });
+}
+
+// Função para ativar o modo de seleção
+function ativarModoSelecao() {
+    modoSelecao = true;
+    janelas = Array.from(document.querySelectorAll(".janela"));
+    janelas.forEach((janela, indice) => {
+        janela.style.border = "2px solid #444";
+        janela.style.transform = `translateX(${indice * 20}px) scale(0.8)`;
+        janela.style.transition = "transform 0.2s ease-in-out";
+    });
+    destacarJanelaAtual();
+}
+
+// Eventos de teclado
+document.addEventListener("keydown", (e) => {
+    if (e.key === "m") {
+        ativarModoSelecao();
+    } else if (modoSelecao) {
+        if (e.key === "ArrowRight") {
+            indiceJanelaAtual = (indiceJanelaAtual + 1) % janelas.length;
+            destacarJanelaAtual();
+        } else if (e.key === "ArrowLeft") {
+            indiceJanelaAtual = (indiceJanelaAtual - 1 + janelas.length) % janelas.length;
+            destacarJanelaAtual();
+        } else if (e.key === " ") {
+            const janelaAtual = janelas[indiceJanelaAtual];
+            janelaAtual.style.transform = "";
+            janelaAtual.style.zIndex = "999999";
+            modoSelecao = false;
+        }
+    }
+});
+
+// Eventos de toque
+let touchStartX = 0;
+let touchStartTime = 0;
+
+document.addEventListener("touchstart", (e) => {
+    if (e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartTime = new Date().getTime();
+        if (e.touches[0].clientX > window.innerWidth / 2 - 50 && e.touches[0].clientX < window.innerWidth / 2 + 50 && e.touches[0].clientY > window.innerHeight / 2 - 50 && e.touches[0].clientY < window.innerHeight / 2 + 50) {
+            setTimeout(() => {
+                if (new Date().getTime() - touchStartTime > 500) {
+                    ativarModoSelecao();
+                }
+            }, 600);
+        }
+    }
+});
+
+document.addEventListener("touchmove", (e) => {
+    if (modoSelecao && e.touches.length === 1) {
+        const touchMoveX = e.touches[0].clientX;
+        if (touchMoveX - touchStartX > 50) {
+            indiceJanelaAtual = (indiceJanelaAtual + 1) % janelas.length;
+            destacarJanelaAtual();
+            touchStartX = touchMoveX;
+        } else if (touchStartX - touchMoveX > 50) {
+            indiceJanelaAtual = (indiceJanelaAtual - 1 + janelas.length) % janelas.length;
+            destacarJanelaAtual();
+            touchStartX = touchMoveX;
+        }
+    }
+});
+
+document.addEventListener("touchend", (e) => {
+    if (modoSelecao) {
+        const touchEndX = e.changedTouches[0].clientX;
+        if (Math.abs(touchEndX - touchStartX) < 10 && touchEndX > window.innerWidth / 2 - 50 && touchEndX < window.innerWidth / 2 + 50) {
+            const janelaAtual = janelas[indiceJanelaAtual];
+            janelaAtual.style.transform = "";
+            janelaAtual.style.zIndex = "999999";
+            modoSelecao = false;
+        }
+    }
+});
+
+let erroFatalExecutado = false;
+
+// Mapeamento das mensagens de erro e se devem acionar o BSOD
+const mensagensErro = {
+  1: { msg: "ERR.JS.GLOBAL.ERROR", critico: true },
+  2: { msg: "ERR.HOMEIFRAME.NOT.EXIST.DOM", critico: true },
+  3: { msg: "ERR.IFRAME.NATIVE.ERROR", critico: true },
+  4: { msg: "ERR.HOME.NOT.LOADED", critico: true },
+  5: { msg: "ERR.CONFLIT", critico: true }, // ← Erro de teste
+  6: { msg: "ERR.FUNCTION.OVERLOADED", critico: false }, // ← Erro de teste
+  default: { msg: "ERR.UNKNOWN", critico: true }
+};
+
+function fatalError(motivo = 0) {
+  if (erroFatalExecutado) return;
+  erroFatalExecutado = true;
+
+  const erro = mensagensErro[motivo] || mensagensErro.default;
+  console.error(erro.msg);
+
+  // Enviar mensagem para o parent após 4 segundos
+  setTimeout(() => {
+    parent.postMessage(`errcod: ${motivo}`, '*');
+  }, 4000);
+
+  if (erro.critico) {
+    const iframe = document.getElementById("homeIframe");
+    if (iframe) {
+      iframe.src = "bsod.html";
+    }
+  }
+}
+
+// 1. Erros globais
+window.addEventListener("error", () => fatalError(1));
+
+// 2. DOM carregado
+window.addEventListener("DOMContentLoaded", () => {
+  const iframe = document.getElementById("homeIframe");
+  if (!iframe) return fatalError(2);
+
+  iframe.addEventListener("error", () => fatalError(3));
+
+  setTimeout(() => {
+    const src = iframe.getAttribute("src");
+    if (!src?.includes("home.html") && !src?.includes("logon.html")) {
+      fatalError(4); // ERR.HOME.NOT.LOADED
+    }
+  }, 40000);
+});
+
+// 3. Controle de conflito
+let controleDeExecucao = false;
+function verificarConflito() {
+  if (controleDeExecucao) {
+    fatalError(5); // teste: conflito detectado
+  } else {
+    controleDeExecucao = true;
+    setTimeout(() => controleDeExecucao = false, 1000);
+  }
+}
+
+// 4. Controle de sobrecarga
+let chamadasCriticas = 0;
+function minhaFuncaoCritica() {
+  chamadasCriticas++;
+  if (chamadasCriticas > 5) {
+    fatalError(6); // teste: sobrecarga detectada
+    return;
+  }
+
+  console.log("Executando função crítica");
+
+  setTimeout(() => chamadasCriticas--, 2000);
+}
+
+let volume = 50; // 0 a 100
+
+function mostrarHUDVolume(novoVolume) {
+  volume = Math.max(0, Math.min(100, novoVolume));
+  const hud = document.getElementById("hudVolume");
+  const barra = hud.querySelector(".barra");
+  barra.style.width = volume + "%";
+
+  hud.style.display = "block";
+
+  clearTimeout(hud._timer);
+  hud._timer = setTimeout(() => {
+    hud.style.display = "none";
+  }, 1200);
+}
+
+// Exemplo de uso:
+document.addEventListener("keydown", (e) => {
+  if (e.code === "ArrowUp") { // Simula volume +
+    mostrarHUDVolume(volume + 10);
+  } else if (e.code === "ArrowDown") { // Simula volume -
+    mostrarHUDVolume(volume - 10);
+  }
+});
+
+setInterval(() => {
+  const iframes = document.querySelectorAll("iframe[data-app]");
+  for (const iframe of iframes) {
+    try {
+      const win = iframe.contentWindow;
+      const doc = win?.document;
+
+      // Tenta acessar algo simples pra ver se está vivo
+      const ok = !!doc?.readyState;
+
+      if (!ok) throw new Error("iframe não responde");
+    } catch (e) {
+      const nome = iframe.getAttribute("data-app") || "desconhecido";
+      Notificacao?.mostrar("App encerrado", `"${nome}" foi fechado por falha de execução.`);
+      iframe.remove();
+    }
+  }
+}, 8000); // Verifica a cada 8 segundos
+
+function limparNome(caminho) {
+  return caminho
+    .replace(/\/index\.html$/, '') // remove "/index.html" no fim
+    .replace(/\.html$/, '');       // remove ".html" no fim
+}
+
+window.addEventListener("message", (event) => {
+  const data = event.data;
+
+  if (typeof data === "string" && data.startsWith("dialog ")) {
+    const dialogIframe = document.querySelector("iframe[src='apps/dialogo.html']");
+    if (dialogIframe) {
+      dialogIframe.contentWindow.postMessage(data, "*");
+    }
+  }
+});
+
+let selecionador = document.createElement('div');
+selecionador.id = 'selecionador';
+document.body.appendChild(selecionador);
+
+let menu = document.createElement('div');
+menu.id = 'menuContextual';
+menu.className = 'menu-contextual';
+menu.innerHTML = `
+  <button onclick="copiar()">Copiar</button>
+  <button onclick="traduzir()">Traduzir</button>
+  <button onclick="selecionarTudo()">Selecionar tudo</button>
+  <button onclick="pesquisar()">Pesquisar</button>
+`;
+document.body.appendChild(menu);
+
+let selecionando = false;
+let textoSelecionado = "";
+
+// Ativa a seleção com o botão direito
+document.addEventListener('mousedown', (e) => {
+  if (e.button === 2) { // Botão direito
+    inicio.x = e.clientX;
+    inicio.y = e.clientY;
+    selecionador.style.left = `${inicio.x}px`;
+    selecionador.style.top = `${inicio.y}px`;
+    selecionador.style.width = '0px';
+    selecionador.style.height = '0px';
+    selecionador.style.display = 'block';
+    selecionando = true;
+    e.preventDefault();
+  }
+});
+
+// Desenha o retângulo de seleção
+document.addEventListener('mousemove', (e) => {
+  if (selecionando) {
+    const largura = e.clientX - inicio.x;
+    const altura = e.clientY - inicio.y;
+    selecionador.style.width = `${Math.abs(largura)}px`;
+    selecionador.style.height = `${Math.abs(altura)}px`;
+    selecionador.style.left = `${Math.min(inicio.x, e.clientX)}px`;
+    selecionador.style.top = `${Math.min(inicio.y, e.clientY)}px`;
+  }
+});
+
+// Ao soltar o botão, verifica se há texto selecionado
+document.addEventListener('mouseup', (e) => {
+  if (selecionando) {
+    selecionando = false;
+    textoSelecionado = window.getSelection().toString().trim();
+    
+    if (textoSelecionado) {
+      const range = window.getSelection().getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      
+      // Posiciona o menu perto do texto selecionado
+      menu.style.left = `${rect.right}px`;
+      menu.style.top = `${rect.bottom}px`;
+      menu.style.display = 'block';
+    } else {
+      menu.style.display = 'none';
+    }
+  }
+});
+
+// Fecha o menu ao clicar fora
+document.addEventListener('click', (e) => {
+  if (!menu.contains(e.target)) {
+    menu.style.display = 'none';
+  }
+});
+
+// Funções do menu
+function copiar() {
+  navigator.clipboard.writeText(textoSelecionado);
+  menu.style.display = 'none';
+}
+
+async function traduzir() {
+  const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(textoSelecionado)}&langpair=pt|en`);
+  const data = await response.json();
+  alert("Tradução: " + data.responseData.translatedText);
+  menu.style.display = 'none';
+}
+
+function selecionarTudo() {
+  const range = document.createRange();
+  range.selectNode(document.body);
+  window.getSelection().removeAllRanges();
+  window.getSelection().addRange(range);
+  textoSelecionado = window.getSelection().toString();
+  menu.style.display = 'block';
+}
+
+function pesquisar() {
+  window.open(`https://www.google.com/search?q=${encodeURIComponent(textoSelecionado)}`);
+  menu.style.display = 'none';
+}
+
+// Bloqueia o menu de contexto padrão
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// Sistema avançado de roteamento de mensagens
+window.addEventListener("message", (e) => {
+  try {
+    if (typeof e.data !== 'string') return;
+    
+    const [prefixo, ...resto] = e.data.split(" ");
+    
+    switch(prefixo) {
+      case "f2":
+        // Envia para o visualizador de arquivos
+        const visualizador = encontrarJanelaApp("visualizador_de_arquivos.html")?.contentWindow;
+        if (visualizador) {
+          visualizador.postMessage(e.data, "*");
+        } else {
+          // Se não encontrado, abre o visualizador e repete a mensagem
+          criarJanela("visualizador_de_arquivos.html");
+          setTimeout(() => {
+            const novoVisualizador = encontrarJanelaApp("visualizador_de_arquivos.html")?.contentWindow;
+            if (novoVisualizador) novoVisualizador.postMessage(e.data, "*");
+          }, 1000);
+        }
+        break;
+    }
+  } catch (error) {
+    console.error("Erro no roteamento de mensagens:", error);
+  }
+});
+
+let lastUser = null;
+
+window.addEventListener("message", (e) => {
+  // 1. Quando um app avisa que está pronto:
+  if (e.data.startsWith("app_ready:")) {
+    const appName = e.data.split(":")[1];
+    console.log(`App ${appName} carregado!`);
+    
+    // Se há um usuário selecionado, envia para o app:
+    if (lastUser) {
+      e.source.postMessage(`user:${lastUser}`, "*");
+    }
+  }
+
+  // 2. Atualiza o último usuário quando ele muda:
+  if (e.data.startsWith("user:")) {
+    lastUser = e.data.split(":")[1].trim();
+  }
+});
+
+// Função para restaurar uma janela minimizada
+function restaurarJanela(nomeArquivo) {
+    // Primeiro, verifica se há janelas minimizadas
+    if (window.janelasMinimizadas && window.janelasMinimizadas.length > 0) {
+        // Procura a janela pelo nome
+        const janelaIndex = window.janelasMinimizadas.findIndex(j => j.nome === nomeArquivo);
+        
+        if (janelaIndex !== -1) {
+            const { elemento } = window.janelasMinimizadas[janelaIndex];
+            
+            // Restaura a janela
+            elemento.style.display = "flex";
+            elemento.style.zIndex = ++zIndexAtual;
+            
+            // Remove da lista de minimizadas
+            window.janelasMinimizadas.splice(janelaIndex, 1);
+            
+            return true;
+        }
+    }
+    
+    // Se não encontrou minimizada, retorna false para abrir nova janela
+    return false;
+}
+
+
+</script>
+</body>
+</html>

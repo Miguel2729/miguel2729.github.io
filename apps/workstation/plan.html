@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Planilhas</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+        td, th {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-width: 80px;
+            text-align: center;
+        }
+        input {
+            width: 100%;
+            border: none;
+            text-align: center;
+        }
+        .configuracoes {
+            margin: 20px auto;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h2>📊 Editor de Planilhas</h2>
+    <div class="configuracoes">
+        <input type="number" id="linhas" value="5" min="1">
+        <label for="linhas">Linhas</label>
+        <input type="number" id="colunas" value="5" min="1">
+        <label for="colunas">Colunas</label>
+        <button onclick="gerarPlanilha()">Gerar Planilha</button>
+    </div>
+    <table id="planilha">
+        <tbody id="corpo-planilha">
+            <!-- A planilha será gerada aqui -->
+        </tbody>
+    </table>
+
+    <script>
+        function gerarPlanilha() {
+            const linhas = parseInt(document.getElementById('linhas').value);
+            const colunas = parseInt(document.getElementById('colunas').value);
+            const corpoPlanilha = document.getElementById('corpo-planilha');
+            corpoPlanilha.innerHTML = '';
+
+            for (let i = 0; i < linhas; i++) {
+                const linha = document.createElement('tr');
+                for (let j = 0; j < colunas; j++) {
+                    const celula = document.createElement('td');
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    celula.appendChild(input);
+                    linha.appendChild(celula);
+                }
+                corpoPlanilha.appendChild(linha);
+            }
+        }
+
+        // Gera a planilha inicial
+        gerarPlanilha();
+    </script>
+</body>
+</html>

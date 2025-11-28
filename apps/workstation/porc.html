@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Gráfico de Porcentagem</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    canvas {
+      margin-top: 20px;
+    }
+
+    .item {
+      margin-bottom: 10px;
+    }
+
+    input[type="text"], input[type="number"], input[type="color"] {
+      margin: 5px;
+    }
+
+    #itens-container {
+      max-width: 600px;
+      margin: auto;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔵 Gráfico de Porcentagem com Múltiplas Cores</h2>
+
+  <div id="itens-container">
+    <!-- Itens serão adicionados aqui -->
+  </div>
+
+  <button onclick="adicionarItem()">➕ Adicionar Item</button>
+  <button onclick="desenharGrafico()">📊 Gerar Gráfico</button>
+
+  <canvas id="grafico" width="300" height="300"></canvas>
+
+  <script>
+    const container = document.getElementById('itens-container');
+
+    function adicionarItem() {
+      const div = document.createElement('div');
+      div.className = 'item';
+      div.innerHTML = `
+        <input type="text" placeholder="Nome" class="nome">
+        <input type="color" value="#4caf50" class="cor">
+        <input type="number" placeholder="%" min="0" max="100" class="porc">
+        <button onclick="this.parentElement.remove()">❌</button>
+      `;
+      container.appendChild(div);
+    }
+
+    function desenharGrafico() {
+      const nomes = document.querySelectorAll('.nome');
+      const cores = document.querySelectorAll('.cor');
+      const porcs = document.querySelectorAll('.porc');
+
+      const valores = [];
+      let total = 0;
+
+      for (let i = 0; i < nomes.length; i++) {
+        const nome = nomes[i].value || `Item ${i+1}`;
+        const cor = cores[i].value;
+        const porc = parseFloat(porcs[i].value);
+        if (!isNaN(porc) && porc > 0) {
+          valores.push({ nome, cor, porc });
+          total += porc;
+        }
+      }
+
+      const canvas = document.getElementById('grafico');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      let startAngle = 0;
+      valores.forEach(item => {
+        const sliceAngle = (item.porc / total) * 2 * Math.PI;
+        ctx.beginPath();
+        ctx.moveTo(150, 150);
+        ctx.arc(150, 150, 120, startAngle, startAngle + sliceAngle);
+        ctx.closePath();
+        ctx.fillStyle = item.cor;
+        ctx.fill();
+        startAngle += sliceAngle;
+      });
+    }
+
+    // Adiciona dois itens por padrão
+    adicionarItem();
+    adicionarItem();
+  </script>
+</body>
+</html>

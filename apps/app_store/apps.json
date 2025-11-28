@@ -1,0 +1,10 @@
+[
+  { "name": "workstation/index.html", "category": "utiliarios" },
+  { "name": "e-mail/index.html", "category": "utiliarios" },
+  { "name": "emulador.html", "category": "utiliarios" },
+  { "name": "pesca_master.html", "category": "jogos" },
+  { "name": "pet_game.html", "category": "jogos" }, 
+  { "name": "escola.html", "category": "escolar" },
+  { "name": "controles_parentais.html", "category": "utiliarios" },
+  { "name": "DNA_sandbox.html", "category": "jogos" }
+]

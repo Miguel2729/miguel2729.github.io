@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Bloco de Notas</title>
+    <style>
+        body {
+            font-family: sans-serif;
+        }
+        #bloco-notas {
+            width: 800px;
+            height: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        #titulo {
+            width: 100%;
+            height: 30px;
+            padding: 10px;
+            border: none;
+            border-bottom: 1px solid #ccc;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #texto {
+            width: 100%;
+            height: calc(100% - 50px);
+            padding: 10px;
+            border: none;
+            font-size: 16px;
+        }
+        #botoes {
+            margin-top: 10px;
+            text-align: right;
+        }
+        #botoes button {
+            width: 100px;
+            height: 30px;
+            margin-left: 10px;
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #botoes button:hover {
+            background-color: #3e8e41;
+        }
+    </style>
+</head>
+<body>
+    <div id="bloco-notas">
+        <input type="text" id="titulo" placeholder="Título">
+        <textarea id="texto" placeholder="Digite seu texto aqui..."></textarea>
+        <div id="botoes">
+            <button id="salvar">Salvar</button>
+            <button id="limpar">Limpar</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('salvar').addEventListener('click', () => {
+            const titulo = document.getElementById('titulo').value;
+            const texto = document.getElementById('texto').value;
+            const nota = {
+                titulo,
+                texto
+            };
+            const notas = JSON.parse(localStorage.getItem('notas')) || [];
+            notas.push(nota);
+            localStorage.setItem('notas', JSON.stringify(notas));
+            alert('Nota salva com sucesso!');
+        });
+
+        document.getElementById('limpar').addEventListener('click', () => {
+            document.getElementById('titulo').value = '';
+            document.getElementById('texto').value = '';
+        });
+
+        // Carregar notas salvas
+        const notas = JSON.parse(localStorage.getItem('notas')) || [];
+        if (notas.length > 0) {
+            const ultimaNota = notas[notas.length - 1];
+            document.getElementById('titulo').value = ultimaNota.titulo;
+            document.getElementById('texto').value = ultimaNota.texto;
+        }
+    </script>
+</body>
+</html>

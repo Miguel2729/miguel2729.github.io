@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Customização</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f5f5f5;
+      color: #333;
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    h1 {
+      color: #0078D7;
+      margin-top: 0;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    
+    .secao {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .secao:last-child {
+      border-bottom: none;
+    }
+    
+    h2 {
+      color: #0078D7;
+      font-size: 18px;
+      margin-bottom: 15px;
+    }
+    
+    .opcao {
+      margin-bottom: 15px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 500;
+    }
+    
+    select, input[type="text"], input[type="color"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    
+    .botoes {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      gap: 10px;
+    }
+    
+    button {
+      background-color: #0078D7;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      flex: 1;
+    }
+    
+    button:hover {
+      background-color: #106EBE;
+    }
+    
+    #btnPadrao {
+      background-color: #666;
+    }
+    
+    #btnPadrao:hover {
+      background-color: #555;
+    }
+    
+    .radio-group {
+      display: flex;
+      gap: 15px;
+    }
+    
+    .radio-option {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .preview {
+      margin-top: 10px;
+      padding: 10px;
+      background-color: #202020;
+      color: white;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    
+    .tema-claro {
+      background-color: #f0f0f0;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Personalize seu netOS</h1>
+    
+    <div class="secao">
+      <h2>Barra Superior</h2>
+      
+      <div class="opcao">
+        <label for="superiorBarra">Exibir barra superior</label>
+        <select id="superiorBarra">
+          <option value="sim">Sim</option>
+          <option value="nao">Não</option>
+        </select>
+      </div>
+    </div>
+    
+    <div class="secao">
+      <h2>Barra de Tarefas</h2>
+      
+      <div class="opcao">
+        <label for="barraCor">Cor da barra de tarefas</label>
+        <input type="color" id="barraCor" value="#141414">
+      </div>
+      
+      <div class="opcao">
+        <label>Exibir na barra de tarefas:</label>
+        <div class="opcao">
+          <input type="checkbox" id="barraDataHora" checked>
+          <label for="barraDataHora" style="display: inline;">Data e Hora</label>
+        </div>
+        <div class="opcao">
+          <input type="checkbox" id="barraRede" checked>
+          <label for="barraRede" style="display: inline;">Status da Rede</label>
+        </div>
+        <div class="opcao">
+          <input type="checkbox" id="barraClima" checked>
+          <label for="barraClima" style="display: inline;">Informações do Clima</label>
+        </div>
+      </div>
+    </div>
+    
+    <div class="secao">
+      <h2>Tema do Sistema</h2>
+      
+      <div class="opcao">
+        <label>Tema</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" id="temaEscuro" name="tema" value="escuro" checked>
+            <label for="temaEscuro">Escuro</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="temaClaro" name="tema" value="claro">
+            <label for="temaClaro">Claro</label>
+          </div>
+        </div>
+        
+        <div id="temaPreview" class="preview">
+          Visualização do tema selecionado
+        </div>
+      </div>
+    </div>
+    
+    <div class="secao">
+      <h2>Menu Iniciar</h2>
+      
+      <div class="opcao">
+        <input type="checkbox" id="menuRecentes" checked>
+        <label for="menuRecentes" style="display: inline;">Exibir aplicativos recentes</label>
+      </div>
+      
+      <div class="opcao">
+        <input type="checkbox" id="menuBusca" checked>
+        <label for="menuBusca" style="display: inline;">Exibir barra de pesquisa</label>
+      </div>
+    </div>
+    
+    <div class="secao">
+      <h2>Fonte do Sistema</h2>
+      
+      <div class="opcao">
+        <label for="fonteSistema">URL da fonte (Google Fonts)</label>
+        <input type="text" id="fonteSistema" placeholder="Ex: https://fonts.googleapis.com/css2?family=Roboto&display=swap">
+      </div>
+    </div>
+    
+    <div class="botoes">
+      <button id="btnCancelar">Cancelar</button>
+      <button id="btnPadrao">Definir Padrão</button>
+      <button id="btnAplicar">Aplicar Configurações</button>
+    </div>
+  </div>
+
+<script>
+  function carregarConfiguracoes() {
+    // Define valores padrão sem consultar localStorage
+    document.getElementById('superiorBarra').value = 'sim';
+    document.getElementById('barraCor').value = '#141414';
+    document.getElementById('barraDataHora').checked = true;
+    document.getElementById('barraRede').checked = true;
+    document.getElementById('barraClima').checked = true;
+    document.getElementById('temaEscuro').checked = true;
+    document.getElementById('menuRecentes').checked = true;
+    document.getElementById('menuBusca').checked = true;
+    document.getElementById('fonteSistema').value = '';
+    
+    atualizarPreviewTema();
+  }
+
+  function atualizarPreviewTema() {
+    const preview = document.getElementById('temaPreview');
+    preview.className = 'preview ' + (document.getElementById('temaClaro').checked ? 'tema-claro' : '');
+  }
+
+  function aplicarConfiguracoes() {
+    const config = {
+      superiorBarra: document.getElementById('superiorBarra').value,
+      barraCor: document.getElementById('barraCor').value,
+      barraDataHora: document.getElementById('barraDataHora').checked,
+      barraRede: document.getElementById('barraRede').checked,
+      barraClima: document.getElementById('barraClima').checked,
+      tema: document.querySelector('input[name="tema"]:checked').value,
+      menuRecentes: document.getElementById('menuRecentes').checked,
+      menuBusca: document.getElementById('menuBusca').checked,
+      fonte: document.getElementById('fonteSistema').value.trim()
+    };
+
+    const mensagens = [
+      `custom superiorbarra ${config.superiorBarra}`,
+      `custom barra cor ${config.barraCor}`,
+      `custom barra dataehora ${config.barraDataHora ? 'sim' : 'nao'}`,
+      `custom barra net ${config.barraRede ? 'sim' : 'nao'}`,
+      `custom barra clima ${config.barraClima ? 'sim' : 'nao'}`,
+      `custom tema ${config.tema}`,
+      `custom menuIniciar recentes ${config.menuRecentes ? 'sim' : 'nao'}`,
+      `custom menuIniciar barra ${config.menuBusca ? 'sim' : 'nao'}`
+    ];
+
+    if (config.fonte) {
+      mensagens.push(`custom font ${config.fonte}`);
+    }
+
+    enviarConfiguracoes(mensagens);
+  }
+
+function definirPadroes() {
+  // Resetar valores no formulário
+  document.getElementById('superiorBarra').value = 'sim';
+  document.getElementById('barraCor').value = '#141414';
+  document.getElementById('barraDataHora').checked = true;
+  document.getElementById('barraRede').checked = true;
+  document.getElementById('barraClima').checked = true;
+  document.getElementById('temaEscuro').checked = true;
+  document.getElementById('menuRecentes').checked = true;
+  document.getElementById('menuBusca').checked = true;
+  document.getElementById('fonteSistema').value = '';
+  
+  atualizarPreviewTema();
+  
+  // Mensagens de reset com intervalo de 2000ms
+  const mensagens = [
+    'custom padrao', // Comando especial
+    'custom superiorbarra sim',
+    'custom barra cor #141414',
+    'custom barra dataehora sim',
+    'custom barra net sim',
+    'custom barra clima sim',
+    'custom tema escuro',
+    'custom menuIniciar recentes sim',
+    'custom menuIniciar barra sim',
+    'custom font ' // Resetar fonte
+  ];
+
+  enviarConfiguracoes(mensagens); // Usa o mesmo sistema de 2000ms
+}
+
+function enviarConfiguracoes(mensagens) {
+  // Tempo entre mensagens (2000ms = 2 segundos)
+  const TEMPO_ENTRE_MENSAGENS = 2000;
+  // Tempo extra após última mensagem antes de fechar (300ms)
+  const TEMPO_EXTRA_FECHAMENTO = 300;
+
+  // Envia cada mensagem com intervalo de 2000ms
+  mensagens.forEach((msg, index) => {
+    setTimeout(() => {
+      parent.postMessage(msg, '*');
+      console.log(`Enviando (${index+1}/${mensagens.length}): ${msg} em ${index * TEMPO_ENTRE_MENSAGENS}ms`);
+    }, index * TEMPO_ENTRE_MENSAGENS);
+  });
+
+  // Fecha a janela após todas as mensagens + tempo extra
+  const tempoTotal = (mensagens.length * TEMPO_ENTRE_MENSAGENS) + TEMPO_EXTRA_FECHAMENTO;
+  setTimeout(() => {
+    parent.postMessage('fechar customizacao.html', '*');
+    console.log(`Fechando janela após ${tempoTotal}ms`);
+  }, tempoTotal);
+}
+
+  // Event Listeners
+  document.getElementById('btnAplicar').addEventListener('click', aplicarConfiguracoes);
+  document.getElementById('btnCancelar').addEventListener('click', () => {
+    parent.postMessage('fechar customizacao.html', '*');
+  });
+  document.getElementById('btnPadrao').addEventListener('click', definirPadroes);
+  
+  document.querySelectorAll('input[name="tema"]').forEach(radio => {
+    radio.addEventListener('change', atualizarPreviewTema);
+  });
+
+  // Inicialização
+  window.addEventListener('load', carregarConfiguracoes);
+</script>
+</body>
+</html>

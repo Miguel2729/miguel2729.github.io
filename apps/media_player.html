@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal Media Player</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .media-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #000;
+            position: relative;
+        }
+        
+        #media-element {
+            max-width: 100%;
+            max-height: 70vh;
+            display: block;
+        }
+        
+        .controls {
+            padding: 15px;
+            background-color: #f8f8f8;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 5px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        
+        #progress-bar {
+            height: 100%;
+            background-color: #4285f4;
+            border-radius: 5px;
+            width: 0%;
+        }
+        
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            align-items: center;
+        }
+        
+        button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 24px;
+            color: #4285f4;
+            padding: 5px;
+        }
+        
+        button:hover {
+            color: #3367d6;
+        }
+        
+        #play-pause {
+            font-size: 32px;
+        }
+        
+        .volume-control {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        #volume {
+            width: 80px;
+        }
+        
+        .title {
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .no-media {
+            padding: 50px;
+            text-align: center;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title" id="media-title">Media Player</div>
+        <div class="media-container">
+            <div id="no-media" class="no-media">No media loaded. Waiting for media data...</div>
+            <img id="media-element" style="display: none;">
+            <video id="video-element" style="display: none;" controls></video>
+            <audio id="audio-element" style="display: none;"></audio>
+        </div>
+        <div class="controls" id="controls" style="display: none;">
+            <div class="progress-container" id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+            <div class="time-display">
+                <span id="current-time">0:00</span>
+                <span id="duration">0:00</span>
+            </div>
+            <div class="buttons">
+                <button id="rewind"><i>⏪</i></button>
+                <button id="play-pause"><i>▶️</i></button>
+                <button id="forward"><i>⏩</i></button>
+                <div class="volume-control">
+                    <button id="mute"><i>🔊</i></button>
+                    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.7">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DOM elements
+        const noMediaElement = document.getElementById('no-media');
+        const mediaTitle = document.getElementById('media-title');
+        const imgElement = document.getElementById('media-element');
+        const videoElement = document.getElementById('video-element');
+        const audioElement = document.getElementById('audio-element');
+        const controlsElement = document.getElementById('controls');
+        const progressBar = document.getElementById('progress-bar');
+        const progressContainer = document.getElementById('progress-container');
+        const currentTimeElement = document.getElementById('current-time');
+        const durationElement = document.getElementById('duration');
+        const playPauseButton = document.getElementById('play-pause');
+        const rewindButton = document.getElementById('rewind');
+        const forwardButton = document.getElementById('forward');
+        const muteButton = document.getElementById('mute');
+        const volumeSlider = document.getElementById('volume');
+
+        // Current media element (audio or video)
+        let currentMediaElement = null;
+        let isPlaying = false;
+
+        // Format time from seconds to MM:SS
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = Math.floor(seconds % 60);
+            return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+        }
+
+        // Update progress bar and time display
+        function updateProgress() {
+            if (!currentMediaElement) return;
+            
+            const { currentTime, duration } = currentMediaElement;
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            
+            currentTimeElement.textContent = formatTime(currentTime);
+            
+            if (!isNaN(duration)) {
+                durationElement.textContent = formatTime(duration);
+            }
+        }
+
+        // Set progress when clicked on progress bar
+        function setProgress(e) {
+            if (!currentMediaElement) return;
+            
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = currentMediaElement.duration;
+            currentMediaElement.currentTime = (clickX / width) * duration;
+        }
+
+        // Play/pause media
+        function togglePlay() {
+            if (!currentMediaElement) return;
+            
+            if (isPlaying) {
+                currentMediaElement.pause();
+            } else {
+                currentMediaElement.play();
+            }
+        }
+
+        // Update play/pause button
+        function updateButton() {
+            if (!currentMediaElement) return;
+            
+            playPauseButton.innerHTML = isPlaying ? '<i>⏸️</i>' : '<i>▶️</i>';
+        }
+
+        // Skip forward or backward
+        function skip(seconds) {
+            if (!currentMediaElement) return;
+            
+            currentMediaElement.currentTime += seconds;
+        }
+
+        // Toggle mute
+        function toggleMute() {
+            if (!currentMediaElement) return;
+            
+            currentMediaElement.muted = !currentMediaElement.muted;
+            muteButton.innerHTML = currentMediaElement.muted ? '<i>🔇</i>' : '<i>🔊</i>';
+        }
+
+        // Set volume
+        function setVolume() {
+            if (!currentMediaElement) return;
+            
+            currentMediaElement.volume = this.value;
+            currentMediaElement.muted = this.value === 0;
+            muteButton.innerHTML = currentMediaElement.muted ? '<i>🔇</i>' : '<i>🔊</i>';
+        }
+
+        // Event listeners
+        progressContainer.addEventListener('click', setProgress);
+        playPauseButton.addEventListener('click', togglePlay);
+        rewindButton.addEventListener('click', () => skip(-10));
+        forwardButton.addEventListener('click', () => skip(25));
+        muteButton.addEventListener('click', toggleMute);
+        volumeSlider.addEventListener('input', setVolume);
+
+        // Media event listeners
+        function setupMediaListeners(mediaElement) {
+            mediaElement.addEventListener('timeupdate', updateProgress);
+            mediaElement.addEventListener('ended', () => {
+                isPlaying = false;
+                updateButton();
+            });
+            mediaElement.addEventListener('play', () => {
+                isPlaying = true;
+                updateButton();
+            });
+            mediaElement.addEventListener('pause', () => {
+                isPlaying = false;
+                updateButton();
+            });
+            mediaElement.addEventListener('volumechange', () => {
+                volumeSlider.value = mediaElement.volume;
+                muteButton.innerHTML = mediaElement.muted ? '<i>🔇</i>' : '<i>🔊</i>';
+            });
+        }
+
+        // Handle incoming media
+        window.addEventListener('message', (event) => {
+            if (event.data.media) {
+                const { type, base64 } = event.data.media;
+                
+                // Hide all media elements first
+                noMediaElement.style.display = 'none';
+                imgElement.style.display = 'none';
+                videoElement.style.display = 'none';
+                audioElement.style.display = 'none';
+                
+                // Remove previous media element listeners
+                if (currentMediaElement) {
+                    currentMediaElement.replaceWith(currentMediaElement.cloneNode());
+                }
+                
+                // Set up the appropriate media element based on type
+                if (['png', 'jpeg', 'webp'].includes(type)) {
+                    // Image
+                    imgElement.src = `data:image/${type};base64,${base64}`;
+                    imgElement.style.display = 'block';
+                    controlsElement.style.display = 'none';
+                    mediaTitle.textContent = `Image (${type.toUpperCase()})`;
+                    currentMediaElement = null;
+                } else if (type === 'mp4') {
+                    // Video
+                    videoElement.src = `data:video/mp4;base64,${base64}`;
+                    videoElement.style.display = 'block';
+                    controlsElement.style.display = 'flex';
+                    mediaTitle.textContent = 'Video Player';
+                    currentMediaElement = videoElement;
+                    setupMediaListeners(videoElement);
+                } else if (['mp3', 'ogg', 'wav'].includes(type)) {
+                    // Audio
+                    audioElement.src = `data:audio/${type};base64,${base64}`;
+                    audioElement.style.display = 'block';
+                    controlsElement.style.display = 'flex';
+                    mediaTitle.textContent = 'Audio Player';
+                    currentMediaElement = audioElement;
+                    setupMediaListeners(audioElement);
+                }
+            }
+        });
+
+        // Initialize volume
+        audioElement.volume = 0.7;
+        videoElement.volume = 0.7;
+        volumeSlider.value = 0.7;
+    </script>
+</body>
+</html>

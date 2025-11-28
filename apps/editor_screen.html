@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Editor de Texto Local</title>
+  <style>
+    textarea { width: 100%; height: 400px; margin-bottom: 10px; }
+    input[type="text"] { width: 80%; }
+    button { margin-left: 5px; }
+  </style>
+</head>
+<body>
+  <h2>Editor</h2>
+  <input type="text" id="searchInput" placeholder="Pesquisar no texto" />
+  <button onclick="searchText()">Pesquisar</button>
+  <br><br>
+  <textarea id="editor"></textarea><br>
+  <button onclick="saveFile()">Salvar</button>
+
+  <script>
+    const filePath = '../index.html';
+
+    // Tentar carregar o arquivo (requer permissões especiais no Android)
+    document.addEventListener('DOMContentLoaded', () => {
+      window.resolveLocalFileSystemURL(filePath, function(fileEntry) {
+        fileEntry.file(function(file) {
+          const reader = new FileReader();
+          reader.onloadend = function() {
+            document.getElementById('editor').value = this.result;
+          };
+          reader.readAsText(file);
+        });
+      });
+    });
+
+    function searchText() {
+      const text = document.getElementById('editor').value;
+      const search = document.getElementById('searchInput').value;
+      if (!search) return;
+      const index = text.indexOf(search);
+      if (index !== -1) {
+        alert(`Texto encontrado na posição ${index}`);
+      } else {
+        alert('Texto não encontrado');
+      }
+    }
+
+    function saveFile() {
+      const content = document.getElementById('editor').value;
+      window.resolveLocalFileSystemURL(filePath, function(fileEntry) {
+        fileEntry.createWriter(function(fileWriter) {
+          const blob = new Blob([content], { type: 'text/html' });
+          fileWriter.write(blob);
+          alert('Arquivo salvo com sucesso!');
+        });
+      });
+    }
+  </script>
+</body>
+</html>

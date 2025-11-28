@@ -1,0 +1,917 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Arquivos Virtual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+
+img {
+    filter: none !important; /* Desativa invers„o autom·tica no dark mode */
+}
+        .toolbar {
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+        .toolbar button {
+            padding: 5px 10px;
+            background-color: #555;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .toolbar button:hover {
+            background-color: #777;
+        }
+        .path-display {
+            flex-grow: 1;
+            padding: 5px;
+            background-color: white;
+            color: black;
+            min-width: 200px;
+        }
+
+/* Layout de grade */
+.file-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 16px;
+    padding: 16px;
+    margin: 20px;
+    background-color: white;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,0.1);
+}
+
+/* Item de arquivo/pasta */
+.file-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    position: relative;
+}
+
+/* Õcones */
+.file-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 8px;
+    object-fit: contain;
+}
+
+/* Nome do arquivo */
+.file-name {
+    width: 100%;
+    word-break: break-word;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+/* Tamanho e data (opcional) */
+.file-size, 
+.file-date {
+    font-size: 11px;
+    color: #777;
+}
+
+/* Checkbox */
+.file-checkbox {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+}
+
+/* Efeitos de hover */
+.file-item:hover {
+    background-color: #f9f9f9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Item "Voltar" (..) - ajuste para n„o quebrar o layout */
+.file-item:has(.file-name:contains("..")) {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+}
+.file-item:has(.file-name:contains("..")) .file-icon {
+    margin-right: 10px;
+    margin-bottom: 0;
+}
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            width: 300px;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 15px;
+            gap: 10px;
+        }
+        .text-editor {
+            width: 100%;
+            height: 300px;
+            margin-top: 10px;
+        }
+        .audio-player {
+            width: 100%;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="toolbar">
+        <button id="up-button">‚Üë Subir</button>
+        <div class="path-display" id="path-display">/</div>
+        <button id="delete-button">Excluir</button>
+        <button id="copy-button">Copiar</button>
+        <button id="move-button">Mover</button>
+        <button id="import-button">Importar</button>
+        <button id="new-folder-button">Nova Pasta</button>
+        <button id="new-file-button">Novo Arquivo</button>
+    </div>
+    <div class="file-list" id="file-list"></div>
+
+    <!-- Modals -->
+    <div class="modal" id="new-folder-modal">
+        <div class="modal-content">
+            <h3>Nova Pasta</h3>
+            <input type="text" id="new-folder-name" placeholder="Nome da pasta">
+            <div class="modal-buttons">
+                <button id="cancel-new-folder">Cancelar</button>
+                <button id="create-new-folder">Criar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="new-file-modal">
+        <div class="modal-content">
+            <h3>Novo Arquivo</h3>
+            <input type="text" id="new-file-name" placeholder="Nome do arquivo">
+            <div class="modal-buttons">
+                <button id="cancel-new-file">Cancelar</button>
+                <button id="create-new-file">Criar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="import-modal">
+        <div class="modal-content">
+            <h3>Importar Arquivo</h3>
+            <input type="file" id="file-import-input">
+            <div class="modal-buttons">
+                <button id="cancel-import">Cancelar</button>
+                <button id="confirm-import">Importar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="text-editor-modal">
+        <div class="modal-content" style="width: 80%; max-width: 800px;">
+            <h3 id="text-editor-title">Editor de Texto</h3>
+            <textarea class="text-editor" id="text-editor"></textarea>
+            <div class="modal-buttons">
+                <button id="cancel-text-edit">Cancelar</button>
+                <button id="save-text-edit">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="audio-player-modal">
+        <div class="modal-content">
+            <h3>Player de √Åudio</h3>
+            <audio controls class="audio-player" id="audio-player"></audio>
+            <div class="modal-buttons">
+                <button id="close-audio-player">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // File manager core
+        const FileManager = {
+            currentUser: 'default',
+            currentPath: '/',
+            clipboard: null,
+            clipboardAction: null, // 'copy' or 'move'
+            fileSystem: {},
+            trash: {},
+            
+            // Initialize file system
+            init: function() {
+                this.loadFileSystem();
+                this.loadTrash();
+                this.navigateTo('/');
+                
+                // Listen for user change messages
+                window.addEventListener('message', (event) => {
+                    if (event.data.startsWith('user:')) {
+                        this.currentUser = event.data.substring(5).trim();
+                        this.loadFileSystem();
+                        this.loadTrash();
+                        this.navigateTo('/');
+                    }
+                });
+            },
+            
+            // Load file system from localStorage
+            loadFileSystem: function() {
+                const fsData = localStorage.getItem(`fileSystem_${this.currentUser}`);
+                this.fileSystem = fsData ? JSON.parse(fsData) : {
+                    '/': {
+                        type: 'directory',
+                        children: {},
+                        created: new Date().toISOString(),
+                        modified: new Date().toISOString()
+                    }
+                };
+            },
+            
+            // Save file system to localStorage
+            saveFileSystem: function() {
+                localStorage.setItem(`fileSystem_${this.currentUser}`, JSON.stringify(this.fileSystem));
+            },
+            
+            // Load trash from localStorage
+            loadTrash: function() {
+                const trashData = localStorage.getItem(`trash_${this.currentUser}`);
+                this.trash = trashData ? JSON.parse(trashData) : {};
+            },
+            
+            // Save trash to localStorage
+            saveTrash: function() {
+                localStorage.setItem(`trash_${this.currentUser}`, JSON.stringify(this.trash));
+            },
+            
+            // Navigate to a path
+            navigateTo: function(path) {
+                if (!this.pathExists(path)) {
+                    console.error('Path does not exist:', path);
+                    return false;
+                }
+                
+                this.currentPath = path;
+                this.updateUI();
+                return true;
+            },
+            
+            // Go up one directory
+            goUp: function() {
+                if (this.currentPath === '/') return;
+                
+                const pathParts = this.currentPath.split('/').filter(p => p);
+                pathParts.pop();
+                const newPath = pathParts.length ? '/' + pathParts.join('/') : '/';
+                this.navigateTo(newPath);
+            },
+            
+            // Check if path exists
+            pathExists: function(path) {
+                const parts = path.split('/').filter(p => p);
+                let current = this.fileSystem['/'];
+                
+                for (const part of parts) {
+                    if (!current.children || !current.children[part]) {
+                        return false;
+                    }
+                    current = current.children[part];
+                }
+                
+                return true;
+            },
+            
+            // Get item at path
+            getItem: function(path) {
+                const parts = path.split('/').filter(p => p);
+                let current = this.fileSystem['/'];
+                
+                for (const part of parts) {
+                    if (!current.children || !current.children[part]) {
+                        return null;
+                    }
+                    current = current.children[part];
+                }
+                
+                return current;
+            },
+            
+            // Get parent of path
+            getParentPath: function(path) {
+                if (path === '/') return null;
+                
+                const parts = path.split('/').filter(p => p);
+                parts.pop();
+                return parts.length ? '/' + parts.join('/') : '/';
+            },
+            
+            // Create new directory
+            createDirectory: function(name) {
+                const newPath = this.currentPath === '/' ? 
+                    `/${name}` : 
+                    `${this.currentPath}/${name}`;
+                
+                if (this.pathExists(newPath)) {
+                    return { success: false, message: 'J√° existe um item com este nome' };
+                }
+                
+                const parentPath = this.currentPath;
+                const parent = this.getItem(parentPath);
+                
+                if (!parent.children) {
+                    parent.children = {};
+                }
+                
+                parent.children[name] = {
+                    type: 'directory',
+                    children: {},
+                    created: new Date().toISOString(),
+                    modified: new Date().toISOString()
+                };
+                
+                parent.modified = new Date().toISOString();
+                this.saveFileSystem();
+                this.updateUI();
+                
+                return { success: true };
+            },
+            
+            // Create new text file
+            createTextFile: function(name, content = '') {
+                const newPath = this.currentPath === '/' ? 
+                    `/${name}` : 
+                    `${this.currentPath}/${name}`;
+                
+                if (this.pathExists(newPath)) {
+                    return { success: false, message: 'J√° existe um item com este nome' };
+                }
+                
+                const parentPath = this.currentPath;
+                const parent = this.getItem(parentPath);
+                
+                if (!parent.children) {
+                    parent.children = {};
+                }
+                
+                parent.children[name] = {
+                    type: 'file',
+                    fileType: 'text',
+                    content: content,
+                    size: content.length,
+                    created: new Date().toISOString(),
+                    modified: new Date().toISOString()
+                };
+                
+                parent.modified = new Date().toISOString();
+                this.saveFileSystem();
+                this.updateUI();
+                
+                return { success: true };
+            },
+            
+            // Import file
+            importFile: function(file) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    const name = file.name;
+                    const newPath = this.currentPath === '/' ? 
+                        `/${name}` : 
+                        `${this.currentPath}/${name}`;
+                    
+                    if (this.pathExists(newPath)) {
+                        resolve({ success: false, message: 'J√° existe um item com este nome' });
+                        return;
+                    }
+                    
+                    const parentPath = this.currentPath;
+                    const parent = this.getItem(parentPath);
+                    
+                    if (!parent.children) {
+                        parent.children = {};
+                    }
+                    
+                    if (file.type.startsWith('image/')) {
+                        reader.onload = (e) => {
+                            parent.children[name] = {
+                                type: 'file',
+                                fileType: 'image',
+                                content: e.target.result.split(',')[1],
+                                size: file.size,
+                                created: new Date().toISOString(),
+                                modified: new Date().toISOString()
+                            };
+                            
+                            parent.modified = new Date().toISOString();
+                            this.saveFileSystem();
+                            this.updateUI();
+                            resolve({ success: true });
+                        };
+                        reader.readAsDataURL(file);
+                    } else if (file.type.startsWith('audio/')) {
+                        reader.onload = (e) => {
+                            parent.children[name] = {
+                                type: 'file',
+                                fileType: 'audio',
+                                content: e.target.result.split(',')[1],
+                                size: file.size,
+                                created: new Date().toISOString(),
+                                modified: new Date().toISOString()
+                            };
+                            
+                            parent.modified = new Date().toISOString();
+                            this.saveFileSystem();
+                            this.updateUI();
+                            resolve({ success: true });
+                        };
+                        reader.readAsDataURL(file);
+                    } else {
+                        reader.onload = (e) => {
+                            parent.children[name] = {
+                                type: 'file',
+                                fileType: 'text',
+                                content: e.target.result,
+                                size: file.size,
+                                created: new Date().toISOString(),
+                                modified: new Date().toISOString()
+                            };
+                            
+                            parent.modified = new Date().toISOString();
+                            this.saveFileSystem();
+                            this.updateUI();
+                            resolve({ success: true });
+                        };
+                        reader.readAsText(file);
+                    }
+                });
+            },
+            
+            // Delete items
+            deleteItems: function(paths) {
+                for (const path of paths) {
+                    const item = this.getItem(path);
+                    if (!item) continue;
+                    
+                    // Add to trash
+                    const trashId = Date.now().toString() + Math.random().toString(36).substr(2, 5);
+                    this.trash[trashId] = {
+                        path: path,
+                        item: item,
+                        deletedAt: new Date().toISOString()
+                    };
+                    
+                    // Remove from file system
+                    const parentPath = this.getParentPath(path);
+                    const name = path.split('/').pop();
+                    const parent = this.getItem(parentPath);
+                    
+                    if (parent && parent.children) {
+                        delete parent.children[name];
+                        parent.modified = new Date().toISOString();
+                    }
+                }
+                
+                this.saveFileSystem();
+                this.saveTrash();
+                this.updateUI();
+            },
+            
+            // Copy items
+            copyItems: function(paths) {
+                this.clipboard = paths;
+                this.clipboardAction = 'copy';
+            },
+            
+            // Move items
+            moveItems: function(paths) {
+                this.clipboard = paths;
+                this.clipboardAction = 'move';
+            },
+            
+            // Paste items
+            pasteItems: function() {
+                if (!this.clipboard || !this.clipboardAction) return;
+                
+                for (const sourcePath of this.clipboard) {
+                    const sourceItem = this.getItem(sourcePath);
+                    if (!sourceItem) continue;
+                    
+                    const sourceName = sourcePath.split('/').pop();
+                    const targetName = this.getUniqueName(sourceName);
+                    const targetPath = this.currentPath === '/' ? 
+                        `/${targetName}` : 
+                        `${this.currentPath}/${targetName}`;
+                    
+                    // Deep clone the item
+                    const newItem = JSON.parse(JSON.stringify(sourceItem));
+                    
+                    // Add to target location
+                    const parent = this.getItem(this.currentPath);
+                    if (!parent.children) {
+                        parent.children = {};
+                    }
+                    parent.children[targetName] = newItem;
+                    parent.modified = new Date().toISOString();
+                    
+                    // If move, delete original
+                    if (this.clipboardAction === 'move') {
+                        const sourceParentPath = this.getParentPath(sourcePath);
+                        const sourceParent = this.getItem(sourceParentPath);
+                        const originalName = sourcePath.split('/').pop();
+                        
+                        if (sourceParent && sourceParent.children) {
+                            delete sourceParent.children[originalName];
+                            sourceParent.modified = new Date().toISOString();
+                        }
+                    }
+                }
+                
+                this.saveFileSystem();
+                this.updateUI();
+                this.clipboard = null;
+                this.clipboardAction = null;
+            },
+            
+            // Get unique name in current directory
+            getUniqueName: function(name) {
+                const parent = this.getItem(this.currentPath);
+                if (!parent.children) return name;
+                
+                let counter = 1;
+                let newName = name;
+                const dotIndex = name.lastIndexOf('.');
+                let baseName = name;
+                let extension = '';
+                
+                if (dotIndex > 0) {
+                    baseName = name.substring(0, dotIndex);
+                    extension = name.substring(dotIndex);
+                }
+                
+                while (parent.children[newName]) {
+                    newName = `${baseName} (${counter})${extension}`;
+                    counter++;
+                }
+                
+                return newName;
+            },
+            
+            // Get all items in current directory
+            getCurrentItems: function() {
+                const currentDir = this.getItem(this.currentPath);
+                if (!currentDir || !currentDir.children) return [];
+                
+                return Object.entries(currentDir.children).map(([name, item]) => {
+                    const itemPath = this.currentPath === '/' ? 
+                        `/${name}` : 
+                        `${this.currentPath}/${name}`;
+                    
+                    return {
+                        name: name,
+                        path: itemPath,
+                        type: item.type,
+                        fileType: item.fileType,
+                        size: item.size || 0,
+                        created: item.created,
+                        modified: item.modified
+                    };
+                });
+            },
+            
+            // Update UI
+            updateUI: function() {
+                // Update path display
+                document.getElementById('path-display').textContent = this.currentPath;
+                
+                // Update file list
+                const fileList = document.getElementById('file-list');
+                fileList.innerHTML = '';
+                
+                // Add ".." for navigation (except root)
+                if (this.currentPath !== '/') {
+                    const upItem = document.createElement('div');
+                    upItem.className = 'file-item';
+                    upItem.innerHTML = `
+                        <img src="folder.png" class="file-icon">
+                        <span class="file-name">..</span>
+                        <span class="file-size"></span>
+                        <span class="file-date"></span>
+                    `;
+                    upItem.addEventListener('click', () => this.goUp());
+                    fileList.appendChild(upItem);
+                }
+                
+                // Add current directory items
+                const items = this.getCurrentItems();
+                items.sort((a, b) => {
+                    // Directories first
+                    if (a.type === 'directory' && b.type !== 'directory') return -1;
+                    if (a.type !== 'directory' && b.type === 'directory') return 1;
+                    
+                    // Then sort by name
+                    return a.name.localeCompare(b.name);
+                });
+                
+                for (const item of items) {
+                    const fileItem = document.createElement('div');
+                    fileItem.className = 'file-item';
+                    
+                    // Determine icon
+                    let icon = 'file.png';
+                    if (item.type === 'directory') {
+                        icon = 'folder.png';
+                    } else if (item.fileType === 'image') {
+                        icon = 'file_image.png';
+                    } else if (item.fileType === 'audio') {
+                        icon = 'file_audio.png';
+                    } else if (item.fileType === 'text') {
+                        icon = 'file_text.png';
+                    }
+                    
+                    // Format size
+                    let sizeStr = '';
+                    if (item.type === 'file') {
+                        if (item.size < 1024) {
+                            sizeStr = `${item.size} B`;
+                        } else if (item.size < 1024 * 1024) {
+                            sizeStr = `${(item.size / 1024).toFixed(1)} KB`;
+                        } else {
+                            sizeStr = `${(item.size / (1024 * 1024)).toFixed(1)} MB`;
+                        }
+                    }
+                    
+                    // Format date
+                    const modifiedDate = new Date(item.modified);
+                    const dateStr = modifiedDate.toLocaleDateString() + ' ' + modifiedDate.toLocaleTimeString();
+                    
+                    fileItem.innerHTML = `
+                        <input type="checkbox" class="file-checkbox" data-path="${item.path}">
+                        <img src="${icon}" class="file-icon">
+                        <span class="file-name">${item.name}</span>
+                        <span class="file-size">${sizeStr}</span>
+                        <span class="file-date">${dateStr}</span>
+                    `;
+                    
+                    // Add click handler
+                    const nameSpan = fileItem.querySelector('.file-name');
+                    nameSpan.addEventListener('click', () => {
+                        if (item.type === 'directory') {
+                            this.navigateTo(item.path);
+                        } else {
+                            this.openFile(item.path);
+                        }
+                    });
+                    
+                    fileList.appendChild(fileItem);
+                }
+            },
+            
+            // Open file
+            openFile: function(path) {
+                const item = this.getItem(path);
+                if (!item) return;
+                
+                if (item.type === 'directory') {
+                    this.navigateTo(path);
+                    return;
+                }
+                
+                switch (item.fileType) {
+                    case 'text':
+                        this.openTextEditor(path);
+                        break;
+                    case 'image':
+                        this.openImageViewer(path);
+                        // Send message to parent after 2 seconds
+                        setTimeout(() => {
+                            parent.postMessage(`imgbin ${item.content}`, "*");
+                        }, 2000);
+                        break;
+                    case 'audio':
+                        this.openAudioPlayer(path);
+                        break;
+                    default:
+                        alert('Tipo de arquivo n√£o suportado');
+                }
+            },
+            
+            // Open text editor
+            openTextEditor: function(path) {
+                const item = this.getItem(path);
+                if (!item || item.type !== 'file' || item.fileType !== 'text') return;
+                
+                document.getElementById('text-editor-title').textContent = `Editando: ${path.split('/').pop()}`;
+                document.getElementById('text-editor').value = item.content;
+                document.getElementById('text-editor-modal').style.display = 'flex';
+                
+                // Save handler
+                const saveHandler = () => {
+                    item.content = document.getElementById('text-editor').value;
+                    item.size = item.content.length;
+                    item.modified = new Date().toISOString();
+                    
+                    const parentPath = this.getParentPath(path);
+                    const parent = this.getItem(parentPath);
+                    if (parent) {
+                        parent.modified = new Date().toISOString();
+                    }
+                    
+                    this.saveFileSystem();
+                    document.getElementById('text-editor-modal').style.display = 'none';
+                };
+                
+                document.getElementById('save-text-edit').onclick = saveHandler;
+                
+                // Cancel handler
+                document.getElementById('cancel-text-edit').onclick = () => {
+                    document.getElementById('text-editor-modal').style.display = 'none';
+                };
+            },
+            
+            // Open image viewer
+            <!-- No script, substitua a funÁ„o openImageViewer por esta vers„o: -->
+openImageViewer: function(path) {
+    const item = this.getItem(path);
+    if (!item || item.type !== 'file' || item.fileType !== 'image') return;
+    
+    // Envia mensagem para abrir o visualizador
+    parent.postMessage("abrir visualizador_de_imagens.html", "*");
+    
+    // Depois de 1010ms (1 segundo e 10ms), envia o cÛdigo da imagem
+    setTimeout(() => {
+        parent.postMessage(`imgbin ${item.content}`, "*");
+    }, 1010);
+    
+    // Remove o modal antigo (se quiser manter compatibilidade, pode comentar esta linha)
+    // document.getElementById('image-viewer-modal').style.display = 'none';
+},
+            
+            // Open audio player
+            openAudioPlayer: function(path) {
+                const item = this.getItem(path);
+                if (!item || item.type !== 'file' || item.fileType !== 'audio') return;
+                
+                const audioPlayer = document.getElementById('audio-player');
+                audioPlayer.src = `data:audio/wav;base64,${item.content}`;
+                document.getElementById('audio-player-modal').style.display = 'flex';
+                
+                // Close handler
+                document.getElementById('close-audio-player').onclick = () => {
+                    audioPlayer.pause();
+                    document.getElementById('audio-player-modal').style.display = 'none';
+                };
+            },
+            
+            // Get selected items
+            getSelectedItems: function() {
+                const checkboxes = document.querySelectorAll('.file-checkbox:checked');
+                return Array.from(checkboxes).map(cb => cb.getAttribute('data-path'));
+            }
+        };
+        
+        // Initialize UI events
+        document.addEventListener('DOMContentLoaded', () => {
+            FileManager.init();
+            
+            // Toolbar buttons
+            document.getElementById('up-button').addEventListener('click', () => FileManager.goUp());
+            document.getElementById('delete-button').addEventListener('click', () => {
+                const selected = FileManager.getSelectedItems();
+                if (selected.length) {
+                    if (confirm(`Tem certeza que deseja excluir ${selected.length} item(ns)?`)) {
+                        FileManager.deleteItems(selected);
+                    }
+                } else {
+                    alert('Selecione pelo menos um item para excluir');
+                }
+            });
+            document.getElementById('copy-button').addEventListener('click', () => {
+                const selected = FileManager.getSelectedItems();
+                if (selected.length) {
+                    FileManager.copyItems(selected);
+                    alert(`${selected.length} item(ns) copiado(s)`);
+                } else {
+                    alert('Selecione pelo menos um item para copiar');
+                }
+            });
+            document.getElementById('move-button').addEventListener('click', () => {
+                const selected = FileManager.getSelectedItems();
+                if (selected.length) {
+                    FileManager.moveItems(selected);
+                    alert(`${selected.length} item(ns) preparado(s) para mover - navegue at√© a pasta de destino e cole`);
+                } else {
+                    alert('Selecione pelo menos um item para mover');
+                }
+            });
+            document.getElementById('import-button').addEventListener('click', () => {
+                document.getElementById('import-modal').style.display = 'flex';
+            });
+            document.getElementById('new-folder-button').addEventListener('click', () => {
+                document.getElementById('new-folder-modal').style.display = 'flex';
+                document.getElementById('new-folder-name').value = '';
+                document.getElementById('new-folder-name').focus();
+            });
+            document.getElementById('new-file-button').addEventListener('click', () => {
+                document.getElementById('new-file-modal').style.display = 'flex';
+                document.getElementById('new-file-name').value = '';
+                document.getElementById('new-file-name').focus();
+            });
+            
+            // New folder modal
+            document.getElementById('create-new-folder').addEventListener('click', () => {
+                const name = document.getElementById('new-folder-name').value.trim();
+                if (name) {
+                    const result = FileManager.createDirectory(name);
+                    if (result.success) {
+                        document.getElementById('new-folder-modal').style.display = 'none';
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            });
+            document.getElementById('cancel-new-folder').addEventListener('click', () => {
+                document.getElementById('new-folder-modal').style.display = 'none';
+            });
+            
+            // New file modal
+            document.getElementById('create-new-file').addEventListener('click', () => {
+                const name = document.getElementById('new-file-name').value.trim();
+                if (name) {
+                    const result = FileManager.createTextFile(name);
+                    if (result.success) {
+                        document.getElementById('new-file-modal').style.display = 'none';
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            });
+            document.getElementById('cancel-new-file').addEventListener('click', () => {
+                document.getElementById('new-file-modal').style.display = 'none';
+            });
+            
+            // Import modal
+            document.getElementById('confirm-import').addEventListener('click', async () => {
+                const fileInput = document.getElementById('file-import-input');
+                if (fileInput.files.length) {
+                    const file = fileInput.files[0];
+                    const result = await FileManager.importFile(file);
+                    if (result.success) {
+                        document.getElementById('import-modal').style.display = 'none';
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            });
+            document.getElementById('cancel-import').addEventListener('click', () => {
+                document.getElementById('import-modal').style.display = 'none';
+            });
+            
+            // Handle paste (Ctrl+V)
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.key === 'v' && FileManager.clipboard) {
+                    FileManager.pasteItems();
+                }
+            });
+        });
+
+// Define um nome FIXO para o app (n√£o usa URL)
+const APP_NAME = "arquivos"; // üëà Nome √∫nico e est√°tico
+
+// Quando carregar, avisa o pai (index.html)
+window.addEventListener("DOMContentLoaded", () => {
+  window.parent.postMessage(`app_ready:${APP_NAME}`, "*");
+});
+    </script>
+</body>
+</html>

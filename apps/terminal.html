@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Terminal CMD</title>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: black;
+      color: white;
+      font-family: 'Press Start 2P';
+      font-size: 16px;
+      margin: 0;
+      padding: 20px;
+    }
+    #terminal {
+      max-width: 1000px;
+      margin: 0 auto;
+      text-align: left;
+    }
+    .input-line {
+      display: flex;
+      margin-top: 10px;
+    }
+    .prompt {
+      margin-right: 5px;
+      white-space: nowrap;
+    }
+    #output div {
+      margin-bottom: 4px;
+      white-space: pre-wrap;
+    }
+
+#input {
+  background: none;
+  border: none;
+  color: white;
+  flex: 1;
+  font-family: 'Press Start 2P';
+  font-size: 16px;
+  outline: none;
+  caret-color: transparent; /* Esconde o cursor padrão */
+  position: relative;
+  white-space: pre;
+}
+
+#input::after {
+  content: "_";
+  animation: blink 1s step-start infinite;
+  position: absolute;
+  margin-left: 2px;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+  </style>
+</head>
+<body>
+  <div id="terminal">
+    <div id="output"></div>
+    <div class="input-line">
+      <span id="prompt" class="prompt"></span>
+      <div id="input" contenteditable="true" spellcheck="false"></div>
+    </div>
+  </div>
+
+  <script>
+    const rootPath = '/';
+let currentPath = rootPath;
+
+    const root = '/';
+    let currentDir = root;
+
+const FileSystem = {
+  estrutura: {
+    tipo: 'dir',
+    permissoes: 'rwx',
+    conteudo: {}
+  },
+
+  getCurrentNode() {
+    const partes = currentPath.split('/').filter(Boolean);
+    let node = FileSystem.estrutura;
+    for (const parte of partes) {
+      if (!node.conteudo[parte]) return null;
+      node = node.conteudo[parte];
+    }
+    return node;
+  },
+
+  criarPasta(nome) {
+    const dir = FileSystem.getCurrentNode();
+    dir.conteudo[nome] = {
+      tipo: 'dir',
+      permissoes: 'rwx',
+      conteudo: {}
+    };
+  },
+
+  criarArquivo(nome, conteudo) {
+    const dir = FileSystem.getCurrentNode();
+    dir.conteudo[nome] = {
+      tipo: 'file',
+      permissoes: 'rw-',
+      bin: conteudo
+    };
+  }
+};
+
+restaurarSistema();
+
+    function atualizarPrompt() {
+  document.getElementById('prompt').textContent = currentPath + '~$'; 
+}
+
+
+    function appendOutput(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      document.getElementById('output').appendChild(div);
+      document.getElementById('output').scrollTop = document.getElementById('output').scrollHeight;
+    }
+
+    const termConsole = { log: appendOutput };
+
+function alterarPermissoes(nome, novasPerms) {
+  const item = FileSystem.estrutura[currentDir][nome];
+  if (item) {
+    item.permissoes = novasPerms;
+    return true;
+  }
+  return false;
+}
+
+    function matchWildcard(pattern, entries) {
+      const regex = new RegExp('^' + pattern.replace(/\*/g, '.*') + '$');
+      return entries.filter(name => regex.test(name));
+    }
+
+    function executarComandosSequenciais(input) {
+      const partes = input.split(/(\s*&&\s*|\s*&\s*)/);
+      let i = 0;
+      let continuar = true;
+
+      function executarProximo() {
+        if (i >= partes.length) return;
+
+        const parte = partes[i].trim();
+
+        if (parte === '&&') {
+          if (!continuar) return;
+          i++;
+          executarProximo();
+        } else if (parte === '&') {
+          i++;
+          executarProximo();
+        } else {
+          const comando = parte;
+          const sucesso = executarComando(comando);
+          continuar = sucesso;
+          i++;
+          setTimeout(executarProximo, 0);
+        }
+      }
+
+      executarProximo();
+    }
+
+function salvarSistema() {
+  localStorage.setItem('fs', JSON.stringify(FileSystem.estrutura));
+  localStorage.setItem('path', currentPath);
+}
+
+function restaurarSistema() {
+  const fs = localStorage.getItem('fs');
+  const path = localStorage.getItem('path');
+  if (fs) FileSystem.estrutura = JSON.parse(fs);
+  if (path) currentPath = path;
+}
+
+function temPermissao(item, tipo) {
+  const mapa = { r: 0, w: 1, x: 2 };
+  return item.permissoes && item.permissoes[mapa[tipo]] !== '-';
+}
+
+
+function executarComando(input) {
+  const [cmd, ...args] = input.trim().split(/\s+/);
+  let sucesso = true;
+  const dir = FileSystem.getCurrentNode();
+
+  switch (cmd) {
+    case 'newdir':
+      FileSystem.criarPasta(args[0]);
+      termConsole.log(`Pasta "${args[0]}" criada`);
+      break;
+
+    case 'newfile':
+      FileSystem.criarArquivo(args[0], '');
+      termConsole.log(`Arquivo "${args[0]}" criado`);
+      break;
+
+    case 'write': {
+      const nome = args[0];
+      const conteudo = args.slice(1).join(' ');
+      if (dir.conteudo[nome] && !temPermissao(dir.conteudo[nome], 'w')) {
+        termConsole.log(`Sem permissão para escrever em "${nome}"`);
+        sucesso = false;
+        break;
+      }
+      FileSystem.criarArquivo(nome, conteudo);
+      termConsole.log(`Arquivo "${nome}" criado`);
+      break;
+    }
+
+    case 'view': {
+      const arquivos = matchWildcard(args[0], Object.keys(dir.conteudo));
+      if (arquivos.length) {
+        arquivos.forEach(nome => {
+          const arq = dir.conteudo[nome];
+          if (!temPermissao(arq, 'r')) {
+            termConsole.log(`Sem permissão para ler "${nome}"`);
+            sucesso = false;
+            return;
+          }
+          termConsole.log(`${nome}: ${arq.bin || '(vazio)'}`);
+        });
+      } else {
+        termConsole.log(`Arquivo "${args[0]}" não encontrado`);
+        sucesso = false;
+      }
+      break;
+    }
+
+case 'open': {
+  const nome = args[0];
+  if (!nome) {
+    termConsole.log('Uso: open <nome>');
+    sucesso = false;
+    break;
+  }
+  parent.postMessage(`abrir ${nome}.html`, '*');
+  termConsole.log(`Solicitado: abrir ${nome}.html`);
+  break;
+}
+
+case 'openadm': {
+  const nome = args[0];
+  if (!nome) {
+    termConsole.log('Uso: openadm <nome>');
+    sucesso = false;
+    break;
+  }
+  parent.postMessage(`abrir_admin ${nome}.html`, '*');
+  termConsole.log(`Solicitado: abrir_admin ${nome}.html`);
+  break;
+}
+
+case 'close': {
+  const nome = args[0];
+  if (!nome) {
+    termConsole.log('Uso: close <nome>');
+    sucesso = false;
+    break;
+  }
+  parent.postMessage(`fechar ${nome}.html`, '*');
+  termConsole.log(`Solicitado: fechar ${nome}.html`);
+  break;
+}
+
+case 'del': {
+  const alvos = matchWildcard(args[0], Object.keys(dir.conteudo));
+  if (!alvos.length) {
+    termConsole.log(`Nenhum item corresponde a "${args[0]}"`);
+    sucesso = false;
+    break;
+  }
+
+  function deletarRecursivo(nome, caminho, item) {
+    if (!temPermissao(item, 'w')) {
+      termConsole.log(`acesso negado: ${caminho}`);
+      sucesso = false;
+      return;
+    }
+
+    if (item.tipo === 'dir') {
+      for (const subNome in item.conteudo) {
+        const subItem = item.conteudo[subNome];
+        deletarRecursivo(subNome, `${caminho}/${subNome}`, subItem);
+      }
+    }
+
+    termConsole.log(`deletado: ${caminho}`);
+  }
+
+  alvos.forEach(nome => {
+    const item = dir.conteudo[nome];
+    const caminhoCompleto = currentPath === '/' ? `/${nome}` : `${currentPath}/${nome}`;
+    deletarRecursivo(nome, caminhoCompleto, item);
+    delete dir.conteudo[nome]; // Remove o item do diretório atual
+  });
+
+  break;
+}
+
+    case 'copy': {
+      const origem = dir.conteudo[args[0]];
+      if (origem) {
+        if (!temPermissao(origem, 'r')) {
+          termConsole.log(`Sem permissão para copiar "${args[0]}"`);
+          sucesso = false;
+          break;
+        }
+        dir.conteudo[args[1]] = JSON.parse(JSON.stringify(origem));
+        termConsole.log(`Arquivo "${args[0]}" copiado para "${args[1]}"`);
+      } else {
+        termConsole.log(`Arquivo "${args[0]}" não encontrado`);
+        sucesso = false;
+      }
+      break;
+    }
+
+    case 'move': {
+      const origem = dir.conteudo[args[0]];
+      if (origem) {
+        if (!temPermissao(origem, 'w')) {
+          termConsole.log(`Sem permissão para mover "${args[0]}"`);
+          sucesso = false;
+          break;
+        }
+        dir.conteudo[args[1]] = origem;
+        delete dir.conteudo[args[0]];
+        termConsole.log(`Arquivo "${args[0]}" movido para "${args[1]}"`);
+      } else {
+        termConsole.log(`Arquivo "${args[0]}" não encontrado`);
+        sucesso = false;
+      }
+      break;
+    }
+
+    case 'rename': {
+      const antigo = args[0];
+      const novo = args[1];
+      if (dir.conteudo[antigo]) {
+        if (!temPermissao(dir.conteudo[antigo], 'w')) {
+          termConsole.log(`Sem permissão para renomear "${antigo}"`);
+          sucesso = false;
+          break;
+        }
+        dir.conteudo[novo] = dir.conteudo[antigo];
+        delete dir.conteudo[antigo];
+        termConsole.log(`"${antigo}" renomeado para "${novo}"`);
+      } else {
+        termConsole.log(`"${antigo}" não encontrado`);
+        sucesso = false;
+      }
+      break;
+    }
+
+    case 'dir': {
+      const destino = args[0];
+      if (destino === '..') {
+        if (currentPath !== '/') {
+          currentPath = currentPath.split('/').slice(0, -1).join('/') || '/';
+        }
+      } else if (dir.conteudo[destino] && dir.conteudo[destino].tipo === 'dir') {
+        currentPath += (currentPath === '/' ? '' : '/') + destino;
+      } else {
+        termConsole.log(`Diretório "${destino}" não existe`);
+        sucesso = false;
+      }
+      atualizarPrompt();
+      termConsole.log(`Diretório atual: ${currentPath}`);
+      break;
+    }
+
+    case 'lf': {
+      const lista = Object.entries(dir.conteudo);
+      if (lista.length) {
+        lista.forEach(([nome, valor]) => {
+          const perms = valor.permissoes || '---';
+          const tipo = valor.tipo === 'dir' ? 'd' : '-';
+          termConsole.log(`${tipo}${perms} ${nome}`);
+        });
+      } else {
+        termConsole.log(`Conteúdo de ${currentPath}: (vazio)`);
+      }
+      break;
+    }
+
+    case 'fsmod': {
+      const [perms, alvo] = args;
+      const encontrados = matchWildcard(alvo, Object.keys(dir.conteudo));
+      if (encontrados.length) {
+        encontrados.forEach(nome => {
+          dir.conteudo[nome].permissoes = perms;
+          termConsole.log(`Permissões de "${nome}" alteradas para "${perms}"`);
+        });
+      } else {
+        termConsole.log(`Nenhum item corresponde a "${alvo}"`);
+        sucesso = false;
+      }
+      break;
+    }
+
+    case 'clear':
+      document.getElementById('output').innerHTML = '';
+      break;
+
+    case 'print':
+      termConsole.log(args.join(' '));
+      break;
+
+case 'help':
+  termConsole.log(`Comandos disponíveis:
+newdir <nome>        - Cria uma nova pasta
+del <nome|*>         - Remove arquivo ou pasta
+print <texto>        - Exibe texto
+write <arq> <txt>    - Cria arquivo com conteúdo
+newfile <nome>       - Cria arquivo vazio
+view <nome|*>        - Exibe conteúdo de arquivo
+copy <orig> <dest>   - Copia arquivo
+move <orig> <dest>   - Move arquivo
+rename <ant> <novo>  - Renomeia arquivo ou pasta
+dir <nome|..>        - Entra ou sai de diretório
+lf                   - Lista arquivos/pastas com permissões
+fsmod <perm> <alvo>  - Altera permissões (ex: rw-, r--, etc.)
+clear                - Limpa a tela
+hello                - Exibe 'hello world'
+help                 - Mostra esta ajuda
+open <nome>          - abre aplicativo 
+openadm <nome>       - abre aplicativo como admistrador 
+close <nome>         - fecha aplicativo
+
+Formato de permissão:
+  r = leitura, w = escrita, x = execução
+  Use '-' para negar (ex: r--, rw-, ---, rwx)
+
+Operadores:
+  *                  - Corresponde a qualquer nome
+  <com1> & <com2>    - Executa comandos em sequência
+  <com1> && <com2>   - Executa o segundo somente se o primeiro for bem-sucedido`);
+  break;
+
+
+case 'info':
+  termConsole.log(`
+  versão: 2.0
+  dev: Miguel
+  nome do sistema: netOS
+  linguagens de programação: JavaScript, css, html
+`);
+  break;
+
+case 'hello':
+  termConsole.log('hello, world!');
+  break;
+
+
+    default:
+      termConsole.log(`Comando não reconhecido: "${cmd}"`);
+      sucesso = false;
+      break;
+  }
+
+  salvarSistema(); // Salva após qualquer comando
+
+  return sucesso;
+}
+
+
+window.addEventListener('DOMContentLoaded', () => {
+  atualizarPrompt();
+  input.focus();
+  appendOutput('Terminal virtual iniciado. Digite um comando e pressione Enter. digite help para ver a lista de comandos');
+});
+
+const input = document.getElementById('input');
+let historico = [];
+let indiceHistorico = -1;
+
+input.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    const fullCommand = input.textContent.trim();
+    if (fullCommand) {
+      historico.push(fullCommand);
+      indiceHistorico = historico.length;
+    }
+    appendOutput(`${currentPath}~$ ${fullCommand}`);
+    executarComandosSequenciais(fullCommand);
+    input.textContent = '';
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (indiceHistorico > 0) {
+      indiceHistorico--;
+      input.textContent = historico[indiceHistorico] || '';
+    }
+  } else if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (indiceHistorico < historico.length - 1) {
+      indiceHistorico++;
+      input.textContent = historico[indiceHistorico] || '';
+    } else {
+      input.textContent = '';
+    }
+  }
+});
+
+input.addEventListener('input', () => {
+  const range = document.createRange();
+  const sel = window.getSelection();
+  range.selectNodeContents(input);
+  range.collapse(false);
+  sel.removeAllRanges();
+  sel.addRange(range);
+});
+
+  </script>
+</body>
+</html>

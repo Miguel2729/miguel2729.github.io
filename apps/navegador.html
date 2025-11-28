@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Navegador Aprimorado</title>
+  <style>
+    :root {
+      --bg: #1e1e2d;
+      --txt: #ffffff;
+      --accent: #ff1b43;
+      --secondary: #2d2d3a;
+      --tab-bg: #2d2d3a;
+      --tab-active: #1e1e2d;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--txt);
+    }
+    .barra {
+      display: flex;
+      background: var(--secondary);
+      padding: 8px;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    .barra input {
+      flex: 1;
+      margin: 0 10px;
+      padding: 8px 15px;
+      border-radius: 20px;
+      border: none;
+      background: var(--tab-bg);
+      color: var(--txt);
+      font-size: 14px;
+    }
+    iframe {
+      width: 100%;
+      height: calc(100vh - 90px);
+      border: none;
+    }
+    button { 
+      padding: 6px 12px;
+      background: var(--secondary);
+      color: var(--txt);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 0 2px;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: var(--accent);
+    }
+    #status {
+      font-size: 12px;
+      margin-left: 10px;
+      color: #aaa;
+    }
+    .tabs {
+      display: flex;
+      overflow-x: auto;
+      background: var(--secondary);
+      padding: 4px 4px 0 4px;
+    }
+    .tab {
+      padding: 8px 15px;
+      margin: 0 2px;
+      cursor: pointer;
+      background: var(--tab-bg);
+      border-radius: 8px 8px 0 0;
+      white-space: nowrap;
+      color: #ccc;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .tab.active {
+      background: var(--tab-active);
+      color: var(--txt);
+      font-weight: bold;
+    }
+    .tab-favicon {
+      width: 16px;
+      height: 16px;
+      margin-right: 6px;
+    }
+    .progress-container {
+      width: 100%;
+      height: 3px;
+      background: transparent;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      transition: width 0.1s ease;
+    }
+    /* Página inicial estilo Opera */
+    .start-page {
+      width: 100%;
+      height: calc(100vh - 90px);
+      background-size: cover;
+      background-position: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 40px;
+      box-sizing: border-box;
+    }
+    .start-page.hidden {
+      display: none;
+    }
+    .search-box {
+      width: 60%;
+      max-width: 600px;
+      margin-bottom: 40px;
+    }
+    .search-box input {
+      width: 100%;
+      padding: 15px 20px;
+      border-radius: 30px;
+      border: none;
+      background: rgba(30, 30, 45, 0.8);
+      color: white;
+      font-size: 16px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .shortcuts {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 20px;
+      width: 80%;
+      max-width: 800px;
+    }
+    .shortcut {
+      background: rgba(30, 30, 45, 0.7);
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+      backdrop-filter: blur(5px);
+    }
+    .shortcut:hover {
+      background: rgba(255, 27, 67, 0.7);
+      transform: translateY(-5px);
+    }
+    .shortcut-icon {
+      width: 40px;
+      height: 40px;
+      margin-bottom: 8px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+    .shortcut-name {
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .add-shortcut {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+    .add-shortcut-icon {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+    /* Configurações */
+    #painelConfig {
+      position: absolute;
+      right: 10px;
+      top: 50px;
+      background: var(--secondary);
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      z-index: 100;
+      width: 250px;
+    }
+    #painelConfig label {
+      display: block;
+      margin: 8px 0;
+      font-size: 14px;
+    }
+    #painelConfig input[type="text"],
+    #painelConfig input[type="url"] {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0 10px 0;
+      background: var(--tab-bg);
+      border: none;
+      border-radius: 4px;
+      color: var(--txt);
+    }
+    .config-section {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #444;
+    }
+    .config-section h3 {
+      margin: 0 0 10px 0;
+      color: var(--accent);
+      font-size: 16px;
+    }
+    /* Modal para adicionar atalhos */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: var(--secondary);
+      padding: 20px;
+      border-radius: 8px;
+      width: 80%;
+      max-width: 500px;
+    }
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 20px;
+    }
+    .modal-actions button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="barra">
+    <button onclick="voltar()" title="Voltar">⬅️</button>
+    <button onclick="avancar()" title="Avançar">➡️</button>
+    <button onclick="recarregar()" title="Recarregar">🔁</button>
+    <input type="text" id="url" placeholder="Digite um link da web ou uma pesquisa">
+    <button onclick="ir()" title="Ir">Ir</button>
+    <button onclick="toggleTema()" title="Alternar tema">🌓</button>
+    <span id="status"></span>
+    <button onclick="abrirConfig()" title="Configurações">⚙️</button>
+    <div id="painelConfig" style="display:none;">
+      <div class="config-section">
+        <h3>Aparência</h3>
+        <label><input type="checkbox" id="modoDesktop"> Site para desktop</label>
+        <div style="margin-top:10px;">
+          <strong>Tema:</strong>
+          <label><input type="radio" name="tema" value="claro" checked onchange="setTema('claro')"> Claro</label>
+          <label><input type="radio" name="tema" value="escuro" onchange="setTema('escuro')"> Escuro</label>
+        </div>
+      </div>
+      <div class="config-section">
+        <h3>Página Inicial</h3>
+        <label>Papel de parede (URL da imagem):
+          <input type="url" id="wallpaperUrl" placeholder="https://exemplo.com/imagem.jpg">
+        </label>
+        <button onclick="aplicarWallpaper()" style="width:100%;">Aplicar</button>
+      </div>
+      <div class="config-section">
+        <h3>Busca</h3>
+        <strong>Motor de busca:</strong>
+        <label><input type="radio" name="busca" value="google" checked> Google</label>
+        <label><input type="radio" name="busca" value="bing"> Bing</label>
+        <label><input type="radio" name="busca" value="wikipedia"> Wikipedia</label>
+        <label><input type="radio" name="busca" value="yahoo"> Yahoo</label>
+      </div>
+      <div class="config-section">
+        <h3>Privacidade</h3>
+        <label><input type="checkbox" id="bloqueadorAds" onchange="toggleAdBlocker()"> Ativar bloqueador de anúncios</label>
+      </div>
+    </div>
+  </div>
+  <div class="tabs" id="abas"></div>
+  
+  <!-- Página inicial estilo Opera -->
+  <div class="start-page" id="startPage">
+    <div class="search-box">
+      <input type="text" id="startPageSearch" placeholder="Pesquisar ou digitar endereço web" autocomplete="off">
+    </div>
+    <div class="shortcuts" id="shortcuts">
+      <!-- Atalhos serão adicionados aqui dinamicamente -->
+      <div class="shortcut add-shortcut" onclick="abrirModalAtalho()">
+        <div class="add-shortcut-icon">+</div>
+        <div class="shortcut-name">Adicionar</div>
+      </div>
+    </div>
+  </div>
+  
+  <iframe id="navegador" class="hidden" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+
+  <!-- Modal para adicionar atalhos -->
+  <div class="modal" id="shortcutModal">
+    <div class="modal-content">
+      <h2>Adicionar Atalho</h2>
+      <label>
+        Nome:
+        <input type="text" id="shortcutName" placeholder="Ex: Google">
+      </label>
+      <label>
+        URL:
+        <input type="url" id="shortcutUrl" placeholder="https://www.google.com">
+      </label>
+      <label>
+        URL do ícone (opcional):
+        <input type="url" id="shortcutIcon" placeholder="https://www.google.com/favicon.ico">
+      </label>
+      <div class="modal-actions">
+        <button onclick="fecharModalAtalho()">Cancelar</button>
+        <button onclick="adicionarAtalho()" style="background:var(--accent)">Adicionar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const iframe = document.getElementById('navegador');
+    const input = document.getElementById('url');
+    const status = document.getElementById('status');
+    const abas = document.getElementById('abas');
+    const progressBar = document.getElementById('progressBar');
+    const startPage = document.getElementById('startPage');
+    const startPageSearch = document.getElementById('startPageSearch');
+    const shortcutsContainer = document.getElementById('shortcuts');
+    const wallpaperUrlInput = document.getElementById('wallpaperUrl');
+    const shortcutModal = document.getElementById('shortcutModal');
+    const historico = [];
+    const guias = [];
+    let posicao = -1;
+    let guiaAtiva = 0;
+    let modoEscuro = true;
+    let adBlockerEnabled = false;
+    const adDomains = [
+      'doubleclick.net',
+      'googlesyndication.com',
+      'googleadservices.com',
+      'adservice.google.com',
+      'ads.youtube.com',
+      'adserver.yahoo.com',
+      'bingads.microsoft.com',
+      'facebook.com/ad',
+      'facebook.com/ads',
+      'ads.facebook.com',
+    ];
+
+    // Atalhos padrão
+    const defaultShortcuts = [
+      { name: 'Google', url: 'https://www.google.com', icon: 'https://www.google.com/favicon.ico' },
+      { name: 'YouTube', url: 'https://www.youtube.com', icon: 'https://www.youtube.com/favicon.ico' },
+      { name: 'Facebook', url: 'https://www.facebook.com', icon: 'https://www.facebook.com/favicon.ico' },
+      { name: 'Twitter', url: 'https://twitter.com', icon: 'https://twitter.com/favicon.ico' },
+      { name: 'Wikipedia', url: 'https://pt.wikipedia.org', icon: 'https://pt.wikipedia.org/static/favicon/wikipedia.ico' },
+      { name: 'GitHub', url: 'https://github.com', icon: 'https://github.com/favicon.ico' }
+    ];
+
+    // Inicialização
+    function init() {
+      setupProgressTracking();
+      carregarConfiguracoes();
+      carregarAtalhos();
+      atualizarAbas();
+      
+      // Adiciona evento de tecla para a barra de pesquisa da página inicial
+      startPageSearch.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          carregarURL(this.value);
+        }
+      });
+      
+      // Adiciona evento de tecla para a barra de URL
+      input.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          ir();
+        }
+      });
+      
+      // Mostrar página inicial ao carregar
+      mostrarPaginaInicial();
+    }
+
+    // Configurações
+    function carregarConfiguracoes() {
+      const config = JSON.parse(localStorage.getItem('browserConfig')) || {};
+      
+      if (config.tema) {
+        setTema(config.tema);
+        document.querySelector(`input[name="tema"][value="${config.tema}"]`).checked = true;
+      }
+      
+      if (config.wallpaper) {
+        wallpaperUrlInput.value = config.wallpaper;
+        startPage.style.backgroundImage = `url('${config.wallpaper}')`;
+      }
+      
+      if (config.modoDesktop) {
+        document.getElementById('modoDesktop').checked = true;
+      }
+      
+      if (config.motorBusca) {
+        document.querySelector(`input[name="busca"][value="${config.motorBusca}"]`).checked = true;
+      }
+      
+      if (config.adBlocker) {
+        document.getElementById('bloqueadorAds').checked = true;
+        toggleAdBlocker();
+      }
+    }
+
+    function salvarConfiguracoes() {
+      const config = {
+        tema: document.querySelector('input[name="tema"]:checked').value,
+        wallpaper: wallpaperUrlInput.value,
+        modoDesktop: document.getElementById('modoDesktop').checked,
+        motorBusca: document.querySelector('input[name="busca"]:checked').value,
+        adBlocker: document.getElementById('bloqueadorAds').checked
+      };
+      localStorage.setItem('browserConfig', JSON.stringify(config));
+    }
+
+    function aplicarWallpaper() {
+      const url = wallpaperUrlInput.value;
+      if (url) {
+        startPage.style.backgroundImage = `url('${url}')`;
+        salvarConfiguracoes();
+      }
+    }
+
+    // Atalhos
+    function carregarAtalhos() {
+      const savedShortcuts = JSON.parse(localStorage.getItem('shortcuts'));
+      const shortcuts = savedShortcuts || defaultShortcuts;
+      
+      shortcutsContainer.innerHTML = '';
+      
+      shortcuts.forEach(shortcut => {
+        const shortcutElement = document.createElement('div');
+        shortcutElement.className = 'shortcut';
+        shortcutElement.innerHTML = `
+          <img src="${shortcut.icon || 'https://www.google.com/s2/favicons?domain=' + shortcut.url}" class="shortcut-icon" onerror="this.src='https://www.google.com/s2/favicons?domain=${shortcut.url}'">
+          <div class="shortcut-name">${shortcut.name}</div>
+        `;
+        shortcutElement.onclick = () => carregarURL(shortcut.url);
+        shortcutsContainer.appendChild(shortcutElement);
+      });
+      
+      // Adicionar botão de adicionar atalho
+      const addButton = document.createElement('div');
+      addButton.className = 'shortcut add-shortcut';
+      addButton.innerHTML = `
+        <div class="add-shortcut-icon">+</div>
+        <div class="shortcut-name">Adicionar</div>
+      `;
+      addButton.onclick = abrirModalAtalho;
+      shortcutsContainer.appendChild(addButton);
+    }
+
+    function abrirModalAtalho() {
+      document.getElementById('shortcutModal').style.display = 'flex';
+    }
+
+    function fecharModalAtalho() {
+      document.getElementById('shortcutModal').style.display = 'none';
+    }
+
+    function adicionarAtalho() {
+      const name = document.getElementById('shortcutName').value;
+      const url = document.getElementById('shortcutUrl').value;
+      const icon = document.getElementById('shortcutIcon').value;
+      
+      if (name && url) {
+        const savedShortcuts = JSON.parse(localStorage.getItem('shortcuts')) || defaultShortcuts;
+        savedShortcuts.push({ name, url, icon });
+        localStorage.setItem('shortcuts', JSON.stringify(savedShortcuts));
+        carregarAtalhos();
+        fecharModalAtalho();
+      }
+    }
+
+    // Navegação
+    function mostrarPaginaInicial() {
+      startPage.classList.remove('hidden');
+      iframe.classList.add('hidden');
+      input.value = '';
+    }
+
+    function esconderPaginaInicial() {
+      startPage.classList.add('hidden');
+      iframe.classList.remove('hidden');
+    }
+
+    function ir() {
+      carregarURL(input.value);
+    }
+
+    function recarregar() {
+      carregando(true);
+      iframe.src = iframe.src;
+    }
+
+    function voltar() {
+      if (posicao > 0) {
+        posicao--;
+        iframe.src = historico[posicao];
+        input.value = historico[posicao];
+      }
+    }
+
+    function avancar() {
+      if (posicao < historico.length - 1) {
+        posicao++;
+        iframe.src = historico[posicao];
+        input.value = historico[posicao];
+      }
+    }
+
+    function toggleTema() {
+      modoEscuro = !modoEscuro;
+      setTema(modoEscuro ? 'escuro' : 'claro');
+      salvarConfiguracoes();
+    }
+
+    function setTema(tema) {
+      modoEscuro = (tema === 'escuro');
+      if (modoEscuro) {
+        document.documentElement.style.setProperty('--bg', '#1e1e2d');
+        document.documentElement.style.setProperty('--txt', '#ffffff');
+        document.documentElement.style.setProperty('--accent', '#ff1b43');
+        document.documentElement.style.setProperty('--secondary', '#2d2d3a');
+        document.documentElement.style.setProperty('--tab-bg', '#2d2d3a');
+        document.documentElement.style.setProperty('--tab-active', '#1e1e2d');
+      } else {
+        document.documentElement.style.setProperty('--bg', '#f0f0f0');
+        document.documentElement.style.setProperty('--txt', '#333333');
+        document.documentElement.style.setProperty('--accent', '#3367d6');
+        document.documentElement.style.setProperty('--secondary', '#ffffff');
+        document.documentElement.style.setProperty('--tab-bg', '#e0e0e0');
+        document.documentElement.style.setProperty('--tab-active', '#ffffff');
+      }
+    }
+
+    function carregando(ativo) {
+      status.textContent = ativo ? 'Carregando...' : '';
+    }
+
+    function novaGuia() {
+      guias.push("about:blank");
+      guiaAtiva = guias.length - 1;
+      mostrarPaginaInicial();
+      atualizarAbas();
+    }
+
+    function selecionarGuia(index) {
+      guiaAtiva = index;
+      if (guias[index] === "about:blank") {
+        mostrarPaginaInicial();
+      } else {
+        input.value = guias[index];
+        iframe.src = guias[index];
+        esconderPaginaInicial();
+      }
+    }
+
+    function atualizarAbas() {
+      abas.innerHTML = '';
+      guias.forEach((url, i) => {
+        const btn = document.createElement('div');
+        btn.className = 'tab' + (i === guiaAtiva ? ' active' : '');
+        
+        // Tentar obter favicon
+        const favicon = document.createElement('img');
+        favicon.className = 'tab-favicon';
+        favicon.src = `https://www.google.com/s2/favicons?domain=${url === "about:blank" ? "opera.com" : url}`;
+        favicon.onerror = "this.src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABmJLR0QA/wD/AP+gvaeTAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAB3RJTUUH4AkEEjIZW3X2XQAAAB1pVFh0Q29tbWVudAAAAAAAQ3JlYXRlZCB3aXRoIEdJTVBkLmUHAAAANklEQVQ4y2NgGAXDADDCGP/+/fsPZ8yZM4cRzQALkA1XYGJiwgikgYGBgYGBgYGBgQHFBQwMAG5fBqV7X3O0AAAAAElFTkSuQmCC'";
+        
+        const title = document.createElement('span');
+        title.textContent = url === "about:blank" ? 'Nova Guia' : new URL(url).hostname.replace('www.', '');
+        
+        const btnFechar = document.createElement('span');
+        btnFechar.textContent = ' ❌';
+        btnFechar.onclick = (e) => {
+          e.stopPropagation();
+          guias.splice(i, 1);
+          if (guiaAtiva >= guias.length) guiaAtiva = guias.length - 1;
+          if (guias.length === 0) {
+            novaGuia();
+          } else {
+            selecionarGuia(guiaAtiva);
+          }
+          atualizarAbas();
+        };
+        
+        btn.appendChild(favicon);
+        btn.appendChild(title);
+        btn.appendChild(btnFechar);
+        btn.onclick = () => selecionarGuia(i);
+        abas.appendChild(btn);
+      });
+      
+      // Adicionar botão de nova guia
+      const newTabBtn = document.createElement('div');
+      newTabBtn.className = 'tab';
+      newTabBtn.textContent = '+';
+      newTabBtn.onclick = novaGuia;
+      abas.appendChild(newTabBtn);
+    }
+
+    function abrirConfig() {
+      const painel = document.getElementById('painelConfig');
+      painel.style.display = painel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function getMotorBusca() {
+      const selecionado = document.querySelector('input[name="busca"]:checked');
+      return selecionado ? selecionado.value : 'google';
+    }
+
+    function carregarURL(url) {
+      if (!url || url.trim() === '') return;
+      
+      let destino = url.trim();
+      const usarDesktop = document.getElementById('modoDesktop').checked;
+      const motor = getMotorBusca();
+
+      if (!destino.startsWith("http")) {
+        const query = encodeURIComponent(destino);
+        switch (motor) {
+          case 'bing':
+            destino = "https://www.bing.com/search?q=" + query;
+            break;
+          case 'wikipedia':
+            destino = "https://pt.wikipedia.org/wiki/" + query;
+            break;
+          case 'yahoo':
+            destino = "https://search.yahoo.com/search?p=" + query;
+            break;
+          default:
+            destino = "https://www.google.com/search?q=" + query;
+        }
+      }
+
+      if (usarDesktop) {
+        if (destino.includes("m.youtube.com")) {
+          destino = destino.replace("m.youtube.com", "www.youtube.com");
+        }
+        if (destino.includes("m.facebook.com")) {
+          destino = destino.replace("m.facebook.com", "www.facebook.com");
+        }
+        if (destino.includes("google.com")) {
+          destino += (destino.includes("?") ? "&" : "?") + "igu=1";
+        }
+      }
+
+      carregando(true);
+      iframe.src = destino;
+      input.value = destino;
+      esconderPaginaInicial();
+      historico.splice(posicao + 1);
+      historico.push(destino);
+      posicao++;
+      guias[guiaAtiva] = destino;
+      atualizarAbas();
+    }
+
+    // Bloqueador de anúncios
+    function interceptRequests() {
+      if (!adBlockerEnabled) return;
+      
+      const originalFetch = window.fetch;
+      window.fetch = async function(...args) {
+        const url = typeof args[0] === 'string' ? args[0] : args[0].url;
+        if (url && adDomains.some(domain => url.includes(domain))) {
+          console.log('Bloqueado (fetch):', url);
+          return Promise.reject(new Error('Bloqueado pelo ad blocker'));
+        }
+        return originalFetch.apply(this, args);
+      };
+
+      const originalOpen = XMLHttpRequest.prototype.open;
+      XMLHttpRequest.prototype.open = function(method, url) {
+        if (url && adDomains.some(domain => url.includes(domain))) {
+          console.log('Bloqueado (XHR):', url);
+          this._shouldAbort = true;
+          return;
+        }
+        originalOpen.apply(this, arguments);
+      };
+      XMLHttpRequest.prototype.send = function(data) {
+        if (this._shouldAbort) return;
+        return XMLHttpRequest.prototype.send.apply(this, arguments);
+      };
+    }
+
+    function toggleAdBlocker() {
+      adBlockerEnabled = document.getElementById('bloqueadorAds').checked;
+      if (adBlockerEnabled) {
+        interceptRequests();
+      }
+      salvarConfiguracoes();
+    }
+
+    // Barra de progresso
+    function setupProgressTracking() {
+      iframe.onloadstart = () => {
+        progressBar.style.width = '10%';
+      };
+      
+      iframe.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percent = Math.min(90, (event.loaded / event.total) * 100);
+          progressBar.style.width = percent + '%';
+        }
+      };
+      
+      // EVENTO ONLOAD CORRIGIDO E COMPLETO
+      iframe.onload = function() {
+        progressBar.style.width = '100%';
+        setTimeout(() => {
+          progressBar.style.width = '0%';
+        }, 500);
+        carregando(false);
+        
+        try {
+          // Atualiza a URL na barra de endereços
+          input.value = iframe.contentWindow.location.href;
+          // Atualiza a guia ativa com a URL atual
+          guias[guiaAtiva] = iframe.contentWindow.location.href;
+          // Atualiza as abas
+          atualizarAbas();
+          
+          // Previne redirecionamentos indesejados
+          preventRedirects();
+        } catch (e) {
+          console.log("Não foi possível acessar URL do iframe devido a política de mesma origem");
+        }
+      };
+    }
+
+    // Prevenção de redirecionamento
+    function preventRedirects() {
+      try {
+        // Prevenir redirecionamentos via beforeunload
+        iframe.contentWindow.addEventListener('beforeunload', (e) => {
+          return undefined;
+        });
+        
+        // Adicionar event listener para capturar cliques nos links
+        iframe.contentWindow.addEventListener('click', (e) => {
+          try {
+            const anchor = e.target.closest('a');
+            if (anchor && anchor.target !== '_blank') {
+              e.preventDefault();
+              e.stopPropagation();
+              
+              const href = anchor.href;
+              if (href && href !== 'about:blank' && href !== iframe.src) {
+                // Usar setTimeout para evitar problemas de execução
+                setTimeout(() => {
+                  carregarURL(href);
+                }, 10);
+              }
+            }
+          } catch (error) {
+            console.log('Não foi possível processar clique devido a política de mesma origem');
+          }
+        }, true);
+        
+      } catch (e) {
+        console.log("Não foi possível prevenir redirecionamentos devido a política de mesma origem");
+      }
+    }
+
+    // Inicialização
+    if (/Mobi|Android/i.test(navigator.userAgent)) {
+      document.getElementById('opcaoDesktop').style.display = 'block';
+    } else {
+      document.getElementById('opcaoDesktop').style.display = 'none';
+    }
+    
+    init();
+    novaGuia();
+  </script>
+</body>
+</html>

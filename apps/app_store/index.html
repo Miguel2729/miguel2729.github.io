@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>App Store</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="search-container">
+    <input type="text" id="search-input" placeholder="Pesquisar aplicativos..." />
+  </div>
+
+  <div class="category-filters">
+    <button class="category-filter active" data-category="all">Todos</button>
+    <button class="category-filter" data-category="utiliarios">Utilitários</button>
+    <button class="category-filter" data-category="jogos">Jogos</button>
+    <button class="category-filter" data-category="escolar">Escolar</button>
+    <button class="category-filter" data-category="desenvolvimento">Desenvolvimento</button>
+    <button class="category-filter" data-category="entretenimento">Entretenimento</button>
+  </div>
+
+  <div class="app-grid" id="app-list"></div>
+
+  <script src="appstore.js"></script>
+</body>
+</html>

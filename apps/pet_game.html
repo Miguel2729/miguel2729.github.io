@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Fofo - Jogo de Cuidar</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #ffebf3;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+        }
+        
+        #game-container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        #pet-container {
+            width: 200px;
+            height: 200px;
+            margin: 20px auto;
+            position: relative;
+        }
+        
+        #pet {
+            width: 100%;
+            height: 100%;
+            background-color: #ffcce6;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+        
+        #pet:hover {
+            transform: scale(1.05);
+        }
+        
+        #pet-face {
+            width: 80%;
+            height: 80%;
+            position: relative;
+        }
+        
+        .eye {
+            width: 30px;
+            height: 40px;
+            background-color: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 30%;
+        }
+        
+        .eye.left {
+            left: 20%;
+        }
+        
+        .eye.right {
+            right: 20%;
+        }
+        
+        .pupil {
+            width: 15px;
+            height: 15px;
+            background-color: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #mouth {
+            width: 40px;
+            height: 20px;
+            border-bottom: 3px solid #333;
+            border-radius: 0 0 20px 20px;
+            position: absolute;
+            bottom: 25%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        #blush {
+            width: 30px;
+            height: 15px;
+            background-color: #ff99cc;
+            border-radius: 50%;
+            position: absolute;
+            bottom: 30%;
+            opacity: 0.6;
+        }
+        
+        #blush.left {
+            left: 15%;
+        }
+        
+        #blush.right {
+            right: 15%;
+        }
+        
+        #stats {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .stat-bar {
+            width: 80px;
+            height: 15px;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 100%;
+            transition: width 0.3s;
+        }
+        
+        #hunger .stat-fill {
+            background-color: #FF9800;
+        }
+        
+        #happiness .stat-fill {
+            background-color: #E91E63;
+        }
+        
+        #energy .stat-fill {
+            background-color: #2196F3;
+        }
+        
+        #hygiene .stat-fill {
+            background-color: #9C27B0;
+        }
+        
+        #actions {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        
+        .action-btn {
+            background-color: #ff99cc;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            font-size: 30px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        
+        .action-btn:hover {
+            transform: scale(1.1);
+            background-color: #ff66b3;
+        }
+        
+        #name-display {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #ff66b3;
+        }
+        
+        #message {
+            height: 20px;
+            color: #ff66b3;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        #customize {
+            margin-top: 20px;
+        }
+        
+        #color-picker {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .color-option:hover {
+            border-color: #333;
+        }
+        
+        #accessories {
+            margin-top: 10px;
+        }
+        
+        select {
+            padding: 5px;
+            border-radius: 5px;
+            border: 2px solid #ff99cc;
+        }
+        
+        .accessory {
+            position: absolute;
+            z-index: 10;
+        }
+        
+        #hat {
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Pet Fofo</h1>
+        
+        <div id="name-display">Pet</div>
+        
+        <div id="pet-container">
+            <div id="pet">
+                <div id="pet-face">
+                    <div class="eye left"><div class="pupil"></div></div>
+                    <div class="eye right"><div class="pupil"></div></div>
+                    <div id="mouth"></div>
+                    <div id="blush left"></div>
+                    <div id="blush right"></div>
+                    <div id="hat" class="accessory"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="message"></div>
+        
+        <div id="stats">
+            <div class="stat" id="hunger">
+                <span>Fome</span>
+                <div class="stat-bar"><div class="stat-fill" style="width: 100%;"></div></div>
+            </div>
+            <div class="stat" id="happiness">
+                <span>Felicidade</span>
+                <div class="stat-bar"><div class="stat-fill" style="width: 100%;"></div></div>
+            </div>
+            <div class="stat" id="energy">
+                <span>Energia</span>
+                <div class="stat-bar"><div class="stat-fill" style="width: 100%;"></div></div>
+            </div>
+            <div class="stat" id="hygiene">
+                <span>Higiene</span>
+                <div class="stat-bar"><div class="stat-fill" style="width: 100%;"></div></div>
+            </div>
+        </div>
+        
+        <div id="actions">
+            <button class="action-btn" onclick="feedPet()">🍎</button>
+            <button class="action-btn" onclick="playWithPet()">🎾</button>
+            <button class="action-btn" onclick="sleepPet()">💤</button>
+            <button class="action-btn" onclick="cleanPet()">🛁</button>
+        </div>
+        
+        <div id="customize">
+            <h3>Personalizar</h3>
+            <div>
+                <label for="pet-name">Nome:</label>
+                <input type="text" id="pet-name" placeholder="Digite um nome">
+                <button onclick="setPetName()">OK</button>
+            </div>
+            
+            <div id="color-picker">
+                <div class="color-option" style="background-color: #ffcce6;" onclick="changePetColor('#ffcce6')"></div>
+                <div class="color-option" style="background-color: #cce6ff;" onclick="changePetColor('#cce6ff')"></div>
+                <div class="color-option" style="background-color: #ccffcc;" onclick="changePetColor('#ccffcc')"></div>
+                <div class="color-option" style="background-color: #ffffcc;" onclick="changePetColor('#ffffcc')"></div>
+                <div class="color-option" style="background-color: #ffcc99;" onclick="changePetColor('#ffcc99')"></div>
+            </div>
+            
+            <div id="accessories">
+                <label for="hat-select">Chapéu:</label>
+                <select id="hat-select" onchange="changeHat()">
+                    <option value="">Nenhum</option>
+                    <option value="🎩">Cartola</option>
+                    <option value="👑">Coroa</option>
+                    <option value="🧢">Boné</option>
+                    <option value="🎓">Formatura</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis do jogo
+        let petStats = {
+            hunger: 100,
+            happiness: 100,
+            energy: 100,
+            hygiene: 100
+        };
+        
+        let petName = "Pet";
+        let messageTimeout;
+        
+        // Atualiza as barras de status
+        function updateStats() {
+            for (let stat in petStats) {
+                let element = document.querySelector(`#${stat} .stat-fill`);
+                element.style.width = `${petStats[stat]}%`;
+                
+                // Muda a cor se o status estiver baixo
+                if (petStats[stat] < 30) {
+                    element.style.backgroundColor = '#f44336';
+                } else {
+                    // Volta para a cor original
+                    if (stat === 'hunger') element.style.backgroundColor = '#FF9800';
+                    else if (stat === 'happiness') element.style.backgroundColor = '#E91E63';
+                    else if (stat === 'energy') element.style.backgroundColor = '#2196F3';
+                    else if (stat === 'hygiene') element.style.backgroundColor = '#9C27B0';
+                }
+            }
+        }
+        
+        // Diminui os status gradualmente
+        function decreaseStats() {
+            for (let stat in petStats) {
+                petStats[stat] = Math.max(0, petStats[stat] - (5 + Math.random() * 5));
+            }
+            updateStats();
+            checkPetMood();
+        }
+        
+        // Verifica o humor do pet e atualiza a aparência
+        function checkPetMood() {
+            const mouth = document.getElementById('mouth');
+            const blushLeft = document.getElementById('blush left');
+            const blushRight = document.getElementById('blush right');
+            
+            // Calcula a média dos status
+            const average = (petStats.hunger + petStats.happiness + petStats.energy + petStats.hygiene) / 4;
+            
+            if (average < 30) {
+                // Triste
+                mouth.style.borderBottom = 'none';
+                mouth.style.borderTop = '3px solid #333';
+                mouth.style.borderRadius = '20px 20px 0 0';
+                blushLeft.style.opacity = '0';
+                blushRight.style.opacity = '0';
+            } else if (average < 70) {
+                // Neutro
+                mouth.style.borderBottom = '3px solid #333';
+                mouth.style.borderTop = 'none';
+                mouth.style.borderRadius = '0 0 20px 20px';
+                mouth.style.width = '20px';
+                blushLeft.style.opacity = '0.3';
+                blushRight.style.opacity = '0.3';
+            } else {
+                // Feliz
+                mouth.style.borderBottom = '3px solid #333';
+                mouth.style.borderTop = 'none';
+                mouth.style.borderRadius = '0 0 20px 20px';
+                mouth.style.width = '40px';
+                blushLeft.style.opacity = '0.6';
+                blushRight.style.opacity = '0.6';
+            }
+        }
+        
+        // Mostra uma mensagem temporária
+        function showMessage(msg) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = msg;
+            
+            clearTimeout(messageTimeout);
+            messageTimeout = setTimeout(() => {
+                messageElement.textContent = '';
+            }, 2000);
+        }
+        
+        // Ações do pet
+        function feedPet() {
+            if (petStats.hunger >= 100) {
+                showMessage(`${petName} já está satisfeito!`);
+                return;
+            }
+            
+            petStats.hunger = Math.min(100, petStats.hunger + 20);
+            petStats.hygiene = Math.max(0, petStats.hygiene - 5);
+            updateStats();
+            checkPetMood();
+            showMessage(`Você alimentou ${petName}!`);
+        }
+        
+        function playWithPet() {
+            if (petStats.energy < 20) {
+                showMessage(`${petName} está cansado demais para brincar!`);
+                return;
+            }
+            
+            petStats.happiness = Math.min(100, petStats.happiness + 20);
+            petStats.energy = Math.max(0, petStats.energy - 15);
+            petStats.hunger = Math.max(0, petStats.hunger - 10);
+            updateStats();
+            checkPetMood();
+            showMessage(`Você brincou com ${petName}!`);
+        }
+        
+        function sleepPet() {
+            petStats.energy = Math.min(100, petStats.energy + 30);
+            petStats.hunger = Math.max(0, petStats.hunger - 10);
+            updateStats();
+            checkPetMood();
+            showMessage(`${petName} tirou uma soneca!`);
+        }
+        
+        function cleanPet() {
+            petStats.hygiene = 100;
+            updateStats();
+            checkPetMood();
+            showMessage(`Você limpou ${petName}!`);
+        }
+        
+        // Personalização
+        function setPetName() {
+            const nameInput = document.getElementById('pet-name');
+            if (nameInput.value.trim() !== '') {
+                petName = nameInput.value.trim();
+                document.getElementById('name-display').textContent = petName;
+                nameInput.value = '';
+                showMessage(`Nome alterado para ${petName}!`);
+            }
+        }
+        
+        function changePetColor(color) {
+            document.getElementById('pet').style.backgroundColor = color;
+        }
+        
+        function changeHat() {
+            const hatSelect = document.getElementById('hat-select');
+            const hatElement = document.getElementById('hat');
+            hatElement.textContent = hatSelect.value;
+        }
+        
+        // Inicializa o jogo
+        function initGame() {
+            updateStats();
+            
+            // Diminui os status a cada 10 segundos
+            setInterval(decreaseStats, 10000);
+            
+            // Faz o pet pular aleatoriamente
+            setInterval(() => {
+                if (Math.random() > 0.7 && petStats.energy > 30 && petStats.happiness > 50) {
+                    const pet = document.getElementById('pet');
+                    pet.style.transform = 'translateY(-20px)';
+                    setTimeout(() => {
+                        pet.style.transform = 'translateY(0)';
+                    }, 300);
+                }
+            }, 5000);
+        }
+        
+        // Inicia o jogo quando a página carrega
+        window.onload = initGame;
+    </script>
+</body>
+</html>

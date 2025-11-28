@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Menu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background: #181818;
+      color: #fff;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      color: #00ffd1;
+    }
+
+    .botoes {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: 100%;
+      max-width: 300px;
+    }
+
+    button {
+      padding: 10px 16px;
+      background: #2c2c2c;
+      color: #fff;
+      border: 1px solid #444;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #444;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Menu Principal</h2>
+
+  <div class="botoes">
+    <button onclick="abrir('criador_de_interface.html')">Abrir gerador de interface</button>
+    <button onclick="parent.postMessage("logoff", "*")">sair</button>
+    <button onclick="fecharTudo()">Fechar Tudo</button>
+  </div>
+
+  <script>
+    function abrir(nome) {
+      parent.postMessage("abrir " + nome, "*");
+    }
+
+    function fecharTudo() {
+      parent.postMessage("fechar_tudo", "*");
+    }
+  </script>
+
+</body>
+</html>

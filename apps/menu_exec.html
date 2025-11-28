@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Executar</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #1e1e1e;
+      color: #fff;
+      padding: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      background-color: #2c2c2c;
+      color: #fff;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #007acc;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #005f9e;
+    }
+
+    #output {
+      margin-top: 20px;
+      background-color: #111;
+      padding: 10px;
+      border-radius: 5px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .console-buttons {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 1000;
+    }
+
+    .console-buttons button {
+      padding: 5px 10px;
+      font-size: 12px;
+      background-color: #333;
+      color: #fff;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+
+    .console-buttons button:hover {
+      background-color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h2>Executar Comando</h2>
+  <input type="text" id="cmdInput" placeholder="Digite um comando...">
+  <button onclick="interpretarComando()">Executar</button>
+
+  <div class="console-buttons">
+    <button onclick="limparConsole()">Limpar Saída</button>
+    <button onclick="alternarConsole()">Saída: Exibir/Ocultar</button>
+  </div>
+
+  <div id="output"></div>
+
+  <script>
+    function interpretarComando() {
+      const entrada = document.getElementById("cmdInput").value.trim();
+      if (!entrada) return;
+      interpretarComandoInterno(entrada);
+      limparInput();
+    }
+
+    function interpretarComandoInterno(entrada) {
+      const [cmd, ...args] = entrada.split(" ");
+      const argumento = args.join(" ");
+
+      if (entrada.endsWith(".js") && !cmd.includes(" ")) {
+        executarScript(entrada);
+        return;
+      }
+
+      switch (cmd.toLowerCase()) {
+        case "msg":
+          postar(argumento);
+          break;
+        case "cmd":
+          postar("abrir terminal.html");
+          break;
+        case "sys":
+          postar("abrir system_manager.html");
+          break;
+        case "js":
+          try {
+            const resultado = eval(argumento);
+            logSaida(`[JS OUTPUT]: ${resultado}`);
+          } catch (e) {
+            logSaida(`[JS ERRO]: ${e}`);
+          }
+          break;
+        case "wasm":
+          postar(`executar_wasm ${argumento}`);
+          break;
+        case "console":
+          logSaida(`[CONSOLE]: ${argumento}`);
+          break;
+        case "exec":
+          executarScript(argumento);
+          break;
+        default:
+          if (cmd.endsWith(".js")) {
+            executarScript(cmd);
+          } else {
+            postar(`abrir ${entrada}`);
+          }
+          break;
+      }
+    }
+
+    function executarScript(url) {
+      const script = document.createElement("script");
+      script.src = url;
+      script.onload = () => logSaida(`[EXEC]: ${url} carregado com sucesso.`);
+      script.onerror = () => logSaida(`[ERRO EXEC]: falha ao carregar ${url}.`);
+      document.body.appendChild(script);
+    }
+
+    function limparInput() {
+      document.getElementById("cmdInput").value = "";
+    }
+
+    function postar(mensagem) {
+      window.parent.postMessage(mensagem, "*");
+      logSaida(`[POST]: ${mensagem}`);
+    }
+
+    function logSaida(texto) {
+      const output = document.getElementById("output");
+      output.innerHTML += `<div>${texto}</div>`;
+      output.scrollTop = output.scrollHeight;
+    }
+
+    function limparConsole() {
+      document.getElementById("output").innerHTML = "";
+    }
+
+    function alternarConsole() {
+      const output = document.getElementById("output");
+      output.style.display = (output.style.display === "none") ? "block" : "none";
+    }
+
+    document.getElementById("cmdInput").addEventListener("keydown", e => {
+      if (e.key === "Enter") interpretarComando();
+    });
+
+    // Escutando mensagens externas do tipo "com <comando>"
+    window.addEventListener("message", (event) => {
+      const msg = String(event.data).trim();
+      if (msg.toLowerCase().startsWith("com ")) {
+        const comando = msg.substring(4).trim();
+        postar(`Recebido via mensagem: ${comando}`);
+        interpretarComandoInterno(comando);
+        window.parent.postMessage("fechar_tudo", "*");
+      }
+    });
+  </script>
+</body>
+</html>

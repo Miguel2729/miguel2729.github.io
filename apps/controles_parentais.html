@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Controles Parentais</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: #f5f5f5;
+      color: #333;
+    }
+    
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+    
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+    
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    
+    input:checked + .slider {
+      background-color: #2196F3;
+    }
+    
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+    
+    .tabs {
+      display: flex;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: 1px solid #ddd;
+      border-bottom: none;
+      background: #eee;
+      margin-right: 5px;
+      border-radius: 5px 5px 0 0;
+      transition: all 0.2s;
+    }
+    
+    .tab:hover {
+      background: #e0e0e0;
+    }
+    
+    .tab.active {
+      background: white;
+      font-weight: bold;
+      border-bottom: 1px solid white;
+      margin-bottom: -1px;
+    }
+    
+    .tab-content {
+      display: none;
+      padding: 20px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 0 5px 5px 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    
+    .tab-content.active {
+      display: block;
+    }
+    
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+    
+    tr:hover {
+      background-color: #f9f9f9;
+    }
+    
+    button {
+      padding: 8px 16px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 14px;
+    }
+    
+    button:hover {
+      background: #0b7dda;
+    }
+    
+    button.secondary {
+      background: #f44336;
+    }
+    
+    button.secondary:hover {
+      background: #d32f2f;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+    
+    .form-group select, 
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    
+    .form-group input[type="number"] {
+      max-width: 150px;
+    }
+    
+    .summary-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .summary-card h3 {
+      margin-top: 0;
+      color: #2196F3;
+    }
+    
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    
+    .stat-item {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 6px;
+      text-align: center;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2196F3;
+      margin: 10px 0;
+    }
+    
+    .stat-label {
+      font-size: 14px;
+      color: #666;
+    }
+    
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #4CAF50;
+      color: white;
+      padding: 15px;
+      border-radius: 4px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      z-index: 1000;
+      display: none;
+    }
+    
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0,0,0,0.1);
+      border-radius: 50%;
+      border-top-color: #2196F3;
+      animation: spin 1s ease-in-out infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .app-icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Controles Parentais</h1>
+    <label class="switch">
+      <input type="checkbox" id="toggleControl">
+      <span class="slider"></span>
+    </label>
+  </div>
+  
+  <div class="tabs">
+    <div class="tab active" data-tab="dashboard">Painel</div>
+    <div class="tab" data-tab="supervision">Supervisão</div>
+    <div class="tab" data-tab="users">Usuários</div>
+    <div class="tab" data-tab="apps">Aplicativos</div>
+    <div class="tab" data-tab="limits">Limites</div>
+  </div>
+  
+  <div class="tab-content active" id="dashboard">
+    <div class="summary-card">
+      <h3>Visão Geral</h3>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">Status</div>
+          <div class="stat-value" id="statusValue">--</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Usuários Supervisionados</div>
+          <div class="stat-value" id="supervisedUsersCount">--</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Apps Bloqueados</div>
+          <div class="stat-value" id="blockedAppsCount">--</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">Atividades Registradas</div>
+          <div class="stat-value" id="activityLogsCount">--</div>
+        </div>
+      </div>
+    </div>
+    
+    <h2>Atividades Recentes</h2>
+    <table id="recentActivityTable">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Aplicativo</th>
+          <th>Ação</th>
+          <th>Data/Hora</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  
+  <div class="tab-content" id="supervision">
+    <h2>Atividades Supervisionadas</h2>
+    <div class="form-group">
+      <label for="filterUser">Filtrar por usuário:</label>
+      <select id="filterUser">
+        <option value="">Todos os usuários</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="filterApp">Filtrar por aplicativo:</label>
+      <select id="filterApp">
+        <option value="">Todos os aplicativos</option>
+      </select>
+    </div>
+    
+    <table id="activityTable">
+      <thead>
+        <tr>
+          <th>Usuário</th>
+          <th>Aplicativo</th>
+          <th>Modo</th>
+          <th>Data/Hora</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  
+  <div class="tab-content" id="users">
+    <h2>Usuários Supervisionados</h2>
+    <div class="form-group">
+      <label for="userSelect">Adicionar usuário:</label>
+      <select id="userSelect">
+        <option value="">Selecione um usuário</option>
+      </select>
+      <button id="addUserBtn">Adicionar</button>
+    </div>
+    
+    <h3>Usuários supervisionados</h3>
+    <ul id="supervisedUsers" class="user-list"></ul>
+  </div>
+  
+  <div class="tab-content" id="apps">
+    <h2>Aplicativos Bloqueados</h2>
+    <div class="form-group">
+      <label for="appSelect">Selecionar aplicativo:</label>
+      <select id="appSelect">
+        <option value="">Selecione um aplicativo</option>
+      </select>
+      <button id="blockAppBtn">Bloquear</button>
+      <button id="allowAppBtn" class="secondary">Permitir</button>
+    </div>
+    
+    <h3>Aplicativos bloqueados</h3>
+    <ul id="blockedApps" class="app-list"></ul>
+  </div>
+  
+  <div class="tab-content" id="limits">
+    <h2>Limite Diário de Uso</h2>
+    <div class="form-group">
+      <label for="limitUserSelect">Usuário:</label>
+      <select id="limitUserSelect">
+        <option value="">Selecione um usuário</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label for="dailyLimit">Limite (minutos):</label>
+      <input type="number" id="dailyLimit" min="0" value="60">
+    </div>
+    
+    <button id="setLimitBtn">Definir Limite</button>
+    
+    <h3>Limites atuais</h3>
+    <ul id="currentLimits" class="limits-list"></ul>
+  </div>
+  
+  <div class="notification" id="notification"></div>
+  
+  <script>
+    // Estado da aplicação
+    const state = {
+      enabled: false,
+      users: [],
+      supervisedUsers: [],
+      apps: [],
+      blockedApps: [],
+      dailyLimits: {},
+      activityLogs: []
+    };
+    
+    // Elementos da UI
+    const elements = {
+      toggleControl: document.getElementById('toggleControl'),
+      statusValue: document.getElementById('statusValue'),
+      supervisedUsersCount: document.getElementById('supervisedUsersCount'),
+      blockedAppsCount: document.getElementById('blockedAppsCount'),
+      activityLogsCount: document.getElementById('activityLogsCount'),
+      filterUser: document.getElementById('filterUser'),
+      filterApp: document.getElementById('filterApp'),
+      userSelect: document.getElementById('userSelect'),
+      addUserBtn: document.getElementById('addUserBtn'),
+      supervisedUsers: document.getElementById('supervisedUsers'),
+      appSelect: document.getElementById('appSelect'),
+      blockAppBtn: document.getElementById('blockAppBtn'),
+      allowAppBtn: document.getElementById('allowAppBtn'),
+      blockedApps: document.getElementById('blockedApps'),
+      limitUserSelect: document.getElementById('limitUserSelect'),
+      dailyLimit: document.getElementById('dailyLimit'),
+      setLimitBtn: document.getElementById('setLimitBtn'),
+      currentLimits: document.getElementById('currentLimits'),
+      activityTable: document.getElementById('activityTable').querySelector('tbody'),
+      recentActivityTable: document.getElementById('recentActivityTable').querySelector('tbody'),
+      notification: document.getElementById('notification')
+    };
+    
+    // Inicialização
+    document.addEventListener('DOMContentLoaded', () => {
+      // Configura os tabs
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          
+          tab.classList.add('active');
+          document.getElementById(tab.dataset.tab).classList.add('active');
+        });
+      });
+      
+      // Configura o toggle
+      elements.toggleControl.addEventListener('change', (e) => {
+        const command = e.target.checked ? 'enable' : 'disable';
+        parent.postMessage(`p ${command}`, '*');
+      });
+      
+      // Configura botões
+      elements.addUserBtn.addEventListener('click', addUser);
+      elements.blockAppBtn.addEventListener('click', blockApp);
+      elements.allowAppBtn.addEventListener('click', allowApp);
+      elements.setLimitBtn.addEventListener('click', setLimit);
+      
+      // Configura filtros
+      elements.filterUser.addEventListener('change', updateActivityTable);
+      elements.filterApp.addEventListener('change', updateActivityTable);
+      
+      // Solicita dados iniciais
+      requestInitialData();
+      
+      // Verifica periodicamente por atualizações (a cada 5 segundos)
+      setInterval(requestInitialData, 5000);
+    });
+    
+    // Solicitar todos os dados iniciais de uma vez
+    function requestInitialData() {
+      parent.postMessage('p getStatus', '*');
+      parent.postMessage('p getUsers', '*');
+      parent.postMessage('p getApps', '*');
+      parent.postMessage('p getLogs', '*');
+    }
+    
+    // Funções de manipulação de dados
+    function addUser() {
+      const userId = elements.userSelect.value;
+      if (userId) {
+        parent.postMessage(`p addUser ${userId}`, '*');
+      }
+    }
+    
+    function removeUser(userId) {
+      parent.postMessage(`p removeUser ${userId}`, '*');
+    }
+    
+    function blockApp() {
+      const appName = elements.appSelect.value;
+      if (appName) {
+        parent.postMessage(`p blockApp ${appName}`, '*');
+      }
+    }
+    
+    function allowApp() {
+      const appName = elements.appSelect.value;
+      if (appName) {
+        parent.postMessage(`p allowApp ${appName}`, '*');
+      }
+    }
+    
+    function setLimit() {
+      const userId = elements.limitUserSelect.value;
+      const minutes = elements.dailyLimit.value;
+      
+      if (userId && minutes) {
+        parent.postMessage(`p setLimit ${userId} ${minutes}`, '*');
+      }
+    }
+    
+    // Funções de atualização da UI
+    function updateStatus(enabled) {
+      state.enabled = enabled;
+      elements.toggleControl.checked = enabled;
+      elements.statusValue.textContent = enabled ? 'Ativo' : 'Inativo';
+      elements.statusValue.style.color = enabled ? '#4CAF50' : '#F44336';
+    }
+    
+    function updateUsersList(users, supervisedUsers) {
+      state.users = users;
+      state.supervisedUsers = supervisedUsers;
+      
+      // Atualiza dropdowns de usuários
+      updateSelect(elements.userSelect, users, 'Selecione um usuário');
+      updateSelect(elements.limitUserSelect, users, 'Selecione um usuário');
+      updateSelect(elements.filterUser, [{id: '', name: 'Todos os usuários'}, ...users], 'Todos os usuários');
+      
+      // Atualiza lista de usuários supervisionados
+      elements.supervisedUsers.innerHTML = '';
+      supervisedUsers.forEach(userId => {
+        const user = users.find(u => u.id === userId);
+        if (user) {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span>${user.name}</span>
+            <button onclick="removeUser('${userId}')" class="secondary">Remover</button>
+          `;
+          elements.supervisedUsers.appendChild(li);
+        }
+      });
+      
+      // Atualiza contagem
+      elements.supervisedUsersCount.textContent = supervisedUsers.length;
+    }
+    
+    function updateAppsList(apps, blockedApps) {
+      state.apps = apps;
+      state.blockedApps = blockedApps;
+      
+      // Atualiza dropdown de apps
+      updateSelect(elements.appSelect, apps, 'Selecione um aplicativo');
+      updateSelect(elements.filterApp, [{id: '', name: 'Todos os aplicativos'}, ...apps.map(a => ({
+        id: a,
+        name: a.replace('.html', '').replace(/_/g, ' ')
+      }))], 'Todos os aplicativos');
+      
+      // Atualiza lista de apps bloqueados
+      elements.blockedApps.innerHTML = '';
+      blockedApps.forEach(appName => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${appName.replace('.html', '').replace(/_/g, ' ')}</span>
+        `;
+        elements.blockedApps.appendChild(li);
+      });
+      
+      // Atualiza contagem
+      elements.blockedAppsCount.textContent = blockedApps.length;
+    }
+    
+    function updateLimits(dailyLimits) {
+      state.dailyLimits = dailyLimits;
+      
+      // Atualiza lista de limites
+      elements.currentLimits.innerHTML = '';
+      Object.entries(dailyLimits).forEach(([userId, minutes]) => {
+        const user = state.users.find(u => u.id === userId);
+        if (user) {
+          const li = document.createElement('li');
+          li.innerHTML = `
+            <span>${user.name}: ${minutes} minutos</span>
+          `;
+          elements.currentLimits.appendChild(li);
+        }
+      });
+    }
+    
+    function updateActivityLogs(logs) {
+      state.activityLogs = logs;
+      
+      // Atualiza tabela de atividades
+      updateActivityTable();
+      
+      // Atualiza tabela de atividades recentes
+      updateRecentActivityTable();
+      
+      // Atualiza contagem
+      elements.activityLogsCount.textContent = logs.length;
+    }
+    
+    function updateActivityTable() {
+      const userId = elements.filterUser.value;
+      const appName = elements.filterApp.value;
+      
+      elements.activityTable.innerHTML = '';
+      
+      state.activityLogs
+        .filter(log => !userId || log.userId === userId)
+        .filter(log => !appName || log.appName === appName)
+        .forEach(log => {
+          const user = state.users.find(u => u.id === log.userId) || {name: log.userId};
+          const tr = document.createElement('tr');
+          
+          tr.innerHTML = `
+            <td>${user.name}</td>
+            <td>${log.appName.replace('.html', '').replace(/_/g, ' ')}</td>
+            <td>${log.mode}</td>
+            <td>${new Date(log.timestamp).toLocaleString()}</td>
+          `;
+          
+          elements.activityTable.appendChild(tr);
+        });
+    }
+    
+    function updateRecentActivityTable() {
+      elements.recentActivityTable.innerHTML = '';
+      
+      state.activityLogs
+        .slice(-5)
+        .reverse()
+        .forEach(log => {
+          const user = state.users.find(u => u.id === log.userId) || {name: log.userId};
+          const tr = document.createElement('tr');
+          
+          tr.innerHTML = `
+            <td>${user.name}</td>
+            <td>${log.appName.replace('.html', '').replace(/_/g, ' ')}</td>
+            <td>${log.mode === 'iniciado' ? 'Aberto' : 'Fechado'}</td>
+            <td>${new Date(log.timestamp).toLocaleString()}</td>
+          `;
+          
+          elements.recentActivityTable.appendChild(tr);
+        });
+    }
+    
+    function updateSelect(selectElement, items, placeholder) {
+      selectElement.innerHTML = '';
+      
+      const placeholderOption = document.createElement('option');
+      placeholderOption.value = '';
+      placeholderOption.textContent = placeholder;
+      selectElement.appendChild(placeholderOption);
+      
+      items.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = item.name || item;
+        selectElement.appendChild(option);
+      });
+    }
+    
+    function showNotification(message, isSuccess = true) {
+      elements.notification.textContent = message;
+      elements.notification.style.backgroundColor = isSuccess ? '#4CAF50' : '#F44336';
+      elements.notification.style.display = 'block';
+      
+      setTimeout(() => {
+        elements.notification.style.display = 'none';
+      }, 3000);
+    }
+    
+    // Ouvinte de mensagens
+    window.addEventListener('message', (e) => {
+      if (typeof e.data === 'string' && e.data.startsWith('p ')) {
+        const [cmd, ...data] = e.data.substring(2).split(' ');
+        
+        switch(cmd) {
+          case 'status':
+            updateStatus(data[0] === 'true');
+            break;
+            
+          case 'users':
+            const users = JSON.parse(data[0]);
+            const supervisedUsers = JSON.parse(data[1]);
+            updateUsersList(users, supervisedUsers);
+            break;
+            
+          case 'apps':
+            const apps = JSON.parse(data[0]);
+            const blockedApps = JSON.parse(data[1]);
+            updateAppsList(apps, blockedApps);
+            break;
+            
+          case 'logs':
+            const logs = JSON.parse(data[0]);
+            updateActivityLogs(logs);
+            break;
+            
+          case 'update':
+            const updateData = JSON.parse(data.join(' '));
+            updateStatus(updateData.status);
+            updateUsersList(updateData.users, updateData.supervisedUsers);
+            updateAppsList(updateData.apps, updateData.blockedApps);
+            updateLimits(updateData.dailyLimits);
+            updateActivityLogs(updateData.logs);
+            break;
+            
+          case 'notification':
+            showNotification(data.join(' '));
+            break;
+        }
+      }
+    });
+    
+    // Funções globais para uso nos eventos
+    window.addUser = addUser;
+    window.removeUser = removeUser;
+    window.blockApp = blockApp;
+    window.allowApp = allowApp;
+    window.setLimit = setLimit;
+  </script>
+</body>
+</html>

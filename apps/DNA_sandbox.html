@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratório Genético Sandbox</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(90deg, #2c3e50, #4ca1af);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .lab-container {
+            display: flex;
+            flex-wrap: wrap;
+            min-height: 600px;
+        }
+
+        .gene-panel {
+            flex: 1;
+            min-width: 300px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-right: 1px solid #ddd;
+        }
+
+        .display-area {
+            flex: 2;
+            min-width: 400px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #e9ecef;
+            position: relative;
+        }
+
+        .organism-selector {
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            font-size: 16px;
+            background-color: white;
+        }
+
+        .gene-controls {
+            margin-top: 20px;
+        }
+
+        .gene-slider {
+            margin-bottom: 15px;
+        }
+
+        .gene-name {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 5px;
+            background: #d3d3d3;
+            outline: none;
+        }
+
+        .slider-value {
+            margin-left: 10px;
+            min-width: 40px;
+            text-align: center;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .action-buttons {
+            margin-top: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .apply-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .apply-btn:hover {
+            background-color: #218838;
+        }
+
+        .reset-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .reset-btn:hover {
+            background-color: #c82333;
+        }
+
+        .random-btn {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .random-btn:hover {
+            background-color: #138496;
+        }
+
+        .organism-display {
+            width: 300px;
+            height: 300px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .dna-strand {
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 200px;
+            background: linear-gradient(to bottom, #ff7e5f, #feb47b);
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+        }
+
+        .base-pair {
+            width: 25px;
+            height: 8px;
+            background-color: #2c3e50;
+            border-radius: 4px;
+        }
+
+        .info-panel {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            margin-top: 20px;
+        }
+
+        .info-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .trait {
+            margin-bottom: 5px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #2c3e50;
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .lab-container {
+                flex-direction: column;
+            }
+            
+            .gene-panel {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Laboratório Genético Sandbox</h1>
+            <p class="subtitle">Experimente modificar genes e observe as consequências!</p>
+        </header>
+        
+        <div class="lab-container">
+            <div class="gene-panel">
+                <div class="organism-selector">
+                    <label for="organism">Selecione um organismo:</label>
+                    <select id="organism">
+                        <option value="plant">Planta</option>
+                        <option value="tree">Árvore</option>
+                        <option value="animal">Animal</option>
+                        <option value="butterfly">Borboleta</option>
+                    </select>
+                </div>
+                
+                <div class="gene-controls">
+                    <div class="gene-slider">
+                        <div class="gene-name">Tamanho</div>
+                        <div class="slider-container">
+                            <input type="range" id="size" min="0" max="100" value="50">
+                            <span class="slider-value" id="size-value">50</span>
+                        </div>
+                    </div>
+                    
+                    <div class="gene-slider">
+                        <div class="gene-name">Cor</div>
+                        <div class="slider-container">
+                            <input type="range" id="color" min="0" max="100" value="50">
+                            <span class="slider-value" id="color-value">50</span>
+                        </div>
+                    </div>
+                    
+                    <div class="gene-slider">
+                        <div class="gene-name">Resistência</div>
+                        <div class="slider-container">
+                            <input type="range" id="resistance" min="0" max="100" value="50">
+                            <span class="slider-value" id="resistance-value">50</span>
+                        </div>
+                    </div>
+                    
+                    <div class="gene-slider">
+                        <div class="gene-name">Metabolismo</div>
+                        <div class="slider-container">
+                            <input type="range" id="metabolism" min="0" max="100" value="50">
+                            <span class="slider-value" id="metabolism-value">50</span>
+                        </div>
+                    </div>
+                    
+                    <div class="gene-slider">
+                        <div class="gene-name">Crescimento</div>
+                        <div class="slider-container">
+                            <input type="range" id="growth" min="0" max="100" value="50">
+                            <span class="slider-value" id="growth-value">50</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="apply-btn" id="apply-btn">Aplicar Alterações</button>
+                    <button class="random-btn" id="random-btn">Combinação Aleatória</button>
+                    <button class="reset-btn" id="reset-btn">Resetar Genes</button>
+                </div>
+            </div>
+            
+            <div class="display-area">
+                <div class="organism-display" id="organism-display">
+                    <!-- Organismo será renderizado aqui via JavaScript -->
+                    <div class="dna-strand">
+                        <div class="base-pair"></div>
+                        <div class="base-pair"></div>
+                        <div class="base-pair"></div>
+                        <div class="base-pair"></div>
+                        <div class="base-pair"></div>
+                    </div>
+                </div>
+                
+                <div class="info-panel">
+                    <div class="info-title">Características do Organismo:</div>
+                    <div class="trait" id="trait-size">Tamanho: Médio</div>
+                    <div class="trait" id="trait-color">Cor: Verde</div>
+                    <div class="trait" id="trait-resistance">Resistência: Moderada</div>
+                    <div class="trait" id="trait-metabolism">Metabolismo: Normal</div>
+                    <div class="trait" id="trait-growth">Taxa de Crescimento: Média</div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Laboratório Genético Sandbox - Um experimento educativo em genética</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Elementos do DOM
+            const organismSelect = document.getElementById('organism');
+            const sizeSlider = document.getElementById('size');
+            const colorSlider = document.getElementById('color');
+            const resistanceSlider = document.getElementById('resistance');
+            const metabolismSlider = document.getElementById('metabolism');
+            const growthSlider = document.getElementById('growth');
+            
+            const sizeValue = document.getElementById('size-value');
+            const colorValue = document.getElementById('color-value');
+            const resistanceValue = document.getElementById('resistance-value');
+            const metabolismValue = document.getElementById('metabolism-value');
+            const growthValue = document.getElementById('growth-value');
+            
+            const applyBtn = document.getElementById('apply-btn');
+            const randomBtn = document.getElementById('random-btn');
+            const resetBtn = document.getElementById('reset-btn');
+            
+            const organismDisplay = document.getElementById('organism-display');
+            
+            const traitSize = document.getElementById('trait-size');
+            const traitColor = document.getElementById('trait-color');
+            const traitResistance = document.getElementById('trait-resistance');
+            const traitMetabolism = document.getElementById('trait-metabolism');
+            const traitGrowth = document.getElementById('trait-growth');
+            
+            // Atualizar valores dos sliders
+            function updateSliderValues() {
+                sizeValue.textContent = sizeSlider.value;
+                colorValue.textContent = colorSlider.value;
+                resistanceValue.textContent = resistanceSlider.value;
+                metabolismValue.textContent = metabolismSlider.value;
+                growthValue.textContent = growthSlider.value;
+            }
+            
+            // Inicializar valores
+            updateSliderValues();
+            
+            // Atualizar organismos com base nos genes
+            function updateOrganism() {
+                const organism = organismSelect.value;
+                const size = parseInt(sizeSlider.value);
+                const color = parseInt(colorSlider.value);
+                const resistance = parseInt(resistanceSlider.value);
+                const metabolism = parseInt(metabolismSlider.value);
+                const growth = parseInt(growthSlider.value);
+                
+                // Atualizar características textuais
+                updateTraits(size, color, resistance, metabolism, growth);
+                
+                // Renderizar o organismo visualmente
+                renderOrganism(organism, size, color, resistance, metabolism, growth);
+            }
+            
+            // Atualizar descrições das características
+            function updateTraits(size, color, resistance, metabolism, growth) {
+                traitSize.textContent = `Tamanho: ${getTraitDescription(size, ['Minúsculo', 'Pequeno', 'Médio', 'Grande', 'Enorme'])}`;
+                traitColor.textContent = `Cor: ${getTraitDescription(color, ['Muito Clara', 'Clara', 'Média', 'Escura', 'Muito Escura'])}`;
+                traitResistance.textContent = `Resistência: ${getTraitDescription(resistance, ['Muito Frágil', 'Frágil', 'Moderada', 'Resistente', 'Muito Resistente'])}`;
+                traitMetabolism.textContent = `Metabolismo: ${getTraitDescription(metabolism, ['Muito Lento', 'Lento', 'Normal', 'Rápido', 'Muito Rápido'])}`;
+                traitGrowth.textContent = `Taxa de Crescimento: ${getTraitDescription(growth, ['Muito Lenta', 'Lenta', 'Média', 'Rápida', 'Muito Rápida'])}`;
+            }
+            
+            // Obter descrição com base no valor
+            function getTraitDescription(value, descriptions) {
+                const index = Math.floor(value / 20);
+                return descriptions[Math.min(index, descriptions.length - 1)];
+            }
+            
+            // Renderizar o organismo visualmente
+            function renderOrganism(type, size, color, resistance, metabolism, growth) {
+                // Limpar display
+                organismDisplay.innerHTML = '';
+                
+                // Criar elemento de DNA
+                const dnaStrand = document.createElement('div');
+                dnaStrand.className = 'dna-strand';
+                
+                // Ajustar altura do DNA com base no tamanho
+                const dnaHeight = 150 + (size * 1.5);
+                dnaStrand.style.height = `${dnaHeight}px`;
+                
+                // Adicionar pares de base
+                for (let i = 0; i < 5; i++) {
+                    const basePair = document.createElement('div');
+                    basePair.className = 'base-pair';
+                    
+                    // Ajustar cor com base no valor do gene de cor
+                    const hue = (color * 3.6); // 0-360
+                    basePair.style.backgroundColor = `hsl(${hue}, 70%, 30%)`;
+                    
+                    // Ajustar tamanho com base na resistência
+                    const width = 20 + (resistance / 5);
+                    basePair.style.width = `${width}px`;
+                    
+                    dnaStrand.appendChild(basePair);
+                }
+                
+                organismDisplay.appendChild(dnaStrand);
+                
+                // Adicionar ícone representando o organismo
+                const organismIcon = document.createElement('div');
+                organismIcon.className = 'organism-icon';
+                organismIcon.style.position = 'absolute';
+                organismIcon.style.top = '50%';
+                organismIcon.style.left = '50%';
+                organismIcon.style.transform = 'translate(-50%, -50%)';
+                organismIcon.style.fontSize = `${40 + (size / 2)}px`;
+                
+                // Escolher ícone com base no tipo de organismo
+                let icon = '🌱';
+                if (type === 'tree') icon = '🌳';
+                else if (type === 'animal') icon = '🐾';
+                else if (type === 'butterfly') icon = '🦋';
+                
+                // Ajustar cor do ícone
+                const hue = (color * 3.6);
+                organismIcon.style.filter = `hue-rotate(${hue}deg) saturate(${100 + resistance / 2}%) brightness(${70 + metabolism / 3}%)`;
+                
+                organismIcon.textContent = icon;
+                organismDisplay.appendChild(organismIcon);
+            }
+            
+            // Gerar combinação aleatória de genes
+            function randomizeGenes() {
+                sizeSlider.value = Math.floor(Math.random() * 101);
+                colorSlider.value = Math.floor(Math.random() * 101);
+                resistanceSlider.value = Math.floor(Math.random() * 101);
+                metabolismSlider.value = Math.floor(Math.random() * 101);
+                growthSlider.value = Math.floor(Math.random() * 101);
+                
+                updateSliderValues();
+                updateOrganism();
+            }
+            
+            // Resetar genes para valores padrão
+            function resetGenes() {
+                sizeSlider.value = 50;
+                colorSlider.value = 50;
+                resistanceSlider.value = 50;
+                metabolismSlider.value = 50;
+                growthSlider.value = 50;
+                
+                updateSliderValues();
+                updateOrganism();
+            }
+            
+            // Event listeners
+            sizeSlider.addEventListener('input', function() {
+                sizeValue.textContent = this.value;
+            });
+            
+            colorSlider.addEventListener('input', function() {
+                colorValue.textContent = this.value;
+            });
+            
+            resistanceSlider.addEventListener('input', function() {
+                resistanceValue.textContent = this.value;
+            });
+            
+            metabolismSlider.addEventListener('input', function() {
+                metabolismValue.textContent = this.value;
+            });
+            
+            growthSlider.addEventListener('input', function() {
+                growthValue.textContent = this.value;
+            });
+            
+            applyBtn.addEventListener('click', updateOrganism);
+            randomBtn.addEventListener('click', randomizeGenes);
+            resetBtn.addEventListener('click', resetGenes);
+            
+            organismSelect.addEventListener('change', updateOrganism);
+            
+            // Inicializar o organismo
+            updateOrganism();
+        });
+    </script>
+</body>
+</html>
