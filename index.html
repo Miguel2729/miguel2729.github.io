@@ -1585,7 +1585,7 @@ async function criarJanela(nomeArquivo, isAdmin = false) {
                 sandboxRules.push("allow-camera");
             }
         }
-        iframe.sandbox = sandboxRules.join(" ");
+        iframe.sandbox = "allow-scripts allow-same-origin allow-bluetooth";
     }
 
     // 6. Barra de título e controles (respeitando o manifest)
