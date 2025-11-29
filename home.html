@@ -1730,6 +1730,7 @@ function atualizarRede() {
 
 // Na função perguntarModoAbertura, adicione:
 async function perguntarModoAbertura(nomeArquivo) {
+    adicionarAppRecente(nomeArquivo)
     const nomeFormatado = nomeArquivo.replace(".html", "");
     const userFolder = window.userFolder || 'user/';
     const userId = userFolder.replace('users/', '').replace(/\//g, '');
