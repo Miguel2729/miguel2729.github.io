@@ -304,7 +304,9 @@
     </div>
   </div>
   
-  <iframe id="navegador" class="hidden" sandbox="allow-same-origin allow-scripts allow-popups allow-forms"></iframe>
+  <iframe id="navegador" class="hidden" 
+        sandbox="allow-same-origin allow-forms allow-scripts"
+        referrerpolicy="no-referrer"></iframe>
 
   <!-- Modal para adicionar atalhos -->
   <div class="modal" id="shortcutModal">
@@ -751,39 +753,22 @@
       };
     }
 
-    // Prevenção de redirecionamento
-    function preventRedirects() {
-      try {
-        // Prevenir redirecionamentos via beforeunload
-        iframe.contentWindow.addEventListener('beforeunload', (e) => {
-          return undefined;
-        });
-        
-        // Adicionar event listener para capturar cliques nos links
-        iframe.contentWindow.addEventListener('click', (e) => {
-          try {
-            const anchor = e.target.closest('a');
-            if (anchor && anchor.target !== '_blank') {
-              e.preventDefault();
-              e.stopPropagation();
-              
-              const href = anchor.href;
-              if (href && href !== 'about:blank' && href !== iframe.src) {
-                // Usar setTimeout para evitar problemas de execução
-                setTimeout(() => {
-                  carregarURL(href);
-                }, 10);
-              }
-            }
-          } catch (error) {
-            console.log('Não foi possível processar clique devido a política de mesma origem');
-          }
-        }, true);
-        
-      } catch (e) {
-        console.log("Não foi possível prevenir redirecionamentos devido a política de mesma origem");
-      }
+    // Atualização simples da URL - função corrigida
+function preventRedirects() {
+  // Esta função agora só atualiza a URL quando a página carrega
+  // Não tenta interceptar cliques (que não funciona entre origens diferentes)
+  try {
+    // Apenas tenta atualizar a URL atual quando a página carrega
+    const currentUrl = iframe.contentWindow.location.href;
+    if (currentUrl !== guias[guiaAtiva]) {
+      input.value = currentUrl;
+      guias[guiaAtiva] = currentUrl;
+      atualizarAbas();
     }
+  } catch (e) {
+    // Ignora erros de mesma origem - é normal
+  }
+}
 
     // Inicialização
     if (/Mobi|Android/i.test(navigator.userAgent)) {
@@ -796,4 +781,4 @@
     novaGuia();
   </script>
 </body>
-</html>
+      </html>
