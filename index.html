@@ -455,96 +455,112 @@ window.addEventListener('message', async (event) => {
 // Variável para armazenar dispositivos conectados
 const connectedDevices = new Map();
 
-// Função para escanear dispositivos Bluetooth
+// Função para escanear dispositivos Bluetooth - VERDADEIRA
 async function scanDevices() {
   try {
-    // Verificar se a API Bluetooth está disponível
-    if (!navigator.bluetooth) {
-      throw new Error('API Bluetooth não suportada neste navegador');
+    console.log("Iniciando escaneamento Bluetooth real...");
+    
+    // ✅ API BLUETOOTH REAL - método correto
+    const device = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: ['generic_access', 'battery_service']
+    });
+    
+    console.log("Dispositivo selecionado:", device);
+    
+    // Determinar tipo pelo nome
+    let type = 'unknown';
+    const name = device.name || 'Dispositivo Desconhecido';
+    
+    if (name.match(/fone|headset|headphone|som|sound|audio|jbl|sony|bose/i)) {
+      type = 'sound';
+    } else if (name.match(/projetor|projector|epson|benq|optoma/i)) {
+      type = 'proj';
+    } else if (name.match(/tela|screen|monitor|display|lg|samsung/i)) {
+      type = 'screen';
     }
     
-    // Solicitar dispositivos Bluetooth próximos
-    const devices = await navigator.bluetooth.getDevices();
+    const devices = [{
+      name: name,
+      id: device.id,
+      type: type
+    }];
     
-    // Filtrar apenas os tipos de dispositivos que nos interessam
-    const filteredDevices = [];
-    
-    for (const device of devices) {
-      // Tentar determinar o tipo do dispositivo pelo nome
-      let type = 'unknown';
-      
-      if (device.name && device.name.match(/fone|headset|headphone|som|sound|audio|jbl|sony|bose/i)) {
-        type = 'sound';
-      } else if (device.name && device.name.match(/projetor|projector|epson|benq|optoma/i)) {
-        type = 'proj';
-      } else if (device.name && device.name.match(/tela|screen|monitor|display|lg|samsung/i)) {
-        type = 'screen';
-      }
-      
-      filteredDevices.push({
-        name: device.name,
-        id: device.id,
-        type: type
-      });
-    }
-    
-    // Enviar os dispositivos encontrados de volta para o parent
+    // Enviar dispositivo encontrado de volta para o app Bluetooth
     if (window.parent && window.parent.postMessage) {
       window.parent.postMessage({
         type: 'bluetooth-devices',
-        devices: filteredDevices
+        devices: devices
       }, '*');
     }
+    
+    return devices;
+    
   } catch (error) {
-    throw new Error(`Falha ao escanear dispositivos: ${error.message}`);
+    console.error('Erro no scanDevices real:', error);
+    
+    // Se o usuário cancelar a seleção, não é um erro
+    if (error.name === 'NotFoundError') {
+      console.log('Usuário cancelou a seleção de dispositivo');
+      // Enviar lista vazia
+      if (window.parent && window.parent.postMessage) {
+        window.parent.postMessage({
+          type: 'bluetooth-devices',
+          devices: []
+        }, '*');
+      }
+      return [];
+    }
+    
+    // Para outros erros, enviar mensagem de erro
+    if (window.parent && window.parent.postMessage) {
+      window.parent.postMessage({
+        type: 'bluetooth-error',
+        error: `Erro Bluetooth: ${error.message}`
+      }, '*');
+    }
+    
+    throw error;
   }
 }
 
-// Função para conectar a um dispositivo Bluetooth
+// Função para conectar a um dispositivo Bluetooth - VERDADEIRA
 async function connectToDevice(name, type) {
   try {
-    // Verificar se a API Bluetooth está disponível
-    if (!navigator.bluetooth) {
-      throw new Error('API Bluetooth não suportada neste navegador');
-    }
+    console.log(`Conectando ao dispositivo: ${name} (${type})`);
     
     let options = {};
     
-    // Configurar filtros baseados no tipo de dispositivo
+    // Configurar filtros baseados no tipo
     switch(type) {
       case 'sound':
         options = {
-          filters: [
-            { name: name },
-            { services: ['audio_sink', 'handsfree'] }
-          ],
-          optionalServices: ['generic_access']
+          filters: [{ name: name }],
+          optionalServices: ['audio_sink', 'handsfree_audio_gateway', 'battery_service']
         };
         break;
         
       case 'proj':
       case 'screen':
         options = {
-          filters: [
-            { name: name },
-            { services: ['serial_port'] }
-          ],
-          optionalServices: ['generic_access']
+          filters: [{ name: name }],
+          optionalServices: ['serial_port', 'battery_service']
         };
         break;
         
       default:
         options = {
           filters: [{ name: name }],
-          optionalServices: ['generic_access']
+          optionalServices: ['generic_access', 'battery_service']
         };
     }
     
-    // Solicitar dispositivo Bluetooth
+    // ✅ CONEXÃO REAL
     const device = await navigator.bluetooth.requestDevice(options);
     
-    // Conectar ao dispositivo
+    // Conectar ao GATT Server
     const server = await device.gatt.connect();
+    console.log(`Conectado ao dispositivo: ${device.name}`);
     
     // Armazenar dispositivo conectado
     connectedDevices.set(name, {
@@ -553,7 +569,7 @@ async function connectToDevice(name, type) {
       type: type
     });
     
-    // Enviar confirmação de conexão para o parent
+    // Enviar confirmação
     if (window.parent && window.parent.postMessage) {
       window.parent.postMessage({
         type: 'bluetooth-connected',
@@ -562,10 +578,9 @@ async function connectToDevice(name, type) {
       }, '*');
     }
     
-    // Configurar listeners para eventos de desconexão
+    // Listener para desconexão
     device.addEventListener('gattserverdisconnected', () => {
       connectedDevices.delete(name);
-      
       if (window.parent && window.parent.postMessage) {
         window.parent.postMessage({
           type: 'bluetooth-disconnected',
@@ -576,6 +591,7 @@ async function connectToDevice(name, type) {
     });
     
   } catch (error) {
+    console.error(`Erro ao conectar com ${name}:`, error);
     throw new Error(`Falha ao conectar com ${name}: ${error.message}`);
   }
 }
