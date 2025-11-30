@@ -1184,7 +1184,7 @@ function abrirItem(icone) {
       }
       break;
     case "app":
-      parent.postMessage(`abrir ${nome}.html`, "*");
+      parent.postMessage(`abrir ${caminho}`, "*");
       break;
     default:
       // Para outros tipos de arquivo
@@ -1834,8 +1834,16 @@ function criarIcone(caminho, nome, slot, tipo, metadata = {}) {
     case "audio":
       iconImg = "imgs/file_audio.png";
       break;
-    case "app":
-      iconImg = "imgs/file_app.png";
+      case "app":
+  // CORREÇÃO: Para apps, tenta usar ícone personalizado
+  if (caminho.endsWith('.html')) {
+    const cleanName = caminho.replace('.html', '').split('/')[0];
+    const iconName = cleanName.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+    iconImg = `icons/${iconName}.png`;
+  } else {
+    iconImg = "imgs/file_app.png";
+  }
+  break;
       break;
     default:
       iconImg = "imgs/file.png";
