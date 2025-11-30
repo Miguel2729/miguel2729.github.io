@@ -1192,6 +1192,242 @@ document.getElementById("homeIframe").addEventListener("load", () => {
   }
 });
 
+async function criarJanelaCustom(nome, modo, codigoHTML) {
+    // 1. Verifica se a janela já existe
+    const existente = Array.from(document.querySelectorAll(".janela")).find(j => {
+        const titulo = j.querySelector(".titulo")?.textContent;
+        return titulo === nome;
+    });
+
+    if (existente) {
+        existente.style.display = "block";
+        existente.style.zIndex = ++zIndexAtual;
+        return;
+    }
+
+    // 2. Configurações padrão
+    const config = {
+        maximizable: true,
+        minimizable: true,
+        resizable: true,
+        width: "600px",
+        height: "400px"
+    };
+
+    // 3. Cria a janela com animação de abertura
+    const janela = document.createElement("div");
+    janela.className = "janela janela-abrindo";
+    janela.style.zIndex = ++zIndexAtual;
+    janela.style.width = config.width;
+    janela.style.height = config.height;
+
+    // Posicionamento inicial
+    const pos = posicoesJanelas[nome];
+    if (pos) {
+        janela.style.top = pos.top;
+        janela.style.left = pos.left;
+    } else {
+        janela.style.top = "50%";
+        janela.style.left = "50%";
+        janela.style.transform = "translate(-50%, -50%) scale(0.9)";
+    }
+
+    // 4. Cria a splash screen simplificada
+    const splash = document.createElement("div");
+    splash.className = "splash-screen";
+    splash.innerHTML = `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+            <div style="width: 50px; height: 50px; background: #0078d7; border-radius: 8px; margin-bottom: 10px;"></div>
+            <div>${nome}</div>
+        </div>
+    `;
+
+    // 5. Cria o conteúdo (inicialmente oculto)
+    const conteudo = document.createElement("div");
+    conteudo.className = "conteudo";
+    conteudo.style.display = "none";
+
+    // 6. Barra de título e controles
+    const barra = document.createElement("div");
+    barra.className = "barra";
+
+    // Container para ícone e título
+    const tituloContainer = document.createElement("div");
+    tituloContainer.style.display = "flex";
+    tituloContainer.style.alignItems = "center";
+    tituloContainer.style.gap = "8px";
+
+    // Ícone padrão
+    const iconeImg = document.createElement("img");
+    iconeImg.src = "imgs/app.png";
+    iconeImg.style.width = "16px";
+    iconeImg.style.height = "16px";
+    iconeImg.style.objectFit = "contain";
+
+    // Nome da janela
+    const titulo = document.createElement("div");
+    titulo.className = "titulo";
+    titulo.textContent = nome;
+
+    // Adiciona ícone e título ao container
+    tituloContainer.appendChild(iconeImg);
+    tituloContainer.appendChild(titulo);
+
+    const icones = document.createElement("div");
+    icones.className = "icones";
+
+    // Botão minimizar
+    if (config.minimizable !== false) {
+        const barBtn = document.createElement("button");
+        barBtn.className = "botao-janela botao-minimizar";
+        barBtn.textContent = "_";
+        barBtn.onclick = () => {
+            janela.style.display = "none";
+            
+            if (!window.janelasMinimizadas) {
+                window.janelasMinimizadas = [];
+            }
+            window.janelasMinimizadas.push({
+                elemento: janela,
+                nome: nome
+            });
+            
+            document.getElementById("homeIframe").contentWindow.postMessage("recents " + nome, "*");
+        };
+        icones.appendChild(barBtn);
+    }
+
+    // Botão maximizar
+    if (config.maximizable !== false) {
+        const fullBtn = document.createElement("button");
+        fullBtn.className = "botao-janela botao-maximizar";
+        fullBtn.textContent = "⛶";
+        let full = false, original = {};
+        
+        fullBtn.onclick = () => {
+            if (!full) {
+                const estilo = window.getComputedStyle(janela);
+                original = {
+                    top: estilo.top,
+                    left: estilo.left,
+                    width: estilo.width,
+                    height: estilo.height,
+                    transform: estilo.transform
+                };
+                
+                janela.classList.add("janela-maximizada");
+                Object.assign(janela.style, {
+                    top: "0",
+                    left: "0",
+                    width: "calc(100vw - 4px)",
+                    height: "calc(100vh - 4px)",
+                    transform: "none",
+                    transition: "all 0.3s ease-out"
+                });
+            } else {
+                janela.classList.remove("janela-maximizada");
+                Object.assign(janela.style, {
+                    top: original.top,
+                    left: original.left,
+                    width: original.width,
+                    height: original.height,
+                    transform: original.transform
+                });
+            }
+            full = !full;
+        };
+        icones.appendChild(fullBtn);
+    }
+
+    // Botão fechar
+    const fecharBtn = document.createElement("button");
+    fecharBtn.className = "botao-janela botao-fechar";
+    fecharBtn.textContent = "X";
+    fecharBtn.onclick = () => {
+        janela.classList.add("janela-fechando");
+        setTimeout(() => {
+            posicoesJanelas[nome] = {
+                top: janela.style.top,
+                left: janela.style.left
+            };
+            localStorage.setItem("posicoesJanelas", JSON.stringify(posicoesJanelas));
+            
+            if (window.janelasMinimizadas) {
+                window.janelasMinimizadas = window.janelasMinimizadas.filter(j => j.nome !== nome);
+            }
+            
+            janela.remove();
+        }, 300);
+    };
+    icones.appendChild(fecharBtn);
+
+    // Adiciona a barra e os controles à janela
+    barra.append(tituloContainer, icones);
+    janela.append(barra, splash, conteudo);
+
+    // 7. CORREÇÃO: Cria iframe e executa JavaScript
+    const iframe = document.createElement("iframe");
+    iframe.style.width = "100%";
+    iframe.style.height = "100%";
+    iframe.style.border = "none";
+    iframe.style.background = "white";
+
+    // Configura sandbox baseado no modo
+    if (modo === "seguro") {
+        iframe.sandbox = "allow-scripts allow-same-origin allow-forms";
+    } else if (modo === "admin") {
+        iframe.sandbox = "allow-scripts allow-same-origin allow-forms allow-popups allow-modals";
+    }
+
+    conteudo.appendChild(iframe);
+
+    // 8. Adiciona redimensionamento
+    if (config.resizable !== false) {
+        const alca = document.createElement("div");
+        alca.className = "alca-resize";
+        janela.appendChild(alca);
+        alca.addEventListener("touchstart", iniciarResizeMobile, { passive: false });
+        alca.addEventListener("mousedown", iniciarResizeDesktop);
+    }
+
+    // 9. Adiciona ao DOM
+    document.body.appendChild(janela);
+    
+    // Ativa o movimento na barra
+    ativarMovimento(janela, barra);
+
+    // 10. Quando o iframe carregar, escreve o conteúdo e executa JS
+    iframe.addEventListener("load", () => {
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        
+        // Adiciona viewport para modo desktop
+        const viewport = iframeDoc.createElement('meta');
+        viewport.name = 'viewport';
+        viewport.content = 'width=1200, initial-scale=1.0';
+        iframeDoc.head.appendChild(viewport);
+        
+        // Escreve o conteúdo HTML (isso executa JavaScript)
+        iframeDoc.write(codigoHTML);
+        iframeDoc.close();
+        
+        // Esconde a splash screen
+        splash.style.opacity = "0";
+        setTimeout(() => {
+            splash.style.display = "none";
+            conteudo.style.display = "block";
+        }, 300);
+    });
+
+    // 11. Inicia carregamento do iframe
+    iframe.src = "about:blank";
+
+    // 12. Finaliza animação de abertura
+    setTimeout(() => {
+        janela.classList.remove("janela-abrindo");
+        if (!pos) janela.style.transform = "translate(-50%, -50%)";
+    }, 10);
+}
+
 // Mensagens recebidas
 window.addEventListener("message", (e) => {
   // 1️⃣ Repassa "user:" para TODOS os iframes (exceto o remetente)
@@ -1202,7 +1438,8 @@ window.addEventListener("message", (e) => {
         iframe.contentWindow.postMessage(e.data, "*");
       }
     });
-  }
+}
+  
   
   if (e.data.startsWith("custom-user:")) {
     const iframes = document.querySelectorAll("iframe");
@@ -1309,6 +1546,28 @@ if (e.data.startsWith("abrir ")) {
       mostrarMensagem(`Janela já está aberta: ${nome}`);
     }
   }
+  
+  // No event listener window.addEventListener("message", (e) => { ... })
+// Adicione este caso:
+
+if (e.data.startsWith("abrir_custom ")) {
+    const partes = e.data.split(" ");
+    const nome = partes[1];
+    const modo = partes[2]; // "admin" ou "seguro"
+    const codigoHTML = e.data.substring(e.data.indexOf(partes[3])); // Pega o resto como código HTML
+    
+    const existente = Array.from(document.querySelectorAll(".janela")).find(j => {
+        const titulo = j.querySelector(".titulo")?.textContent;
+        return titulo === nome;
+    });
+    
+    if (!existente) {
+        criarJanelaCustom(nome, modo, codigoHTML);
+        mostrarMensagem(`Abrindo janela custom: ${nome}`);
+    } else {
+        mostrarMensagem(`Janela já está aberta: ${nome}`);
+    }
+}
 
   // 2️⃣ Repassa "user-selected:" para TODOS os iframes (exceto o remetente)
   if (e.data.startsWith("user-selected:")) {
