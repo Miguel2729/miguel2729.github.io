@@ -56,41 +56,127 @@ iframe#homeIframe {
   position: fixed;
   width: 600px;
   height: 400px;
-  background: #2c2c2c;
-  border: 2px solid #444;
-  box-shadow: 0 0 10px rgba(0,0,0,0.5);
+  background: #ffffff; /* Mantém o fundo */
+  border: 1px solid #e0e0e0; /* Bordas mais suaves */
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.08),
+    0 1px 3px rgba(0, 0, 0, 0.04); /* Sombras mais modernas */
   display: flex;
   flex-direction: column;
   overflow: hidden;
   z-index: 999999;
-  border-radius: 20px;
-  transition: transform 0.1s ease-out;
+  border-radius: 21px; /* Bordas arredondadas */
   transition: 
-    transform 0.3s ease-out,
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     width 0.3s ease-out,
     height 0.3s ease-out,
-    opacity 0.2s ease-out;
+    opacity 0.2s ease-out,
+    box-shadow 0.3s ease; /* Transições suaves */
   transform-origin: center center;
 }
 
+.barra {
+  background: linear-gradient(135deg, #ff6b35 0%, #9d4edd 100%); 
+  color: white;
+  padding: 12px 16px; /* Padding ajustado */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: move;
+  user-select: none;
+  touch-action: none;
+  border-radius: 12px 12px 0 0; /* Bordas arredondadas apenas no topo */
+  height: 18px; /* Altura consistente */
+}
+
+.titulo {
+  font-size: 15px;
+  flex: 1;
+  font-weight: 500; /* Fonte um pouco mais grossa */
+  letter-spacing: 0.2px; /* Espaçamento entre letras */
+}
+
+.conteudo {
+  flex: 1;
+  overflow: hidden;
+  background: #f8f9fa; /* Fundo mais claro para o conteúdo */
+  border-radius: 0 0 12px 12px; /* Bordas arredondadas apenas na base */
+}
+
+.alca-resize {
+  position: absolute;
+  width: 24px; /* Tamanho maior */
+  height: 24px;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #ff6b35 0%, #9d4edd 100%);
+  cursor: nwse-resize;
+  touch-action: none;
+  z-index: 1;
+  border-radius: 8px 0 12px 0; /* Bordas arredondadas específicas */
+  opacity: 0; /* Escondida por padrão */
+  transition: opacity 0.2s ease; /* Aparece suavemente */
+}
+
+.janela:hover .alca-resize {
+  opacity: 0.8; /* Aparece ao passar o mouse */
+}
+
+.botao-janela {
+  width: 32px; /* Tamanho um pouco maior */
+  height: 32px;
+  border-radius: 50%; /* Botões circulares */
+  border: none;
+  font-weight: 500;
+  font-size: 14px;
+  color: white;
+  margin-left: 5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease; /* Transição suave para hover */
+}
+
+.botao-janela:hover {
+  transform: scale(1.1); /* Efeito de zoom */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); /* Sombra no hover */
+}
+
+.botao-fechar {
+  background-color: #ff5f57; /* Vermelho mais moderno */
+  border-radius: 50%;
+}
+
+.botao-minimizar {
+  background-color: #ffbd2e; /* Amarelo mais suave */
+  color: black;
+  border-radius: 50%;
+}
+
+.botao-maximizar {
+  background-color: #28c940; /* Verde mais moderno */
+  border-radius: 50%;
+}
+
 .janela-abrindo {
-  transform: scale(0.9);
+  transform: scale(0.95) translateY(10px); /* Animação mais suave */
   opacity: 0;
 }
 
-/* Animação ao fechar */
 .janela-fechando {
-  transform: scale(0.9) translateY(20px);
+  transform: scale(0.95) translateY(20px); /* Animação mais suave */
   opacity: 0;
 }
 
-/* Estado maximizado */
 .janela-maximizada {
   transition: 
-    width 0.3s ease-out,
-    height 0.3s ease-out,
-    top 0.3s ease-out,
-    left 0.3s ease-out;
+    width 0.3s cubic-bezier(0.2, 0, 0.2, 1),
+    height 0.3s cubic-bezier(0.2, 0, 0.2, 1),
+    top 0.3s cubic-bezier(0.2, 0, 0.2, 1),
+    left 0.3s cubic-bezier(0.2, 0, 0.2, 1);
+  border-radius: 0; /* Sem bordas arredondadas quando maximizada */
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); /* Sombra mais forte */
 }
 
 .splash-screen {
@@ -99,39 +185,27 @@ iframe#homeIframe {
   left: 0;
   width: 100%;
   height: 100%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradiente */
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  background-color: #f0f0f0;
   display: none;
   justify-content: center;
   align-items: center;
   z-index: 10;
   transition: opacity 0.3s ease-out;
-}
-
-.barra {
-  background: #333;
-  color: white;
-  padding: 6px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: move;
-  user-select: none;
-  touch-action: none;
-  border-radius: 8px;
-}
-
-.titulo {
-  font-size: 14px;
-  flex: 1;
+  border-radius: 12px; /* Mesmas bordas arredondadas */
 }
 
 .icones {
   display: flex;
-  gap: 6px;
+  gap: 8px; /* Espaçamento maior entre botões */
 }
+
+
+
+
+
 
 .icones img {
   width: 24px;
@@ -150,17 +224,6 @@ iframe#homeIframe {
   border: none;
 }
 
-.alca-resize {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-  right: 0;
-  bottom: 0;
-  background: #555;
-  cursor: nwse-resize;
-  touch-action: none;
-  z-index: 1;
-}
 
 #notificacao {
   position: fixed;
@@ -328,33 +391,8 @@ iframe#homeIframe {
       100% { transform: scale(1); opacity: 0.8; }
     }
     
-    .botao-janela {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  border: none;
-  font-weight: bold;
-  font-size: 16px;
-  color: white;
-  margin-left: 5px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.botao-fechar {
-  background-color: #e81123; /* vermelho Windows 7 */
-}
 
-.botao-minimizar {
-  background-color: #FFDD00; /* amarelo suave */
-  color: black;
-}
-
-.botao-maximizar {
-  background-color: #16c60c; /* verde Windows 7 */
-}
   </style>
 </head>
 <body>
@@ -2273,15 +2311,11 @@ function fatalError(motivo = 0) {
   const erro = mensagensErro[motivo] || mensagensErro.default;
   console.error(erro.msg);
 
-  // Enviar mensagem para o parent após 4 segundos
-  setTimeout(() => {
-    parent.postMessage(`errcod: ${motivo}`, '*');
-  }, 4000);
-
   if (erro.critico) {
     const iframe = document.getElementById("homeIframe");
     if (iframe) {
       iframe.src = "bsod.html";
+      parent.postMessage(`errcod: ${motivo}`);
     }
   }
 }

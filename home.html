@@ -4,186 +4,253 @@
   <meta charset="UTF-8" />
   <title>Home</title>
   <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      font-family: sans-serif;
-    }
-
-    body { 
-      margin: 0;
-      padding: 0;
-      background: none;
-      color: white;
-       background-color: var(--bg-color);
-       color: var(--text-color);
-    }
-    
-    :root {
+:root {
   --bg-color: #202020;
   --text-color: #fff;
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.36);
+  --primary-color: #0078D7;
+  --primary-glow: rgba(0, 120, 215, 0.3);
+  --hover-color: rgba(255, 255, 255, 0.1);
+  --transition-speed: 0.25s;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: none;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 img {
   filter: none !important;
   color-scheme: light dark;
 }
- 
+
 #conteudoPrincipal {
   height: 100%;
   width: 100%;
 }
 
-    #barraTarefas {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 60px;
-      background: rgba(20, 20, 20, 0.95);
-      display: flex;
-      align-items: center;
-      padding: 0 15px;
-      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.6);
-      z-index: 1000;
-      gap: 5px;
-    }
+/* LIQUID GLASS EFFECT */
+.liquid-glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 12px;
+}
 
-    #menuIniciar {
-      width: 50px;
-      height: 50px;
-      background: #E500FF;
-      color: white;
-      font-size: 24px;
-      text-align: center;
-      line-height: 50px;
-      border-radius: 4px;
-      cursor: pointer;
-      user-select: none;
-    }
+/* BARRA DE TAREFAS MODERNA */
+#barraTarefas {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  z-index: 1000;
+  gap: 8px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(40px) saturate(200%);
+  -webkit-backdrop-filter: blur(40px) saturate(200%);
+  border-top: 1px solid var(--glass-border);
+  box-shadow: 0 -1px 20px rgba(0, 0, 0, 0.2);
+}
 
-    #appsRecentes {
-      display: flex;
-      gap: 8px;
-      flex: 1;
-      align-items: center;
-      overflow-x: auto;
-    }
+#menuIniciar {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--primary-color), #9B4DFF);
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  transition: all var(--transition-speed) ease;
+  box-shadow: 0 4px 12px var(--primary-glow);
+}
 
-    #appsRecentes .icone {
-      background: #333;
-      padding: 8px 12px;
-      border-radius: 4px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
+#menuIniciar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 20px var(--primary-glow);
+}
 
-    #appsRecentes .icone:hover {
-      background: #555;
-    }
+#appsRecentes {
+  display: flex;
+  gap: 6px;
+  flex: 1;
+  align-items: center;
+  overflow-x: auto;
+  padding: 0 8px;
+}
 
-    #painelMenu {
-      position: fixed;
-      bottom: 70px;
-      left: 10px;
-      width: 600px; /* Aumentado de 300px para 600px */
-      max-height: 70vh;
-      background: rgba(20, 20, 20, 0.95);
-      border-radius: 8px;
-      padding: 10px;
-      box-shadow: 0 0 10px #000;
-      overflow-y: auto;
-      z-index: 999;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.25s ease;
-      display: flex; /* Adicionado para layout flexível */
-    }
-    
-        /* Divisão do painel em duas colunas */
-    #painelMenuEsquerdo {
-      width: 300px; /* Mantém o tamanho original */
-      padding-right: 10px;
-      border-right: 1px solid #444;
-    }
+#appsRecentes .icone {
+  background: var(--glass-bg);
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all var(--transition-speed) ease;
+  border: 1px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+}
 
-    #painelMenuDireito {
-      width: 300px;
-      padding-left: 10px;
-    }
+#appsRecentes .icone:hover {
+  background: var(--hover-color);
+  border-color: var(--glass-border);
+  transform: translateY(-2px);
+}
 
-    #painelMenu.aberto {
-      opacity: 1;
-      pointer-events: auto;
-    }
+#appsRecentes .icone img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+}
 
-    h3 {
-      margin: 8px 0 4px;
-      font-size: 16px;
-      border-bottom: 1px solid #444;
-      padding-bottom: 4px;
-    }
+#appsRecentes .icone span {
+  font-size: 12px;
+  color: white;
+}
 
-    .icone, .botao {
-      display: inline-block;
-      padding: 10px 12px;
-      margin: 4px 4px 0 0;
-      background: #333;
-      border-radius: 4px;
-      cursor: pointer;
-      user-select: none;
-      text-align: center;
-      font-size: 14px;
-    }
+/* PAINEL DO MENU INICIAR MODERNO */
+#painelMenu {
+  position: fixed;
+  bottom: 60px;
+  left: 16px;
+  width: 640px;
+  max-height: 70vh;
+  border-radius: 16px;
+  padding: 0;
+  overflow: hidden;
+  z-index: 999;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  transform: translateY(20px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  display: flex;
+}
 
-    .icone:hover, .botao:hover {
-      background-color: #555;
-    }
+#painelMenu.aberto {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
 
-    .area {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-bottom: 12px;
-    }
+#painelMenuEsquerdo {
+  width: 320px;
+  padding: 20px;
+  border-right: 1px solid var(--glass-border);
+  overflow-y: auto;
+  max-height: 70vh;
+}
 
-    .botoes {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+#painelMenuDireito {
+  width: 320px;
+  padding: 20px;
+  overflow-y: auto;
+  max-height: 70vh;
+}
+
+h3 {
+  margin: 20px 0 12px 0;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: rgba(255, 255, 255, 0.7);
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.icone, .botao {
+  display: inline-block;
+  padding: 12px 16px;
+  margin: 4px 4px 0 0;
+  background: var(--glass-bg);
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  font-size: 14px;
+  transition: all var(--transition-speed) ease;
+  border: 1px solid transparent;
+}
+
+.icone:hover, .botao:hover {
+  background: var(--hover-color);
+  border-color: var(--glass-border);
+  transform: translateY(-2px);
+}
+
+.area {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 5px;
+}
+
+.botoes {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
 
 #painelDireito {
   margin-left: auto;
   display: flex;
-  gap: 5px;
-  align-items: center; /* Centraliza verticalmente */
-  height: 60%; /* Obrigatório */
-  padding: 0 5px; /* Espaçamento interno opcional */
+  gap: 6px;
+  align-items: center;
+  height: 100%;
+  padding: 0 8px;
 }
 
 .painelMini {
-  background: transparent !important;
-  padding: 0 10px; /* Ajuste o padding horizontal (vertical deve ser 0) */
-  margin: 0; /* Remove margens */
-  border-radius: 0;
+  background: transparent;
+  padding: 0 12px;
+  margin: 0;
+  border-radius: 8px;
   font-size: 12px;
   cursor: default;
   user-select: none;
-  height: 60%; /* Ocupa toda a altura do #painelDireito */
+  height: 32px;
   display: flex;
-  align-items: center; /* Centraliza o conteúdo verticalmente */
-  justify-content: center; /* Centraliza horizontalmente (opcional) */
+  align-items: center;
+  justify-content: center;
   transition: background 0.2s;
 }
 
 .painelMini:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
+  background: var(--hover-color);
 }
 
-/* Estilo específico para o relógio */
 #relogio {
   font-family: 'Segoe UI', sans-serif;
   font-weight: 400;
@@ -196,47 +263,54 @@ img {
 }
 
 #relogio .hora {
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 #relogio .data {
   font-size: 11px;
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
-    #painelRecentes {
-      position: fixed;
-      bottom: 70px;
-      right: 10px;
-      background: rgba(20, 20, 20, 0.95);
-      color: white;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px #000;
-      display: none;
-      max-width: 200px;
-      max-height: 50vh;
-      overflow-y: auto;
-      transition: opacity 0.2s ease;
-      opacity: 0;
-    }
+#painelRecentes {
+  position: fixed;
+  bottom: 60px;
+  right: 16px;
+  padding: 16px;
+  border-radius: 16px;
+  display: none;
+  max-width: 240px;
+  max-height: 50vh;
+  overflow-y: auto;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 0;
+  transform: translateY(10px);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
 
-    #painelRecentes.aberto {
-      display: block;
-      opacity: 1;
-    }
+#painelRecentes.aberto {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
 #areaTrabalho {
   position: absolute;
   width: 100%;
-  height: 100%;
-  background-image: url("wallpapers/wallpaper9.png");
+  height: calc(100% - 48px);
+  background-image: url("wallpapers/wallpaper18.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  z-index: 0; /* isso garante que ela fique no fundo */
-  top: 0;
+  z-index: 10;
+  top: 48px;
   left: 0;
+  overflow: visible;
 }
+
 .iconeDesktop {
   width: 80px;
   text-align: center;
@@ -244,45 +318,103 @@ img {
   pointer-events: auto;
   user-select: none;
   -webkit-user-drag: none;
+  transition: transform 0.2s ease;
+  position: absolute;
+  z-index: 50;
+}
+
+.iconeDesktop:hover {
+  transform: scale(1.05);
 }
 
 .iconeDesktop img {
   width: 48px;
   height: 48px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.2));
+  /* CORREÇÃO: Remover background transparente que estava escondendo a imagem */
+  background: transparent !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
 }
+
+/* Estilo específico para ícones da área de trabalho - CORREÇÃO */
+.iconeDesktop span.nome-icone {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.5);
+  padding: 2px 4px;
+  border-radius: 4px;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
 .usuario-info {
   position: relative;
   display: flex;
   align-items: center;
-  padding: 10px 15px;
-  border-bottom: 1px solid #444;
-  background-color: rgba(0, 0, 0, 0.2);
-  z-index: 1;
+  padding: 12px 20px;
+  z-index: 100;
+  height: 48px;
+  box-sizing: border-box;
+  
+  /* EFEITO LIQUID GLASS INTENSO */
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(50px) saturate(200%);
+  -webkit-backdrop-filter: blur(50px) saturate(200%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  
+  /* Gradiente sutil para mais profundidade */
+  background-image: 
+    linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.08) 0%,
+      rgba(255, 255, 255, 0.02) 100%
+    );
+  
+  /* Sombra superior */
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.03),
+    0 4px 20px rgba(0, 0, 0, 0.25);
 }
 
 .usuario-info img {
   width: 40px;
   height: 40px;
-  border-radius: 50%;
-  margin-right: 10px;
+  border-radius: 10px;
+  margin-right: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .usuario-info span {
-  font-weight: bold;
+  font-weight: 600;
   color: white;
   font-size: 16px;
 }
 
 #buscaApp {
   width: 100%;
-  padding: 8px 10px;
-  margin-bottom: 10px;
+  padding: 12px 16px;
+  margin-bottom: 16px;
   border: none;
-  border-radius: 50px;
+  border-radius: 12px;
   font-size: 14px;
-  background-color: #222;
+  background: rgba(255, 255, 255, 0.1);
   color: white;
-  width: calc(100% - 20px);
+  transition: all var(--transition-speed) ease;
+  border: 1px solid transparent;
+}
+
+#buscaApp:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
 #botaoPower {
@@ -295,53 +427,67 @@ img {
 #botaoPower img {
   width: 32px;
   height: 32px;
+  transition: transform 0.2s ease;
+}
+
+#botaoPower img:hover {
+  transform: scale(1.1);
 }
 
 .popupPower {
   display: none;
   position: absolute;
-  bottom: 40px;
+  bottom: 45px;
   right: 0;
-  background-color: #111;
-  border: 1px solid #444;
-  border-radius: 6px;
-  box-shadow: 0 0 6px #000;
+  border-radius: 12px;
   overflow: hidden;
   z-index: 999;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
 .popupPower div {
-  padding: 8px 12px;
+  padding: 12px 16px;
   color: white;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
 .popupPower div:hover {
-  background-color: #333;
+  background: var(--hover-color);
 }
 
 .menu-contextual {
   position: absolute;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  z-index: 9999;
+  border-radius: 12px;
+  z-index: 10000;
   padding: 8px;
-  font-family: sans-serif;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  min-width: 160px;
+  display: none;
 }
+
 .menu-contextual button {
   display: block;
   width: 100%;
   background: none;
   border: none;
   text-align: left;
-  padding: 6px 10px;
+  padding: 10px 12px;
   font-size: 14px;
   cursor: pointer;
+  border-radius: 6px;
+  color: white;
+  transition: background 0.2s;
 }
+
 .menu-contextual button:hover {
-  background-color: #ddd;
+  background: var(--hover-color);
 }
 
 .loading-ring {
@@ -359,35 +505,21 @@ img {
   width: 64px;
   height: 64px;
   margin: 8px;
-  border: 8px solid #00aaff;
+  border: 8px solid var(--primary-color);
   border-radius: 50%;
   animation: loadingRing 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-  border-color: #00aaff transparent transparent transparent;
-}
-
-.loading-ring div:nth-child(1) {
-  animation-delay: -0.45s;
-}
-.loading-ring div:nth-child(2) {
-  animation-delay: -0.3s;
-}
-.loading-ring div:nth-child(3) {
-  animation-delay: -0.15s;
+  border-color: var(--primary-color) transparent transparent transparent;
 }
 
 @keyframes loadingRing {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 #bootAnimation {
   position: fixed;
   inset: 0;
-  background-color: black;
+  background: linear-gradient(135deg, #000428, #004e92);
   color: #00aaff;
   font-size: 5em;
   display: flex;
@@ -408,205 +540,160 @@ img {
   to { transform: translateY(0); opacity: 1; }
 }
 
-  .dia-evento {
-    border: 2px solid red !important;
-    border-radius: 50% !important;
-  }
-  
-  /* Painel de Configurações */
+.dia-evento {
+  border: 2px solid var(--primary-color) !important;
+  border-radius: 50% !important;
+}
+
+/* PAINEL DE CONFIGURAÇÕES MODERNO */
 #painelConfig {
   position: fixed;
-  bottom: 70px;
-  right: 10px;
-  width: 250px;
-  background: rgba(20, 20, 20, 0.98);
-  color: white;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  bottom: 60px;
+  right: 16px;
+  width: 300px;
+  border-radius: 16px;
+  padding: 20px;
   display: none;
   z-index: 999;
-  backdrop-filter: blur(10px);
-  border: 1px solid #444;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
 }
 
-/* Controles deslizantes */
-#painelConfig input[type="range"] {
-  -webkit-appearance: none;
+#verTudo {
   width: 100%;
-  height: 6px;
-  border-radius: 3px;
-  background: #444;
-  outline: none;
-  margin: 10px 0;
-}
-
-#painelConfig input[type="range"]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: #0078D7;
-  cursor: pointer;
-  border: 2px solid white;
-}
-
-/* Botões do painel */
-#painelConfig button {
-  background: #333;
+  padding: 12px;
+  margin: 8px 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
   color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all var(--transition-speed) ease;
 }
 
-#painelConfig button:hover {
-  background: #444;
+#verTudo:hover {
+  background: var(--hover-color);
+  transform: translateY(-2px);
 }
 
-/* Botão ⚙️ na barra de tarefas */
-#menuConfig {
-  cursor: pointer;
-  transition: transform 0.3s;
-}
-
-#menuConfig:hover {
-  transform: rotate(90deg);
-  background: #333;
-}
-
-    #verTudo {
-      width: calc(100% - 20px); /* Ajuste para o padding */
-    }
-    
-    .icone {
-  width: 80px;
-  height: 80px;
+.icone {
+  width: 84px;
+  height: 84px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 8px;
+  padding: 12px;
   margin: 4px;
   text-align: center;
-  background: #333;
-  border-radius: 4px;
-  transition: background 0.2s;
+  background: var(--glass-bg);
+  border-radius: 12px;
+  transition: all var(--transition-speed) ease;
   cursor: pointer;
   user-select: none;
+  border: 1px solid transparent;
 }
 
 .icone:hover {
-  background: #555;
+  background: var(--hover-color);
+  border-color: var(--glass-border);
+  transform: translateY(-2px);
 }
 
 .icone img {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
+  /* CORREÇÃO: Garantir que ícones sejam visíveis */
+  background: transparent !important;
+  filter: none !important;
 }
 
 .icone span {
   font-size: 12px;
   word-break: break-word;
   max-width: 100%;
+  line-height: 1.2;
 }
 
-/* NOVOS ESTILOS PARA OS CONTROLES DESLIZANTES - ONE UI 7.0 STYLE */
+/* SLIDERS MODERNOS */
 .oneui-slider {
   -webkit-appearance: none;
   width: 100%;
-  height: 4px;
-  border-radius: 2px;
-  background: #444;
+  height: 6px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.1);
   outline: none;
   margin: 15px 0;
   transition: all 0.2s ease;
 }
 
 .oneui-slider:hover {
-  background: #555;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .oneui-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
-  background: #0078D7;
+  background: var(--primary-color);
   cursor: pointer;
   border: 3px solid white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 4px 12px rgba(0, 120, 215, 0.4);
   transition: all 0.2s ease;
 }
 
 .oneui-slider::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 120, 215, 0.6);
 }
 
-.oneui-slider::-moz-range-thumb {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #0078D7;
-  cursor: pointer;
-  border: 3px solid white;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
-}
-
-.oneui-slider::-moz-range-thumb:hover {
-  transform: scale(1.15);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
-}
-
-/* Estilo para os rótulos */
 .slider-label {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 5px;
+  margin-bottom: 8px;
   font-size: 13px;
-  color: #ccc;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .slider-value {
-  font-weight: bold;
-  color: #0078D7;
+  font-weight: 600;
+  color: var(--primary-color);
   min-width: 30px;
   text-align: right;
 }
 
-/* Container para agrupar controles relacionados */
 .slider-group {
-  margin-bottom: 20px;
-  padding-bottom: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .slider-group:last-child {
   border-bottom: none;
-  margin-bottom: 15px;
+  margin-bottom: 20px;
 }
 
-/* Menu contextual para ícones de apps */
+/* MENU CONTEXTUAL APPS */
 .menu-contextual-app {
   position: absolute;
-  background: rgba(30, 30, 30, 0.98);
-  border: 1px solid #444;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-  z-index: 10000;
+  border-radius: 12px;
+  z-index: 10001;
   padding: 6px 0;
-  min-width: 180px;
-  backdrop-filter: blur(10px);
-  font-family: sans-serif;
+  min-width: 200px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(200%);
+  -webkit-backdrop-filter: blur(30px) saturate(200%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  font-family: 'Segoe UI', sans-serif;
 }
 
 .menu-contextual-app button {
@@ -615,26 +702,170 @@ img {
   background: none;
   border: none;
   text-align: left;
-  padding: 8px 12px;
+  padding: 10px 16px;
   font-size: 13px;
   color: white;
   cursor: pointer;
   transition: background 0.2s;
+  border-radius: 0;
 }
 
 .menu-contextual-app button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-}
-
-.menu-contextual-app button:active {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: var(--hover-color);
 }
 
 .menu-contextual-app .separator {
   height: 1px;
-  background-color: #444;
+  background-color: var(--glass-border);
   margin: 4px 0;
 }
+
+/* PAINEL DE ARQUIVOS */
+#painelFS {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  width: 340px;
+  max-height: 70vh;
+  overflow: auto;
+  border-radius: 16px;
+  padding: 20px;
+  display: none;
+  z-index: 9999;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* MODAL EDITOR */
+#modalEditor {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  backdrop-filter: blur(10px);
+}
+
+#modalEditor > div {
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(200%);
+  padding: 24px;
+  border-radius: 16px;
+  width: 500px;
+  max-width: 90%;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* PAINEL CALENDÁRIO */
+#painelCalendario {
+  position: fixed;
+  top: 100px;
+  right: 20px;
+  width: 300px;
+  border-radius: 16px;
+  padding: 20px;
+  display: none;
+  z-index: 9999;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* PAINEL CADERNO */
+#painelCaderno {
+  position: fixed;
+  top: 100px;
+  right: 340px;
+  width: 320px;
+  height: 320px;
+  border-radius: 16px;
+  padding: 20px;
+  display: none;
+  z-index: 9999;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* DEBUG MENSAGEM */
+#debugMensagem {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  z-index: 9999;
+  display: none;
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+}
+
+/* ANIMAÇÕES ADICIONAIS */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* SCROLLBAR MODERNA */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* CORREÇÃO: Scrollbar específica para painéis */
+#painelMenuEsquerdo::-webkit-scrollbar,
+#painelMenuDireito::-webkit-scrollbar {
+  width: 6px;
+}
+
+#painelMenuEsquerdo::-webkit-scrollbar-track,
+#painelMenuDireito::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+#painelMenuEsquerdo::-webkit-scrollbar-thumb,
+#painelMenuDireito::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+
+
   </style>
 </head>
 <body>
@@ -1065,7 +1296,7 @@ function criarUsuarioVirtual(nome, fotoBase64) {
   resetarConfiguracoesPadrao();
   
   // Definir wallpaper padrão
-  setUserWallpaper('wallpaper1.png');
+  setUserWallpaper('wallpaper18.png');
   
   // Carregar dados
   carregarDadosUsuario();
@@ -1320,8 +1551,8 @@ function carregarDadosUsuario() {
   if (wallpaperSalvo) {
     area.style.backgroundImage = `url("wallpapers/${wallpaperSalvo}")`;
   } else {
-    area.style.backgroundImage = 'url("wallpapers/wallpaper1.png")';
-    setUserWallpaper('wallpaper1.png');
+    area.style.backgroundImage = 'url("wallpapers/wallpaper18.png")';
+    setUserWallpaper('wallpaper18.png');
   }
 }
 
@@ -2046,7 +2277,7 @@ setTimeout(() => {
       const areaTrabalho = document.getElementById("areaTrabalho");
       areaTrabalho.style.backgroundImage = wallpaperSalvo 
         ? `url("wallpapers/${wallpaperSalvo}")`
-        : 'url("wallpapers/wallpaper1.png")';
+        : 'url("wallpapers/wallpaper18.png")';
 
       // Ícones da área de trabalho
       fetch(`${userFolder}files.json`)
@@ -2112,7 +2343,7 @@ function renderizarArquivos() {
 
   for (const nome in estrutura) {
     const item = estrutura[nome];
-    const tipo = item.bin ? "📄" : "📁";
+    const tipo = item.bin ? "📄" : "??";
 
     const div = document.createElement("div");
     div.style.padding = "4px 0";
@@ -2458,7 +2689,7 @@ function getUserWallpaper() {
   // 4. Fallback para usuários físicos (compatibilidade com sistema antigo)
   try {
     // Verifica se existe um wallpaper padrão na pasta do usuário físico
-    const defaultWallpaper = 'wallpaper1.png';
+    const defaultWallpaper = 'wallpaper18.png';
     const testUrl = `${userFolder}wallpapers/${defaultWallpaper}`;
     
     // Esta é uma verificação assíncrona simulada
@@ -2466,7 +2697,7 @@ function getUserWallpaper() {
     return defaultWallpaper; // Assume que existe como fallback
   } catch (e) {
     console.warn("Wallpaper padrão não encontrado, usando fallback");
-    return 'wallpaper1.png'; // Fallback absoluto
+    return 'wallpaper18.png'; // Fallback absoluto
   }
 }
 

@@ -7,14 +7,14 @@ console(para ver avisos, informações e erros (aperte f12 para abrir )).
 barra de tarefas:
 os aplicativos aparecem lá sempre que você clicar no botão amerelo da janela, tem uma parte para mostrar hora e data, status de rede, clima, e o botão "⚙️".
 
-menu iniciar(botão 🟦):
+menu iniciar(botão ☰):
 mostra os aplicativos e alguns botões, opções de desligar e reiniciar(botão power) e uma barra de pesquisa, inicialmente exibe os 8 primeiros aplicativos, clique em ver tudo para ver tudo e clique em ocultar para voltar a ver 8 apps.
 
 botão "⚙️":
 clique nele para ajustar brilho, volume, conectar Bluetooth, e customizar.
 
 janelas:
-o x vermelho fecha, "_" vai ocultar e colocar na barra de tarefas, "□" deixa em tela cheia, para mover arraste a barra cinza da janela, para Redimensionar você deve Arrastar o quadradinho cinza que está no canto inferior direito da janela que pode ser movido livremente para Redimensionar.
+o x vermelho fecha, "_" vai ocultar e colocar na barra de tarefas, "⛶" deixa em tela cheia, para mover arraste a barra cinza da janela, para Redimensionar você deve Arrastar o quadradinho cinza que está no canto inferior direito da janela que pode ser movido livremente para Redimensionar.
 
 app não funciona:
 se o app não está funcionando corretamente tente abrir como administrador.
@@ -25,7 +25,6 @@ botões superiores:
 📁 - arquivos.
 
 dicas:
-aperte "m" no seu teclado para entrar em modo seleção de janela
 aperte o botão direito(ou use toque longo se estiver no celular) para abrir um menu contextual
 arraste o mouse enquanto presiona o botão direito para selecionar uma área e poder traduzir, pesquisar e copiar.
 

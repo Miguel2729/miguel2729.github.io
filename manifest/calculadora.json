@@ -1,7 +1,7 @@
 {
-  "resizable": false,
+  "resizable": true,
   "minimizable": true,
   "maximizable": false,
-  "width": "300px",
-  "height": "420px"
+  "width": "320px",
+  "height": "440px"
 }

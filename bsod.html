@@ -100,48 +100,46 @@
     </div>
   </div>
   <script>
-    // Inicializa a mensagem de erro como "Carregando..."
-    document.getElementById("mensagemErro").textContent = "Carregando...";
+// Inicializa a mensagem de erro como "Carregando..."
+document.getElementById("mensagemErro").textContent = "Carregando...";
 
-    // Função para atualizar a mensagem de erro na tela
-    function atualizarMensagemErro(mensagem) {
-      document.getElementById("mensagemErro").textContent = `Código do erro: ${mensagem}`;
-    }
+// Função para atualizar a mensagem de erro na tela
+function atualizarMensagemErro(mensagem) {
+  document.getElementById("mensagemErro").textContent = `Código do erro: ${mensagem}`;
+}
 
-    // Ouvinte para mensagens do parent
-    window.addEventListener('message', function(event) {
-      // Verifica se a mensagem começa com "errcod:"
-      if (typeof event.data === 'string' && event.data.startsWith("errcod:")) {
-        // Remove o prefixo "errcod:" e atualiza a mensagem de erro
-        const codigoErro = event.data.substring(7).trim();
-        atualizarMensagemErro(codigoErro);
-      }
-    });
+// Ouvinte para mensagens do parent - CORRIGIDO
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.startsWith("errcod: ")) {
+    const erro = e.data.slice(8); // Remove "errcod: "
+    document.getElementById("mensagemErro").textContent = erro;
+  }
+});
 
-    // Envia mensagem ao parent (caso usado em iframe)
-    parent.postMessage("fechar_tudo", "*");
+// Envia mensagem ao parent (caso usado em iframe)
+parent.postMessage("fechar_tudo", "*");
 
-    // Faz o conteúdo aparecer após 1 segundo
-    setTimeout(() => {
-      document.querySelector(".container").classList.remove("escondido");
-      document.querySelector(".container").classList.add("visivel");
-    }, 1000);
+// Faz o conteúdo aparecer após 1 segundo
+setTimeout(() => {
+  document.querySelector(".container").classList.remove("escondido");
+  document.querySelector(".container").classList.add("visivel");
+}, 1000);
 
-    function fastboot() {
-      parent.postMessage('fastboot', '*');
-    }
+function fastboot() {
+  parent.postMessage('fastboot', '*');
+}
 
-    function recovery() {
-      parent.postMessage('recovery', '*');
-    }
+function recovery() {
+  parent.postMessage('recovery', '*');
+}
 
-    function desligar() {
-      parent.postMessage('desligar', '*');
-    }
+function desligar() {
+  parent.postMessage('desligar', '*');
+}
 
-    function reiniciar() {
-      parent.postMessage('reboot', '*');
-    }
+function reiniciar() {
+  parent.postMessage('reboot', '*');
+}
   </script>
 </body>
 </html>

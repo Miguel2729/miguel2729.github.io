@@ -10,8 +10,6 @@
   "pintar.html",
   "notas.html",
   "flappy_bird.html",
-  "clima.html",
-  "minecraft.html",
   "arquivos.html",
   "manual.html",
   "gravador.html",
@@ -21,6 +19,6 @@
   "musica/index.html",
   "config.html",
   "camera.html",
-  "controles_parentais.html",
-  "app_store/index.html"
+  "app_store/index.html",
+  "app_manager.html"
 ]
