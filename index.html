@@ -1,0 +1,141 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>WebProxy para Navegadores Antigos</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .url-input {
+            width: 70%;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+        }
+        .submit-btn {
+            padding: 8px 20px;
+            font-size: 16px;
+            background: #0066cc;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .bookmarklet {
+            background: #ffcc00;
+            padding: 10px;
+            margin: 20px 0;
+            border: 1px solid #cc9900;
+        }
+        .features {
+            margin-top: 30px;
+        }
+        .feature {
+            background: #e6f2ff;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #0066cc;
+        }
+        .warning {
+            background: #fff3cd;
+            padding: 10px;
+            margin: 20px 0;
+            border: 1px solid #ffeaa7;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌐 WebProxy Universal</h1>
+        <p><strong>Compatível com navegadores antigos (TVs, dispositivos legados)</strong></p>
+        
+        <div class="warning">
+            <strong>⚠️ Atenção:</strong> Este proxy simplifica sites modernos para funcionar em navegadores antigos. 
+            Alguns recursos como JavaScript avançado, vídeos e WebGL podem não funcionar.
+        </div>
+        
+        <form method="get" action="/proxy" target="_top">
+            <p>
+                <label for="url"><strong>Digite a URL do site:</strong></label><br>
+                <input type="text" 
+                       id="url" 
+                       name="url" 
+                       class="url-input" 
+                       value="http://"
+                       required>
+                <input type="submit" value="Acessar" class="submit-btn">
+            </p>
+        </form>
+        
+        <div class="bookmarklet">
+            <h2>📌 Bookmarklet</h2>
+            <p>Arraste este link para sua barra de favoritos:</p>
+            <p>
+                <a href="javascript:void(window.open('http://' + window.location.host + '/proxy?url=' + encodeURIComponent(window.location.href)))" 
+                   style="background:#0066cc;color:white;padding:5px 10px;text-decoration:none;">
+                   🔄 Abrir no Proxy
+                </a>
+            </p>
+            <p>Quando estiver em um site, clique no favorito para abri-lo através do proxy.</p>
+        </div>
+        
+        <div class="features">
+            <h2>✨ Funcionalidades</h2>
+            
+            <div class="feature">
+                <strong>✅ Sites Simplificados</strong><br>
+                Remove elementos complexos que não funcionam em navegadores antigos
+            </div>
+            
+            <div class="feature">
+                <strong>✅ Compatibilidade Total</strong><br>
+                Funciona em navegadores de TV, dispositivos móveis antigos e browsers legados
+            </div>
+            
+            <div class="feature">
+                <strong>✅ Navegação Básica</strong><br>
+                Links, imagens e formulários funcionam normalmente
+            </div>
+            
+            <div class="feature">
+                <strong>✅ Segurança</strong><br>
+                Filtra conteúdo malicioso e scripts complexos
+            </div>
+        </div>
+        
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccc;">
+            <h3>Sites de exemplo:</h3>
+            <ul>
+                <li><a href="/proxy?url=http://example.com">Example.com</a></li>
+                <li><a href="/proxy?url=http://textise dot iitty">Textise (site simplificado)</a></li>
+                <li><a href="/proxy?url=http://wikipedia.org">Wikipedia</a></li>
+            </ul>
+        </div>
+        
+        <div style="margin-top: 20px; font-size: 12px; color: #666;">
+            <p><strong>Como usar:</strong></p>
+            <ol>
+                <li>Digite a URL completa (com http:// ou https://)</li>
+                <li>Clique em "Acessar"</li>
+                <li>Navegue normalmente pelos links</li>
+                <li>Use o botão voltar/avançar do navegador</li>
+            </ol>
+        </div>
+    </div>
+</body>
+</html>
