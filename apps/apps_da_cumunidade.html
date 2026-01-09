@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplicativos da Comunidade</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            min-height: calc(100vh - 40px);
+        }
+
+        header {
+            background: linear-gradient(135deg, #0078d7 0%, #005a9e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0078d7;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #0078d7;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            background: #f8f9fa;
+            padding: 0 30px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .nav-button {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            font-size: 1em;
+            color: #666;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .nav-button:hover {
+            color: #0078d7;
+            background: rgba(0, 120, 215, 0.1);
+        }
+
+        .nav-button.active {
+            color: #0078d7;
+            font-weight: 600;
+        }
+
+        .nav-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #0078d7;
+            border-radius: 3px 3px 0 0;
+        }
+
+        .main-content {
+            padding: 30px;
+            min-height: 600px;
+        }
+
+        /* Tela de Login/Registro */
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            background: none;
+            border: none;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-tab.active {
+            color: #0078d7;
+            font-weight: 600;
+            border-bottom: 3px solid #0078d7;
+            margin-bottom: -2px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #0078d7;
+            box-shadow: 0 0 0 3px rgba(0, 120, 215, 0.1);
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #0078d7 0%, #005a9e 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 120, 215, 0.3);
+        }
+
+        /* Tela de Apps */
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            font-size: 1em;
+            background: #f8f9fa;
+        }
+
+        .filter-select {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 50px;
+            background: white;
+            font-size: 1em;
+            min-width: 200px;
+        }
+
+        .upload-button {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Grid de Apps */
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            border: 1px solid #e0e0e0;
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .app-icon {
+            height: 150px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3em;
+        }
+
+        .app-icon img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+        }
+
+        .app-content {
+            padding: 20px;
+        }
+
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .app-title {
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .app-rating {
+            background: #ffc107;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        .app-description {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            height: 60px;
+            overflow: hidden;
+        }
+
+        .app-meta {
+            display: flex;
+            justify-content: space-between;
+            color: #888;
+            font-size: 0.85em;
+            margin-bottom: 20px;
+        }
+
+        .app-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-button {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .download-button {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+            color: white;
+        }
+
+        .open-button {
+            background: linear-gradient(135deg, #0078d7 0%, #005a9e 100%);
+            color: white;
+        }
+
+        .delete-button {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+        }
+
+        .action-button:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* Upload Form */
+        .upload-form input,
+        .upload-form textarea,
+        .upload-form select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .upload-form textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .file-input {
+            border: 2px dashed #ddd;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .file-input:hover {
+            border-color: #0078d7;
+        }
+
+        /* Estrelas de avaliação */
+        .stars {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .star {
+            font-size: 1.5em;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star.active {
+            color: #ffc107;
+        }
+
+        /* Responsividade */
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 10px;
+            }
+            
+            header {
+                padding: 20px;
+            }
+            
+            .user-info {
+                position: static;
+                margin-top: 15px;
+                justify-content: center;
+            }
+            
+            nav {
+                flex-wrap: wrap;
+                padding: 0;
+            }
+            
+            .nav-button {
+                flex: 1 0 50%;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <div class="logo-icon">💎</div>
+                <div>Aplicativos da Comunidade</div>
+            </div>
+            <div class="subtitle">Descubra, baixe e compartilhe aplicativos incríveis</div>
+            <div class="user-info" id="userInfo" style="display: none;">
+                <div class="avatar" id="userAvatar">U</div>
+                <div>
+                    <div id="userName">Usuário</div>
+                    <div style="font-size: 0.8em; opacity: 0.8;" id="userEmail"></div>
+                </div>
+                <button onclick="logout()" style="margin-left: 10px; padding: 5px 15px; background: rgba(255,255,255,0.3); border: none; border-radius: 5px; color: white; cursor: pointer;">
+                    Sair
+                </button>
+            </div>
+        </header>
+
+        <nav>
+            <button class="nav-button active" onclick="showSection('explore')">Explorar</button>
+            <button class="nav-button" onclick="showSection('myApps')">Meus Apps</button>
+            <button class="nav-button" onclick="showSection('upload')">Enviar App</button>
+            <button class="nav-button" onclick="showSection('admin')" id="adminTab" style="display: none;">Admin</button>
+        </nav>
+
+        <div class="main-content">
+            <!-- Seção de Login -->
+            <div id="loginSection" class="auth-container">
+                <div class="auth-tabs">
+                    <button class="auth-tab active" onclick="showAuthTab('login')">Login</button>
+                    <button class="auth-tab" onclick="showAuthTab('register')">Registro</button>
+                </div>
+                
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>Nome de usuário</label>
+                        <input type="text" id="loginUsername" placeholder="Seu nome de usuário">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="password" id="loginPassword" placeholder="Sua senha">
+                    </div>
+                    <button class="auth-button" onclick="login()">Entrar</button>
+                </div>
+
+                <div id="registerForm" style="display: none;">
+                    <div class="form-group">
+                        <label>Nome de usuário</label>
+                        <input type="text" id="regUsername" placeholder="Escolha um nome de usuário">
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" placeholder="Seu email">
+                    </div>
+                    <div class="form-group">
+                        <label>Senha</label>
+                        <input type="password" id="regPassword" placeholder="Crie uma senha">
+                    </div>
+                    <button class="auth-button" onclick="register()">Criar Conta</button>
+                </div>
+            </div>
+
+            <!-- Seção de Apps (após login) -->
+            <div id="appSections" style="display: none;">
+                <!-- Explorar -->
+                <div id="exploreSection">
+                    <div class="controls">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Buscar aplicativos..." oninput="searchApps()">
+                        </div>
+                        <select class="filter-select" id="categoryFilter" onchange="filterApps()">
+                            <option value="all">Todas as categorias</option>
+                            <option value="utility">Utilitários</option>
+                            <option value="game">Jogos</option>
+                            <option value="tool">Ferramentas</option>
+                            <option value="educational">Educacional</option>
+                            <option value="entertainment">Entretenimento</option>
+                        </select>
+                        <select class="filter-select" id="sortFilter" onchange="sortApps()">
+                            <option value="download_count">Mais baixados</option>
+                            <option value="rating">Melhor avaliados</option>
+                            <option value="newest">Mais recentes</option>
+                        </select>
+                    </div>
+                    <div class="apps-grid" id="appsGrid">
+                        <!-- Apps serão carregados aqui -->
+                    </div>
+                </div>
+
+                <!-- Meus Apps -->
+                <div id="myAppsSection" style="display: none;">
+                    <h2 style="margin-bottom: 20px;">Meus Apps Instalados</h2>
+                    <div class="apps-grid" id="myAppsGrid">
+                        <!-- Apps instalados aparecerão aqui -->
+                    </div>
+                </div>
+
+                <!-- Upload -->
+                <div id="uploadSection" style="display: none;">
+                    <h2 style="margin-bottom: 20px;">Enviar Novo App</h2>
+                    <div class="upload-form">
+                        <input type="text" id="appName" placeholder="Nome do aplicativo *">
+                        <textarea id="appDescription" placeholder="Descrição do aplicativo *"></textarea>
+                        <input type="text" id="appVersion" placeholder="Versão (ex: 1.0.0)" value="1.0.0">
+                        <select id="appCategory">
+                            <option value="utility">Utilitário</option>
+                            <option value="game">Jogo</option>
+                            <option value="tool">Ferramenta</option>
+                            <option value="educational">Educacional</option>
+                            <option value="entertainment">Entretenimento</option>
+                        </select>
+                        <input type="text" id="appTags" placeholder="Tags (separadas por vírgula)">
+                        
+                        <div class="file-input" onclick="document.getElementById('appFile').click()">
+                            <div>📁 Clique para selecionar o arquivo HTML do app *</div>
+                            <div style="font-size: 0.9em; color: #666;" id="appFileName">Nenhum arquivo selecionado</div>
+                        </div>
+                        <input type="file" id="appFile" accept=".html" style="display: none;" onchange="updateFileName()">
+                        
+                        <div class="file-input" onclick="document.getElementById('iconFile').click()">
+                            <div>🖼️ Clique para selecionar ícone (opcional)</div>
+                            <div style="font-size: 0.9em; color: #666;" id="iconFileName">Nenhum arquivo selecionado</div>
+                        </div>
+                        <input type="file" id="iconFile" accept=".png,.jpg,.jpeg" style="display: none;" onchange="updateIconName()">
+                        
+                        <button class="upload-button" style="width: 100%; margin-top: 20px;" onclick="uploadApp()">
+                            Enviar Aplicativo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Admin -->
+                <div id="adminSection" style="display: none;">
+                    <h2 style="margin-bottom: 20px;">Aprovação de Apps</h2>
+                    <div id="pendingApps">
+                        <!-- Apps pendentes aparecerão aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes -->
+    <div class="modal-overlay" id="detailsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <div class="modal-title" id="modalAppName">App Name</div>
+                <button class="close-modal" onclick="closeModal()">×</button>
+            </div>
+            <div id="modalContent">
+                <!-- Conteúdo do modal será preenchido dinamicamente -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuração
+        const BACKEND_URL = 'http://localhost:5000/api';
+        let currentUser = null;
+        let currentSection = 'explore';
+        let allApps = [];
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            checkLogin();
+        });
+
+        // Funções de Autenticação
+        async function login() {
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            if (!username || !password) {
+                alert('Por favor, preencha todos os campos');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, password})
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    currentUser = data.user;
+                    localStorage.setItem('community_user', JSON.stringify(currentUser));
+                    showAppSections();
+                    loadApps();
+                } else {
+                    alert(data.error || 'Erro no login');
+                }
+            } catch (error) {
+                alert('Erro de conexão com o servidor');
+            }
+        }
+
+        async function register() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            
+            if (!username || !email || !password) {
+                alert('Por favor, preencha todos os campos');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({username, email, password})
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert('Conta criada com sucesso! Faça login.');
+                    showAuthTab('login');
+                } else {
+                    alert(data.error || 'Erro no registro');
+                }
+            } catch (error) {
+                alert('Erro de conexão com o servidor');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('community_user');
+            checkLogin();
+        }
+
+        function checkLogin() {
+            const savedUser = localStorage.getItem('community_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showAppSections();
+                loadApps();
+            } else {
+                showLoginSection();
+            }
+        }
+
+        function showAuthTab(tab) {
+            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+            document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+            event.target.classList.add('active');
+        }
+
+        // Funções de Navegação
+        function showSection(section) {
+            document.querySelectorAll('.nav-button').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('#appSections > div').forEach(div => {
+                div.style.display = 'none';
+            });
+            
+            document.getElementById(`${section}Section`).style.display = 'block';
+            currentSection = section;
+            
+            if (section === 'explore') {
+                loadApps();
+            } else if (section === 'myApps') {
+                loadMyApps();
+            } else if (section === 'admin' && currentUser?.is_admin) {
+                loadPendingApps();
+            }
+        }
+
+        function showLoginSection() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('appSections').style.display = 'none';
+        }
+
+        function showAppSections() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('appSections').style.display = 'block';
+            document.getElementById('userInfo').style.display = 'flex';
+            
+            // Atualizar informações do usuário
+            document.getElementById('userName').textContent = currentUser.username;
+            document.getElementById('userEmail').textContent = currentUser.email;
+            document.getElementById('userAvatar').textContent = currentUser.username.charAt(0).toUpperCase();
+            
+            // Mostrar aba admin se for admin
+            if (currentUser.is_admin) {
+                document.getElementById('adminTab').style.display = 'block';
+            }
+        }
+
+        // Funções de Apps
+        async function loadApps() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/apps`);
+                allApps = await response.json();
+                displayApps(allApps);
+            } catch (error) {
+                console.error('Erro ao carregar apps:', error);
+                document.getElementById('appsGrid').innerHTML = '<p style="text-align: center; color: #666;">Erro ao carregar aplicativos</p>';
+            }
+        }
+
+        function displayApps(apps) {
+            const grid = document.getElementById('appsGrid');
+            grid.innerHTML = '';
+            
+            if (apps.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #666; grid-column: 1 / -1;">Nenhum aplicativo encontrado</p>';
+                return;
+            }
+            
+            apps.forEach(app => {
+                const appElement = document.createElement('div');
+                appElement.className = 'app-card';
+                appElement.innerHTML = `
+                    <div class="app-icon">
+                        ${app.icon_path ? `<img src="${app.icon_path}" alt="${app.name}">` : '📱'}
+                    </div>
+                    <div class="app-content">
+                        <div class="app-header">
+                            <div class="app-title">${app.name}</div>
+                            <div class="app-rating">⭐ ${app.rating.toFixed(1)}</div>
+                        </div>
+                        <div class="app-description">${app.description}</div>
+                        <div class="app-meta">
+                            <div>👤 ${app.author}</div>
+                            <div>⬇️ ${app.download_count}</div>
+                        </div>
+                        <div class="app-actions">
+                            <button class="action-button download-button" onclick="downloadApp('${app.id}')">Baixar</button>
+                            <button class="action-button open-button" onclick="openApp('${app.id}')">Abrir</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(appElement);
+            });
+        }
+
+        function searchApps() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const filteredApps = allApps.filter(app => 
+                app.name.toLowerCase().includes(searchTerm) ||
+                app.description.toLowerCase().includes(searchTerm) ||
+                app.tags.some(tag => tag.toLowerCase().includes(searchTerm))
+            );
+            displayApps(filteredApps);
+        }
+
+        function filterApps() {
+            const category = document.getElementById('categoryFilter').value;
+            let filteredApps = allApps;
+            
+            if (category !== 'all') {
+                filteredApps = allApps.filter(app => app.category === category);
+            }
+            
+            displayApps(filteredApps);
+        }
+
+        async function sortApps() {
+            const sortBy = document.getElementById('sortFilter').value;
+            try {
+                const response = await fetch(`${BACKEND_URL}/apps?sort=${sortBy}`);
+                allApps = await response.json();
+                displayApps(allApps);
+            } catch (error) {
+                console.error('Erro ao ordenar apps:', error);
+            }
+        }
+
+        async function downloadApp(appId) {
+            if (!currentUser) {
+                alert('Faça login para baixar aplicativos');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/apps/${appId}/download`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({user_id: currentUser.id})
+                });
+                
+                if (response.ok) {
+                    // Criar blob e fazer download
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${appId}.html`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    
+                    alert('Aplicativo baixado com sucesso!');
+                } else {
+                    const error = await response.json();
+                    alert(error.error || 'Erro ao baixar aplicativo');
+                }
+            } catch (error) {
+                console.error('Erro no download:', error);
+                alert('Erro ao baixar aplicativo');
+            }
+        }
+
+        function openApp(appId) {
+            // Encontrar o app na lista
+            const app = allApps.find(a => a.id === appId);
+            if (app) {
+                // Usar abrir_custom para abrir o app
+                const appContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=1200, initial-scale=1.0">
+                        <title>${app.name}</title>
+                        <style>
+                            body { margin: 0; padding: 20px; font-family: Arial, sans-serif; }
+                            .app-header { margin-bottom: 20px; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="app-header">
+                            <h1>${app.name}</h1>
+                            <p>${app.description}</p>
+                            <p><small>Por ${app.author} | Versão ${app.version}</small></p>
+                        </div>
+                        <div id="app-content">
+                            <p style="color: #666; text-align: center; padding: 50px;">
+                                Este aplicativo precisa ser instalado para funcionar completamente.<br>
+                                <button onclick="parent.postMessage('install ${appId}', '*')" 
+                                        style="margin-top: 20px; padding: 10px 20px; background: #0078d7; color: white; border: none; border-radius: 5px;">
+                                    Instalar Agora
+                                </button>
+                            </p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                window.parent.postMessage(`abrir_custom ${app.name} seguro ${appContent}`, '*');
+            }
+        }
+
+        async function loadMyApps() {
+            // Carregar apps instalados do localStorage
+            const installedApps = JSON.parse(localStorage.getItem('installed_apps') || '[]');
+            const grid = document.getElementById('myAppsGrid');
+            grid.innerHTML = '';
+            
+            if (installedApps.length === 0) {
+                grid.innerHTML = '<p style="text-align: center; color: #666; grid-column: 1 / -1;">Você não tem aplicativos instalados</p>';
+                return;
+            }
+            
+            // Nota: Em um sistema real, você buscaria os detalhes dos apps do servidor
+            installedApps.forEach(app => {
+                const appElement = document.createElement('div');
+                appElement.className = 'app-card';
+                appElement.innerHTML = `
+                    <div class="app-icon">📱</div>
+                    <div class="app-content">
+                        <div class="app-title">${app.name}</div>
+                        <div class="app-description">${app.description}</div>
+                        <div class="app-meta">
+                            <div>Versão ${app.version}</div>
+                            <div>Instalado em ${new Date(app.installed_at).toLocaleDateString()}</div>
+                        </div>
+                        <div class="app-actions">
+                            <button class="action-button open-button" onclick="openInstalledApp('${app.id}')">Abrir</button>
+                            <button class="action-button delete-button" onclick="uninstallApp('${app.id}')">Desinstalar</button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(appElement);
+            });
+        }
+
+        // Upload de Apps
+        function updateFileName() {
+            const fileInput = document.getElementById('appFile');
+            const fileName = document.getElementById('appFileName');
+            fileName.textContent = fileInput.files[0]?.name || 'Nenhum arquivo selecionado';
+        }
+
+        function updateIconName() {
+            const fileInput = document.getElementById('iconFile');
+            const fileName = document.getElementById('iconFileName');
+            fileName.textContent = fileInput.files[0]?.name || 'Nenhum arquivo selecionado';
+        }
+
+        async function uploadApp() {
+            if (!currentUser) {
+                alert('Faça login para enviar aplicativos');
+                return;
+            }
+            
+            const appName = document.getElementById('appName').value;
+            const description = document.getElementById('appDescription').value;
+            const version = document.getElementById('appVersion').value;
+            const category = document.getElementById('appCategory').value;
+            const tags = document.getElementById('appTags').value;
+            const appFile = document.getElementById('appFile').files[0];
+            const iconFile = document.getElementById('iconFile').files[0];
+            
+            if (!appName || !description || !appFile) {
+                alert('Preencha todos os campos obrigatórios (*)');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('user_id', currentUser.id);
+            formData.append('name', appName);
+            formData.append('description', description);
+            formData.append('version', version);
+            formData.append('category', category);
+            formData.append('tags', tags);
+            formData.append('app_file', appFile);
+            if (iconFile) {
+                formData.append('icon_file', iconFile);
+            }
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/apps/upload`, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(data.message + (data.requires_approval ? '\nSeu app será revisado por um administrador.' : ''));
+                    // Limpar formulário
+                    document.getElementById('appName').value = '';
+                    document.getElementById('appDescription').value = '';
+                    document.getElementById('appTags').value = '';
+                    document.getElementById('appFile').value = '';
+                    document.getElementById('iconFile').value = '';
+                    document.getElementById('appFileName').textContent = 'Nenhum arquivo selecionado';
+                    document.getElementById('iconFileName').textContent = 'Nenhum arquivo selecionado';
+                } else {
+                    alert(data.error || 'Erro ao enviar aplicativo');
+                }
+            } catch (error) {
+                console.error('Erro no upload:', error);
+                alert('Erro ao enviar aplicativo');
+            }
+        }
+
+        // Funções Admin
+        async function loadPendingApps() {
+            if (!currentUser?.is_admin) return;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/admin/apps/pending`);
+                const apps = await response.json();
+                
+                const container = document.getElementById('pendingApps');
+                container.innerHTML = '';
+                
+                if (apps.length === 0) {
+                    container.innerHTML = '<p style="text-align: center; color: #666;">Nenhum app pendente</p>';
+                    return;
+                }
+                
+                apps.forEach(app => {
+                    const appElement = document.createElement('div');
+                    appElement.className = 'app-card';
+                    appElement.innerHTML = `
+                        <div class="app-content">
+                            <div class="app-title">${app.name}</div>
+                            <div class="app-description">${app.description}</div>
+                            <div class="app-meta">
+                                <div>👤 ${app.author}</div>
+                                <div>Enviado em ${new Date(app.created_at).toLocaleDateString()}</div>
+                            </div>
+                            <div class="app-actions">
+                                <button class="action-button open-button" onclick="reviewApp('${app.id}')">Revisar</button>
+                                <button class="action-button download-button" onclick="approveApp('${app.id}')">Aprovar</button>
+                                <button class="action-button delete-button" onclick="rejectApp('${app.id}')">Rejeitar</button>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(appElement);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar apps pendentes:', error);
+            }
+        }
+
+        async function approveApp(appId) {
+            if (!confirm('Aprovar este aplicativo?')) return;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/admin/apps/${appId}/approve`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    alert('App aprovado com sucesso!');
+                    loadPendingApps();
+                }
+            } catch (error) {
+                console.error('Erro ao aprovar app:', error);
+            }
+        }
+
+        async function rejectApp(appId) {
+            if (!confirm('Rejeitar este aplicativo? O arquivo será deletado.')) return;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}/admin/apps/${appId}/reject`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    alert('App rejeitado!');
+                    loadPendingApps();
+                }
+            } catch (error) {
+                console.error('Erro ao rejeitar app:', error);
+            }
+        }
+
+        function reviewApp(appId) {
+            alert(`Abrindo preview do app ${appId}\nEm um sistema real, você abriria o app para revisão.`);
+            // Implementar visualização do app
+        }
+
+        // Funções Auxiliares
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        // Instalação de Apps
+        async function installApp(appId) {
+            try {
+                const response = await fetch(`${BACKEND_URL}/apps/${appId}`);
+                const app = await response.json();
+                
+                // Salvar app localmente
+                const installedApps = JSON.parse(localStorage.getItem('installed_apps') || '[]');
+                installedApps.push({
+                    id: app.id,
+                    name: app.name,
+                    description: app.description,
+                    version: app.version,
+                    installed_at: new Date().toISOString()
+                });
+                
+                localStorage.setItem('installed_apps', JSON.stringify(installedApps));
+                
+                // Baixar arquivo
+                await downloadApp(appId);
+                
+                alert(`${app.name} instalado com sucesso!`);
+                loadMyApps();
+            } catch (error) {
+                console.error('Erro na instalação:', error);
+                alert('Erro ao instalar aplicativo');
+            }
+        }
+
+        function uninstallApp(appId) {
+            if (!confirm('Desinstalar este aplicativo?')) return;
+            
+            const installedApps = JSON.parse(localStorage.getItem('installed_apps') || '[]');
+            const updatedApps = installedApps.filter(app => app.id !== appId);
+            localStorage.setItem('installed_apps', JSON.stringify(updatedApps));
+            
+            loadMyApps();
+            alert('Aplicativo desinstalado!');
+        }
+
+        function openInstalledApp(appId) {
+            const installedApps = JSON.parse(localStorage.getItem('installed_apps') || '[]');
+            const app = installedApps.find(a => a.id === appId);
+            
+            if (app) {
+                // Aqui você carregaria o arquivo HTML real salvo
+                const appContent = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <meta charset="UTF-8">
+                        <meta name="viewport" content="width=1200, initial-scale=1.0">
+                        <title>${app.name}</title>
+                    </head>
+                    <body style="margin: 0; padding: 20px; font-family: Arial, sans-serif;">
+                        <h1>${app.name}</h1>
+                        <p>Este é o aplicativo ${app.name} (Versão ${app.version})</p>
+                        <p>Instalado em ${new Date(app.installed_at).toLocaleDateString()}</p>
+                        <div style="background: #f0f0f0; padding: 20px; border-radius: 10px; margin-top: 20px;">
+                            <h3>Área do Aplicativo</h3>
+                            <p>Em um aplicativo real, aqui estaria o conteúdo funcional.</p>
+                            <p>Este é um exemplo de aplicativo instalado localmente.</p>
+                        </div>
+                    </body>
+                    </html>
+                `;
+                
+                window.parent.postMessage(`abrir_custom ${app.name} seguro ${appContent}`, '*');
+            }
+        }
+
+        // Ouvinte para mensagens de instalação
+        window.addEventListener('message', (event) => {
+            if (event.data.startsWith('install ')) {
+                const appId = event.data.split(' ')[1];
+                installApp(appId);
+            }
+        });
+    </script>
+</body>
+</html>
