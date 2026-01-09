@@ -1,6 +1,6 @@
 [
-  {"name": "miguel", "folder": "miguel"},
-  {"name": "isabelle", "folder": "isabelle"},
-  {"name": "rosinha", "folder": "rosinha"},
-  {"name": "vagner", "folder": "vagner"}
+  {
+    "name": "miguel",
+    "folder": "criador"
+  }
 ]
