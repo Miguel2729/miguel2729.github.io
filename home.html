@@ -2315,39 +2315,61 @@ function verificarEventosHoje() {
   const eventos = JSON.parse(localStorage.getItem(eventosKey)) || {};
   if (eventos[dia]) alert(`evento hoje, Você tem um evento marcado: ${eventos[dia]}`);
 }
-
 async function mostrarTodosAplicativos() {
   const botao = document.getElementById("verTudo");
   const container = document.getElementById("apps");
   const resultadosPesquisa = document.getElementById("resultadosPesquisa");
   
+  // Se o botão diz "Ocultar", volte para a visualização normal
   if (botao.textContent === "Ocultar") {
+    // Voltar para visualização normal (8 primeiros apps)
     container.innerHTML = "";
     container.style.display = "flex";
     container.style.flexWrap = "wrap";
     container.style.gap = "6px";
     resultadosPesquisa.style.display = "none";
-    await renderizarApps();
+    
+    // Mostrar apenas os primeiros 8 apps
+    const appsParaMostrar = listaAplicativos.slice(0, 8);
+    for (const nomeArquivo of appsParaMostrar) {
+      const nomeFormatado = formatarNomeApp(nomeArquivo);
+      const icone = await criarElementoIcone(nomeArquivo, nomeFormatado);
+      container.appendChild(icone);
+    }
+    
     botao.textContent = "Ver tudo";
     return;
   }
-
+  
+  // Se chegou aqui, é para mostrar TODOS os apps
+  // PRIMEIRO: garantir que temos apps carregados
   if (!listaAplicativos || listaAplicativos.length === 0) {
-    console.warn("Lista de aplicativos ainda não carregada.");
-    return;
+    // Tenta carregar os apps agora
+    const response = await fetch("apps.json");
+    const appsDoArquivo = await response.json();
+    
+    // Pega apps instalados
+    const appsInstaladosSalvos = localStorage.getItem(getCustomKey(APPS_INSTALADOS_KEY));
+    const appsInstaladosLocais = appsInstaladosSalvos ? JSON.parse(appsInstaladosSalvos) : [];
+    
+    // Junta tudo
+    listaAplicativos = [...new Set([...appsDoArquivo, ...appsInstaladosLocais])];
   }
-
+  
+  // Limpar container
   container.innerHTML = "";
   container.style.display = "flex";
   container.style.flexWrap = "wrap";
-  container.style.gap = "6px";
+  container.style.gap = "8px";
   resultadosPesquisa.style.display = "none";
-
+  
+  // Mostrar TODOS os apps
   for (const nomeArquivo of listaAplicativos) {
     const nomeFormatado = formatarNomeApp(nomeArquivo);
     const icone = await criarElementoIcone(nomeArquivo, nomeFormatado);
     container.appendChild(icone);
   }
+  
   botao.textContent = "Ocultar";
 }
 
@@ -2632,6 +2654,27 @@ function carregarAppsInstaladosVirtual() {
   const storage = JSON.parse(localStorage.getItem(`virtual_storage_${virtualUserUID}`));
   return storage && storage.apps ? storage.apps.installed : [];
 }
+
+// Garantir que a lista de apps seja carregada quando a página carrega
+window.addEventListener('load', function() {
+  // Carrega os apps após 1 segundo (tempo para tudo inicializar)
+  setTimeout(async function() {
+    if (!listaAplicativos || listaAplicativos.length === 0) {
+      try {
+        const response = await fetch("apps.json");
+        const appsDoArquivo = await response.json();
+        
+        const appsInstaladosSalvos = localStorage.getItem(getCustomKey(APPS_INSTALADOS_KEY));
+        const appsInstaladosLocais = appsInstaladosSalvos ? JSON.parse(appsInstaladosSalvos) : [];
+        
+        listaAplicativos = [...new Set([...appsDoArquivo, ...appsInstaladosLocais])];
+        console.log("Apps carregados no carregamento da página:", listaAplicativos.length);
+      } catch (error) {
+        console.error("Erro ao carregar apps:", error);
+      }
+    }
+  }, 1000);
+});
 </script>
 <div id="modalEditor" style="position:fixed; inset:0; background:rgba(0,0,0,0.75); display:none; align-items:center; justify-content:center; z-index:10000;">
   <div style="background:#111; padding:20px; border-radius:10px; width:500px; max-width:90%; color:white; display:flex; flex-direction:column;">
