@@ -179,23 +179,7 @@ iframe#homeIframe {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15); /* Sombra mais forte */
 }
 
-.splash-screen {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Gradiente */
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-  transition: opacity 0.3s ease-out;
-  border-radius: 12px; /* Mesmas bordas arredondadas */
-}
+
 
 .icones {
   display: flex;
@@ -203,7 +187,41 @@ iframe#homeIframe {
 }
 
 
+.splash-screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #000000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    transition: opacity 0.3s ease-out;
+    border-radius: 12px;
+    opacity: 1;
+}
 
+.splash-icon {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+    animation: splashFadeIn 0.5s ease-out;
+}
+
+@keyframes splashFadeIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
 
 
 
@@ -1270,15 +1288,39 @@ async function criarJanelaCustom(nome, modo, codigoHTML) {
         janela.style.transform = "translate(-50%, -50%) scale(0.9)";
     }
 
-    // 4. Cria a splash screen simplificada
-    const splash = document.createElement("div");
-    splash.className = "splash-screen";
-    splash.innerHTML = `
-        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
-            <div style="width: 50px; height: 50px; background: #0078d7; border-radius: 8px; margin-bottom: 10px;"></div>
-            <div>${nome}</div>
-        </div>
-    `;
+      
+// 4. Cria a splash screen (fundo preto com ícone grande)
+const splash = document.createElement("div");
+splash.className = "splash-screen";
+
+// Obtém o caminho do ícone
+const iconPath = "imgs/app.png"
+console.log("Ícone para splash:", nomeArquivo, "->", iconPath); // DEBUG
+
+// Cria o elemento de imagem
+const splashIcon = document.createElement("img");
+splashIcon.className = "splash-icon";
+
+// Tenta carregar o ícone personalizado primeiro
+const testImage = new Image();
+testImage.onload = function() {
+    console.log("Ícone personalizado carregado:", iconPath);
+    splashIcon.src = iconPath;
+};
+testImage.onerror = function() {
+    console.log("Ícone personalizado falhou, usando padrão");
+    splashIcon.src = 'imgs/app.png';
+};
+testImage.src = iconPath;
+
+// Adiciona fallback caso a imagem ainda não carregue
+splashIcon.onerror = function() {
+    console.log("Fallback: usando ícone padrão");
+    this.src = 'imgs/app.png';
+};
+
+splash.appendChild(splashIcon);
+splash.appendChild(splashIcon);
 
     // 5. Cria o conteúdo (inicialmente oculto)
     const conteudo = document.createElement("div");
@@ -1854,24 +1896,41 @@ async function criarJanela(nomeArquivo, isAdmin = false) {
         janela.style.transform = "translate(-50%, -50%) scale(0.9)";
     }
 
-    // 4. Cria a splash screen
-    const splash = document.createElement("div");
-    splash.className = "splash-screen";
-    
-    // Verifica se a splash screen existe
-    const splashImg = `splash/${nomeArquivo.replace('.html', '.png')}`;
-    const splashExists = await fetch(splashImg, { method: 'HEAD' }).then(res => res.ok).catch(() => false);
-    
-    if (splashExists) {
-        splash.style.backgroundImage = `url('${splashImg}')`;
-    } else {
-        splash.innerHTML = `
-            <div class="splash-loading">
-                <div class="splash-spinner"></div>
-                <div>${limparNome(nomeArquivo).replace(/_/g, " ")}</div>
-            </div>
-        `;
-    }
+   // 4. Cria a splash screen (fundo preto com ícone grande)
+const splash = document.createElement("div");
+splash.className = "splash-screen";
+
+// Cria o elemento de imagem
+const splashIcon = document.createElement("img");
+splashIcon.className = "splash-icon";
+
+// Converte o nome do arquivo para o padrão de ícone
+const appName = nomeArquivo.replace('.html', '');
+const iconName = appName.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+const customIconPath = `icons/${iconName}.png`;
+const defaultIconPath = 'imgs/app.png';
+
+console.log("Tentando carregar ícone:", customIconPath);
+
+// Tenta carregar o ícone personalizado
+const testImg = new Image();
+testImg.onload = function() {
+    console.log("Sucesso: ícone personalizado carregado");
+    splashIcon.src = customIconPath;
+};
+testImg.onerror = function() {
+    console.log("Falha: usando ícone padrão");
+    splashIcon.src = defaultIconPath;
+};
+testImg.src = customIconPath;
+
+// Fallback adicional
+splashIcon.onerror = function() {
+    console.log("Fallback final: usando ícone padrão");
+    this.src = defaultIconPath;
+};
+
+splash.appendChild(splashIcon);
 
     // 5. Cria o conteúdo (inicialmente oculto)
     const conteudo = document.createElement("div");
