@@ -440,16 +440,25 @@ iframe#homeIframe {
 </div>
 <script>
 async function getAppIconPath(appName) {
-  const cleanName = appName.replace('.html', '').split('/')[0];
-  const iconName = cleanName.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
+  // Converte o nome do arquivo para o padrão de ícone
+  let iconName;
+  
+  // Se for um arquivo index.html dentro de uma pasta
+  if (appName.includes('/index.html')) {
+    // Pega o nome da pasta (ex: app_store/index.html -> app_store)
+    iconName = appName.split('/')[0];
+  } else {
+    // Remove .html e pasta se houver
+    iconName = appName
+      .replace(/\.html$/, '')
+      .replace(/^.*\//, '');
+  }
+  
+  // Normaliza o nome do ícone
+  iconName = iconName.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
   const customIconPath = `icons/${iconName}.png`;
   
-  return new Promise((resolve) => {
-    const img = new Image();
-    img.onload = () => resolve(customIconPath);
-    img.onerror = () => resolve('imgs/app.png');
-    img.src = customIconPath;
-  });
+  return customIconPath
 }
 
 function formatarNomeApp(nomeArquivo) {
@@ -1896,39 +1905,35 @@ async function criarJanela(nomeArquivo, isAdmin = false) {
         janela.style.transform = "translate(-50%, -50%) scale(0.9)";
     }
 
-   // 4. Cria a splash screen (fundo preto com ícone grande)
+// 4. Cria a splash screen (fundo preto com ícone grande)
 const splash = document.createElement("div");
 splash.className = "splash-screen";
+
+// Obtém o caminho do ícone
+const customIconPath = await getAppIconPath(nomeArquivo);
+const defaultIconPath = 'imgs/app.png';
+
+console.log("Tentando carregar ícone para:", nomeArquivo, "->", customIconPath);
 
 // Cria o elemento de imagem
 const splashIcon = document.createElement("img");
 splashIcon.className = "splash-icon";
-
-// Converte o nome do arquivo para o padrão de ícone
-const appName = nomeArquivo.replace('.html', '');
-const iconName = appName.replace(/\s+/g, '_').replace(/[^\w-]/g, '');
-const customIconPath = `icons/${iconName}.png`;
-const defaultIconPath = 'imgs/app.png';
-
-console.log("Tentando carregar ícone:", customIconPath);
+splashIcon.alt = `Ícone ${nomeArquivo}`;
 
 // Tenta carregar o ícone personalizado
-const testImg = new Image();
-testImg.onload = function() {
-    console.log("Sucesso: ícone personalizado carregado");
+const imgTest = new Image();
+imgTest.onload = function() {
+    console.log("✅ Ícone personalizado carregado:", customIconPath);
     splashIcon.src = customIconPath;
 };
-testImg.onerror = function() {
-    console.log("Falha: usando ícone padrão");
+imgTest.onerror = function() {
+    console.log("❌ Ícone personalizado falhou, usando padrão");
     splashIcon.src = defaultIconPath;
 };
-testImg.src = customIconPath;
 
-// Fallback adicional
-splashIcon.onerror = function() {
-    console.log("Fallback final: usando ícone padrão");
-    this.src = defaultIconPath;
-};
+// Começa tentando com o ícone padrão enquanto testa o personalizado
+splashIcon.src =customIconPath;
+imgTest.src = customIconPath;
 
 splash.appendChild(splashIcon);
 
